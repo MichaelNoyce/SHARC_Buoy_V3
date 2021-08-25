@@ -99,18 +99,49 @@ void setup() {
 
 void loop() {
 
+  //Retrieve X Acceleration and print out 
   Wire.beginTransmission(ADDRESS);
   Wire.write(ACCEL_XOUT_H);
   Wire.endTransmission();
-  
   Wire.requestFrom(ADDRESS,2,1);  
   for(int i = 0; i<2 ; i++)
   {
     rawAX[i] = Wire.read();
   }
   rawACCX = rawAX[1] | rawAX[0]<<8;
+  //Serial.println(rawACCX/16384, DEC); 
 
-  Serial.println(rawACCX/16384, DEC); 
-  delay(100);
+  
+  //Retrieve Y Acceleration and print out 
+  Wire.beginTransmission(ADDRESS);
+  Wire.write(ACCEL_YOUT_H);
+  Wire.endTransmission();
+  Wire.requestFrom(ADDRESS,2,1);  
+  for(int i = 0; i<2 ; i++)
+  {
+    rawAY[i] = Wire.read();
+  }
+  rawACCY = rawAY[1] | rawAY[0]<<8;
+  Serial.println(rawACCY/16384, DEC); 
+
+    //Retrieve Y Acceleration and print out 
+  Wire.beginTransmission(ADDRESS);
+  Wire.write(ACCEL_ZOUT_H);
+  Wire.endTransmission();
+  Wire.requestFrom(ADDRESS,2,1);  
+  for(int i = 0; i<2 ; i++)
+  {
+    rawAZ[i] = Wire.read();
+  }
+  rawACCZ = rawAZ[1] | rawAZ[0]<<8;
+  Serial.println(rawACCZ/16384, DEC); 
+
+
+  
+  delay(500); //Pseudo Sampling delay (make more accurate by updating SMPLRT_DIV)
+
+
+
+  
 
 }
