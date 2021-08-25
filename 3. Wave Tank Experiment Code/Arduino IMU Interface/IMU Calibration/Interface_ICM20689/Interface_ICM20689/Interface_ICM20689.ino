@@ -109,7 +109,8 @@ void loop() {
     rawAX[i] = Wire.read();
   }
   rawACCX = rawAX[1] | rawAX[0]<<8;
-  //Serial.println(rawACCX/16384, DEC); 
+  Serial.print(rawACCX/16384*9.81, DEC);
+  Serial.print("\t"); 
 
   
   //Retrieve Y Acceleration and print out 
@@ -122,7 +123,8 @@ void loop() {
     rawAY[i] = Wire.read();
   }
   rawACCY = rawAY[1] | rawAY[0]<<8;
-  Serial.println(rawACCY/16384, DEC); 
+  Serial.print(rawACCY/16384*9.81, DEC);
+  Serial.print("\t"); 
 
     //Retrieve Y Acceleration and print out 
   Wire.beginTransmission(ADDRESS);
@@ -134,7 +136,8 @@ void loop() {
     rawAZ[i] = Wire.read();
   }
   rawACCZ = rawAZ[1] | rawAZ[0]<<8;
-  Serial.println(rawACCZ/16384, DEC); 
+  Serial.print(rawACCZ/16384*9.81, DEC);
+  Serial.print("\n"); 
 
 
   
