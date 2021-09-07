@@ -90,3 +90,58 @@ uint8_t ICM20689::getDeviceID() {
     I2Cdev::readBits(devAddr, ICM20689_RA_WHO_AM_I, ICM20689_WHO_AM_I_BIT, ICM20689_WHO_AM_I_LENGTH, buffer);
     return buffer[0];
 }
+
+
+//ACCEL_OUT Registers
+
+/** Get 3-axis accelerometer readings.
+ * @param x 16-bit signed integer container for X-axis acceleration
+ * @param y 16-bit signed integer container for Y-axis acceleration
+ * @param z 16-bit signed integer container for Z-axis acceleration
+ * @see 
+ */
+void ICM20689::getAcceleration(int16_t* x, int16_t* y, int16_t* z) {
+    I2Cdev::readBytes(devAddr, ICM20689_ACCEL_XOUT_H, 6, buffer);
+    *x = (((int16_t)buffer[0]) << 8) | buffer[1];
+    *y = (((int16_t)buffer[2]) << 8) | buffer[3];
+    *z = (((int16_t)buffer[4]) << 8) | buffer[5];
+}
+
+/** Get X-axis accelerometer reading.
+ * @return X-axis acceleration measurement in 16-bit 2's complement format
+ * @see getMotion6()
+ * @see MPU6050_RA_ACCEL_XOUT_H
+ */
+int16_t ICM20689::getAccelerationX() {
+    I2Cdev::readBytes(devAddr, ICM20689_ACCEL_XOUT_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+/** Get Y-axis accelerometer reading.
+ * @return Y-axis acceleration measurement in 16-bit 2's complement format
+ * @see getMotion6()
+ * @see MPU6050_RA_ACCEL_YOUT_H
+ */
+int16_t ICM20689::getAccelerationY() {
+    I2Cdev::readBytes(devAddr, ICM20689_ACCEL_YOUT_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+/** Get Z-axis accelerometer reading.
+ * @return Z-axis acceleration measurement in 16-bit 2's complement format
+ * @see getMotion6()
+ * @see MPU6050_RA_ACCEL_ZOUT_H
+ */
+int16_t ICM20689::getAccelerationZ() {
+    I2Cdev::readBytes(devAddr, ICM20689_ACCEL_ZOUT_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+
+// TEMP_OUT_* registers
+
+/** Get current internal temperature.
+ * @return Temperature reading in 16-bit 2's complement format
+ * @see MPU6050_RA_TEMP_OUT_H
+ */
+int16_t ICM20689::getTemperature() {
+    I2Cdev::readBytes(devAddr, ICM20689_RA_TEMP_OUT_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
+}

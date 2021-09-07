@@ -85,6 +85,15 @@
 #define ICM20689_WHO_AM_I_BIT               7
 #define ICM20689_WHO_AM_I_LENGTH            8
 
+//ACCEL_OUT Registers
+#define ICM20689_ACCEL_XOUT_H            0x3B
+#define ICM20689_ACCEL_XOUT_L            0x3C
+#define ICM20689_ACCEL_YOUT_H            0x3D
+#define ICM20689_ACCEL_YOUT_L            0x3E
+#define ICM20689_ACCEL_ZOUT_H            0x3F
+#define ICM20689_ACCEL_ZOUT_L            0x40
+
+//GYRO_OUT Registers 
 
 
 class ICM20689 { 
@@ -124,6 +133,16 @@ class ICM20689 {
     //WHO_AM_I Register
      uint8_t getDeviceID();
      bool testConnection();
+
+     //TEMP_OUT Registers 
+     int16_t getTemperature(); 
+
+     //ACCEL_OUT Registers 
+     void getAcceleration(int16_t* x, int16_t* y, int16_t* z);
+     int16_t getAccelerationX();
+     int16_t getAccelerationY();
+     int16_t getAccelerationZ();
+     
 
     private:
         uint8_t devAddr;

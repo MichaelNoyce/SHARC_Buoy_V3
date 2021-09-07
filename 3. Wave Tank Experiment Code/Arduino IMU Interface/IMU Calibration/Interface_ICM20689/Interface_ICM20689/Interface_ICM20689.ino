@@ -13,7 +13,7 @@
 //Acceleration and Orientation Variables
 byte rawAX[2], rawAY[2], rawAZ[2];
 byte rawGX[2], rawGY[2], rawGZ[2];
-float rawACCX, rawACCY, rawACCZ;
+int rawACCX, rawACCY, rawACCZ;
 float rawGYROX, rawGYROY, rawGYROZ;
 bool connectionStatus;
 
@@ -38,7 +38,9 @@ void loop() {
   else
     Serial.println("Failed!");
 
+  rawACCX = ICM20689Test.getAccelerationX(); 
 
+  Serial.println(rawACCX, DEC);
 
   //Serial.print(rawACCX/16384*9.81, DEC);
   //Serial.print("\t"); 
