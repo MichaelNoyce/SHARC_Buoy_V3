@@ -40,10 +40,10 @@ void loop() {
 
   rawACCX = ICM20689Test.getAccelerationX(); 
 
-  Serial.println(rawACCX, DEC);
+  //Serial.println(rawACCX, DEC);
 
-  //Serial.print(rawACCX/16384*9.81, DEC);
-  //Serial.print("\t"); 
+  Serial.print(rawACCX/16384*9.81, DEC);
+  Serial.print("\t"); 
 
   //Serial.print(rawACCY/16384*9.81, DEC);
   //Serial.print("\t"); 

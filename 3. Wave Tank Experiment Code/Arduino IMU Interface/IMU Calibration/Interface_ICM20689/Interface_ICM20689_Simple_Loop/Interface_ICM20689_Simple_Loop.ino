@@ -144,5 +144,5 @@ void loop() {
   Serial.print(rawACCZ/16384*9.81, DEC);
   Serial.print("\n"); 
   
-  delay(500); //Pseudo Sampling delay (make more accurate by updating SMPLRT_DIV)
+  delay(1000); //Pseudo Sampling delay (make more accurate by updating SMPLRT_DIV)
 }
