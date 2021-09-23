@@ -38,7 +38,7 @@ void loop() {
   else
     Serial.println("Failed!");
 
-  rawACCX = ICM20689Test.getAccelerationX(); 
+  rawACCX = ICM20689Test.getAccelerationZ(); 
 
   //Serial.println(rawACCX, DEC);
 
