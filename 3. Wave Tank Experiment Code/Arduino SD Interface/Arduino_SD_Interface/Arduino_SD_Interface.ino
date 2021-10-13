@@ -35,7 +35,7 @@
 */
 #include <SD.h>
 
-const int chipSelect = 10;
+const int chipSelect = 9;
 
 File myFile;
 
@@ -50,7 +50,7 @@ while (!Serial);
 
   Serial.print("Initializing SD card...");
 
-  if (!SD.begin(10)) {
+  if (!SD.begin(chipSelect)) {
 
     Serial.println("initialization failed!");
 

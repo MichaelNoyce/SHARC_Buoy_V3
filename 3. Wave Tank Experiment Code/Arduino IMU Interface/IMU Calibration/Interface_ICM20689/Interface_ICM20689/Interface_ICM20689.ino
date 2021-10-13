@@ -1,4 +1,5 @@
-//------------------------------------------------------------
+
+/------------------------------------------------------------
 //Program: Interface_ICM20689.ino I
 //Author: Michael Noyce
 //Description: Function to test the ICM20689 library
@@ -10,10 +11,16 @@
 #include <Wire.h>
 #include "ICM20689.h" 
 
+// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
+// is used in I2Cdev.h
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+    #include "Wire.h"
+#endif
+
 //Acceleration and Orientation Variables
 byte rawAX[2], rawAY[2], rawAZ[2];
 byte rawGX[2], rawGY[2], rawGZ[2];
-int rawACCX, rawACCY, rawACCZ;
+int16_t ax, ay, az;
 float rawGYROX, rawGYROY, rawGYROZ;
 bool connectionStatus;
 
@@ -21,29 +28,30 @@ bool connectionStatus;
 ICM20689 ICM20689Test;
 
 void setup() {
+
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+        Wire.begin();
+    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+        Fastwire::setup(400, true);
+    #endif
   
    Serial.begin(9600);
    ICM20689Test.initialize(); 
+
+   Serial.println("Testing device connections...");
+   Serial.println(ICM20689Test.testConnection() ? "ICM20689 connection successful" : "MPU6050 connection failed");
    
 }
 
 void loop() {
 
-    connectionStatus = ICM20689Test.testConnection();
-
-   delay(1000);
-
-  if (connectionStatus)
-    Serial.println("Connected!");
-  else
-    Serial.println("Failed!");
-
-  rawACCX = ICM20689Test.getAccelerationZ(); 
+  ICM20689Test.getAcceleration(&ax, &ay, &az); 
 
   //Serial.println(rawACCX, DEC);
 
-  Serial.print(rawACCX/16384*9.81, DEC);
-  Serial.print("\t"); 
+  Serial.print(ax);
+  Serial.print("\n"); 
 
   //Serial.print(rawACCY/16384*9.81, DEC);
   //Serial.print("\t"); 

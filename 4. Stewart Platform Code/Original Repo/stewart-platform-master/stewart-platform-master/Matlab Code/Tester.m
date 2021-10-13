@@ -7,21 +7,17 @@
 stewie = StewartPlatform(152, 18.92, 103, 28.07, 73, 165);
 stewie.connect('COM12');
 stewie.calibrate;
-% Perform x, y translation tests
-for x = -20:10:20
-    for y = -20:10:20
-        stewie.set_position(0,0,0,x,y,140);
-        stewie.move(0.75);
-        !adb shell "input keyevent 27"
-        pause(2);
-    end
-end
+
+stewie.set_position(0,0,0,x,y,120);
+pause(20);
+
 % Perform z translation tests
 for z = 120:10:200
     stewie.set_position(0,0,0,0,0,z);
     stewie.move(0.75);
     take_photo;
 end
+
 % Perform roll tests
 for roll = -30:10:30
     stewie.set_position(roll,0,0,0,0,140);
@@ -41,6 +37,18 @@ for yaw = -30:10:30
     take_photo;
 end
             
+
+% Perform x, y translation tests
+for x = -20:10:20
+    for y = -20:10:20
+        stewie.set_position(0,0,0,x,y,120);
+        stewie.move(0.75);
+        !adb shell "input keyevent 27"
+        pause(5);
+    end
+end
+
+
 %% Functions
 
 % Rename images in 'Imports' folder
