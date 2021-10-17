@@ -7,8 +7,7 @@
 //       developed by Jeff Rowberg
 //------------------------------------------------------------
 
-
-#include <Wire.h>
+#include "I2Cdev.h"
 #include "ICM20689.h" 
 
 //Acceleration and Orientation Variables

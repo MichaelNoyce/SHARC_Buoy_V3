@@ -142,8 +142,10 @@ class ICM20689 {
      int16_t getAccelerationX();
      int16_t getAccelerationY();
      int16_t getAccelerationZ();
-     
 
+     //Motion 
+     void getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
+    
     private:
         uint8_t devAddr;
         uint8_t buffer[14];

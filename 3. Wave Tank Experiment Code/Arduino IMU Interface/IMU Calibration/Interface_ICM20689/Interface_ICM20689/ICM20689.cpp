@@ -21,7 +21,7 @@
  * @return 
  */
 void ICM20689::initialize() {
-  softReset(); 
+  //softReset(); 
   setClockSource(ICM20689_CLK_PLL_INTERNAL_AUTO);
   setFullScaleAccelRange(ICM20689_ACCEL_FS_2G);
   setFullScaleGyroRange(ICM20689_GYRO_FS_250_DPS);
@@ -139,9 +139,32 @@ int16_t ICM20689::getAccelerationZ() {
 
 /** Get current internal temperature.
  * @return Temperature reading in 16-bit 2's complement format
- * @see MPU6050_RA_TEMP_OUT_H
+ * @see ICM20689_RA_TEMP_OUT_H
  */
 int16_t ICM20689::getTemperature() {
     I2Cdev::readBytes(devAddr, ICM20689_RA_TEMP_OUT_H, 2, buffer);
     return (((int16_t)buffer[0]) << 8) | buffer[1];
+}
+
+/** Get raw 6-axis motion sensor readings (accel/gyro).
+ * Retrieves all currently available motion sensor values.
+ * @param ax 16-bit signed integer container for accelerometer X-axis value
+ * @param ay 16-bit signed integer container for accelerometer Y-axis value
+ * @param az 16-bit signed integer container for accelerometer Z-axis value
+ * @param gx 16-bit signed integer container for gyroscope X-axis value
+ * @param gy 16-bit signed integer container for gyroscope Y-axis value
+ * @param gz 16-bit signed integer container for gyroscope Z-axis value
+ * @see getAcceleration()
+ * @see getRotation()
+ * @see MPU6050_RA_ACCEL_XOUT_H
+ */
+
+void ICM20689::getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz) {
+    I2Cdev::readBytes(devAddr, ICM20689_ACCEL_XOUT_H, 14, buffer);
+    *ax = (((int16_t)buffer[0]) << 8) | buffer[1];
+    *ay = (((int16_t)buffer[2]) << 8) | buffer[3];
+    *az = (((int16_t)buffer[4]) << 8) | buffer[5];
+    *gx = (((int16_t)buffer[8]) << 8) | buffer[9];
+    *gy = (((int16_t)buffer[10]) << 8) | buffer[11];
+    *gz = (((int16_t)buffer[12]) << 8) | buffer[13];
 }

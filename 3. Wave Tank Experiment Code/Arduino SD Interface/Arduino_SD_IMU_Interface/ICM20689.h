@@ -9,7 +9,6 @@
 #ifndef ICM20689_H
 #define ICM20689_H
 
-#include <Wire.h>
 #include <Arduino.h>
 #include "I2cdev.h"
 

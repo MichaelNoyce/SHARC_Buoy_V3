@@ -35,7 +35,7 @@
 */
 #include <SD.h>
 
-const int chipSelect = 9;
+const int chipSelect = 10;
 
 File myFile;
 
