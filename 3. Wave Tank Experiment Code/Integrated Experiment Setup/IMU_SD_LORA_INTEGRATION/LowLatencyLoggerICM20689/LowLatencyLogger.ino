@@ -17,6 +17,7 @@
 #include "SdFat.h"
 #include "FreeStack.h"
 #include "UserTypes.h"
+#include <Wire.h> 
 
 #ifdef __AVR_ATmega328P__
 #include "MinimumSerial.h"
@@ -35,13 +36,13 @@ const uint32_t LOG_INTERVAL_USEC = 2000;
 // Set USE_SHARED_SPI non-zero for use of an SPI sensor.
 // May not work for some cards.
 #ifndef USE_SHARED_SPI
-#define USE_SHARED_SPI 0
+#define USE_SHARED_SPI 1
 #endif  // USE_SHARED_SPI
 //------------------------------------------------------------------------------
 // Pin definitions.
 //
 // SD chip select pin.
-const uint8_t SD_CS_PIN = SS;
+const uint8_t SD_CS_PIN = 52;
 //
 // Digital pin to indicate an error, set to -1 if not used.
 // The led blinks for fatal errors. The led goes on solid for
@@ -50,7 +51,7 @@ const uint8_t SD_CS_PIN = SS;
 #ifdef ERROR_LED_PIN
 #undef ERROR_LED_PIN
 #endif  // ERROR_LED_PIN
-const int8_t ERROR_LED_PIN = -1;
+const int8_t ERROR_LED_PIN = 13;
 //------------------------------------------------------------------------------
 // File definitions.
 //
@@ -92,6 +93,25 @@ const uint8_t BUFFER_BLOCK_COUNT = 12;
 //==============================================================================
 // End of configuration constants.
 //==============================================================================
+
+
+//==============================================================================
+// ICM20689 Register Addresses (for Manual entry) 
+//==============================================================================
+#define ADDRESS      0x68 // device address (ADDR SEL in position 0) 
+
+//Configuration registers
+#define GYRO_CONFIG             0x1B
+#define ACCEL_CONFIG            0x1C
+
+//Power registers
+#define PWR_MGMT_1              0x6B // 
+#define PWR_MGMT_2              0x6C //
+//==============================================================================
+// End of register addresses
+//==============================================================================
+
+
 // Temporary log file.  Will be deleted if a reset or power failure occurs.
 #define TMP_FILE_NAME FILE_BASE_NAME "##.bin"
 
@@ -559,6 +579,67 @@ void testSensor() {
 }
 //------------------------------------------------------------------------------
 void setup(void) {
+
+   Serial.begin(9600);
+   
+   Wire.begin(); //Initialize i2c
+
+   //Power Management Configuration
+   Wire.beginTransmission(ADDRESS);
+   Wire.write(PWR_MGMT_1); //Power management register 1
+   Wire.write(0x01); //binary 
+   if (Wire.endTransmission () == 0)
+    {
+    Serial.println("PWR_MGMT_1 configured");
+    }
+   else
+    {
+    Serial.println("PWR_MGMT_1 not configured, i2c issue");
+    }
+
+   Wire.beginTransmission(ADDRESS);
+   Wire.write(PWR_MGMT_2); //Power management register 2
+   Wire.write(0x00);
+   Wire.endTransmission();
+   if (Wire.endTransmission () == 0)
+    {
+    Serial.println("PWR_MGMT_2 configured");
+    }
+   else
+    {
+    Serial.println("PWR_MGMT_2 not configured, i2c issue");
+    }
+
+    //Accelerometer Configuration 
+   Wire.beginTransmission(ADDRESS);
+   Wire.write(ACCEL_CONFIG); //Accelerometer configuration register 2
+   Wire.write(0x00);
+   Wire.endTransmission();
+   if (Wire.endTransmission () == 0)
+    {
+    Serial.println("ACCEL_CONFIG configured");
+    }
+   else
+    {
+    Serial.println("ACCEL_CONFIG not configured, i2c issue");
+    }
+    
+    //Gyroscope Configuration 
+   Wire.beginTransmission(ADDRESS);
+   Wire.write(GYRO_CONFIG); //Accelerometer configuration register 2
+   Wire.write(0x00);
+   Wire.endTransmission();
+   if (Wire.endTransmission () == 0)
+    {
+    Serial.println("ACCEL_CONFIG configured");
+    }
+   else
+    {
+    Serial.println("ACCEL_CONFIG not configured, i2c issue");
+    }    
+
+
+  
   if (ERROR_LED_PIN >= 0) {
     pinMode(ERROR_LED_PIN, OUTPUT);
   }
@@ -568,7 +649,7 @@ void setup(void) {
   while (!Serial) {
     SysCall::yield();
   }
-  Serial.print(F("\nFreeStack: "));
+  Serial.print(F("FreeStack: "));
   Serial.println(FreeStack());
   Serial.print(F("Records/block: "));
   Serial.println(DATA_DIM);
@@ -584,7 +665,7 @@ void setup(void) {
 
   // Initialize at the highest speed supported by the board that is
   // not over 50 MHz. Try a lower speed if SPI errors occur.
-  if (!sd.begin(SD_CS_PIN, SD_SCK_MHZ(50))) {
+  if (!sd.begin(SD_CS_PIN, SPI_HALF_SPEED)) {
     sd.initErrorPrint(&Serial);
     fatalBlink();
   }

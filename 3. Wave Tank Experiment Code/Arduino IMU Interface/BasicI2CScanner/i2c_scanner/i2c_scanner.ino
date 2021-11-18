@@ -54,6 +54,7 @@ void loop()
     // the Write.endTransmisstion to see if
     // a device did acknowledge to the address.
     Wire.beginTransmission(address);
+    
     error = Wire.endTransmission();
  
     if (error == 0)
