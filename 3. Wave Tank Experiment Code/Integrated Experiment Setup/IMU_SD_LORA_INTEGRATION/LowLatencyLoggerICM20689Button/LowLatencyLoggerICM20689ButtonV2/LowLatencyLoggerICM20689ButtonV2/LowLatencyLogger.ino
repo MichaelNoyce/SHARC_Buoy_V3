@@ -31,7 +31,7 @@ MinimumSerial MinSerial;
 #define ABORT_ON_OVERRUN 1
 //------------------------------------------------------------------------------
 //Interval between data records in microseconds.
-const uint32_t LOG_INTERVAL_USEC = 2000;
+const uint32_t LOG_INTERVAL_USEC = 10000;
 //------------------------------------------------------------------------------
 // Set USE_SHARED_SPI non-zero for use of an SPI sensor.
 // May not work for some cards.
@@ -42,7 +42,7 @@ const uint32_t LOG_INTERVAL_USEC = 2000;
 // Pin definitions.
 //
 // SD chip select pin.
-const uint8_t SD_CS_PIN = 52;
+const uint8_t SD_CS_PIN = 10;
 //
 // Digital pin to indicate an error, set to -1 if not used.
 // The led blinks for fatal errors. The led goes on solid for
@@ -56,8 +56,8 @@ const int8_t ERROR_LED_PIN = -1;
 //Button Variables 
 //-----------------------------------------------------------------------------
 // constants won't change. They're used here to set pin numbers:
-const int buttonPin = 50 ;    // the number of the pushbutton pin
-const int ledPin = 13;      // the number of the LED pin
+const int buttonPin = 2 ;    // the number of the pushbutton pin
+const int ledPin = 3;      // the number of the LED pin
 
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
