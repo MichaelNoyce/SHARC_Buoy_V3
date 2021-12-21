@@ -1,0 +1,3 @@
+C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/5. Firmware Development/Spectral Compression Algorithm/C Implementation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/5. Firmware Development/Spectral Compression Algorithm/C Implementation/cmake-build-debug/CMakeFiles/C_Implementation.dir
+C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/5. Firmware Development/Spectral Compression Algorithm/C Implementation/cmake-build-debug/CMakeFiles/edit_cache.dir
