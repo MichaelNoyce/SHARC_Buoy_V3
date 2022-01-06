@@ -18,11 +18,16 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#define ARM_MATH_CM4
+#define __FPU_PRESENT   1
 #include "main.h"
-
+#include "arm_math.h"
+#include "arm_const_structs.h"
+#include "697hz.inc"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,6 +37,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SAMPLES 512
+#define FFT_SIZE SAMPLES/2
+
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,8 +49,12 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
-
+DMA_HandleTypeDef hdma_usart2_rx;
+uint32_t i = 0, freq = 1;
+float32_t sin_val;
+float32_t sine_array[512];
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -49,14 +62,28 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
-/* USER CODE BEGIN PFP */
+static void MX_USART1_UART_Init(void);
 
+/* USER CODE BEGIN PFP */
+void fft_test(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t sendBuffer[13];
+float32_t Input[SAMPLES];
+float32_t Output[FFT_SIZE];
 
+typedef struct {
+	const char *desc;
+	unsigned char *data;
+} test_wave_t;
+
+static const test_wave_t WAVES[] = {
+		{ "697Hz", __697hz_raw },
+};
 /* USER CODE END 0 */
 
 /**
@@ -87,8 +114,21 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
+  MX_USART1_UART_Init();
+
   /* USER CODE BEGIN 2 */
+  char buff1[30];
+  sprintf(buff1,"FFT Test Started\r\n");
+  HAL_UART_Transmit(&huart2,(uint8_t*)buff1,strlen(buff1),100);
+
+
+
+  for (int i; i < FFT_SIZE; i++) {
+  	  sine_array[i] += (float)0.5 * (float)sin((float)2 * (float)3.14159265359 * (float)1 * (float)freq * (float)i / (float)(FFT_SIZE / 2));
+  	  }
+
 
   /* USER CODE END 2 */
 
@@ -97,9 +137,16 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  //Flash LED to indicate program start
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	    HAL_Delay(1000);
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	    HAL_Delay(1000);
+	    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
     /* USER CODE BEGIN 3 */
   }
+
+
   /* USER CODE END 3 */
 }
 
@@ -143,7 +190,8 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
@@ -155,6 +203,41 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
 }
 
 /**
@@ -193,6 +276,22 @@ static void MX_USART2_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -226,7 +325,47 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* Prevent unused argument(s) compilation warning */
+  UNUSED(huart);
 
+  HAL_UART_Transmit(&huart2, sendBuffer, 13, 100);
+
+  /* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_UART_RxCpltCallback can be implemented in the user file.
+   */
+}
+
+void fft_test(void){
+	static arm_cfft_radix4_instance_f32 fft_instance;
+	static float32_t Output[FFT_SIZE*2]; //has to be twice FFT size
+	float32_t* Input = sine_array;
+    float32_t maxValue;                /* Max FFT value is stored here */
+    uint32_t maxIndex;                /* Index in Output array where max value is */
+	int init_status;
+
+    /* Initialize the CFFT/CIFFT module, intFlag = 0, doBitReverse = 1 */
+    init_status = arm_cfft_radix4_init_f32(&fft_instance, FFT_SIZE, 0, 1);
+	char InitStatus[30];
+	sprintf(InitStatus,"FFT Init %d\r\n", (int)init_status);
+	HAL_UART_Transmit(&huart2,(uint8_t*)InitStatus,strlen(InitStatus),100);
+
+    /* Process the data through the CFFT/CIFFT module */
+    arm_cfft_radix4_f32(&fft_instance, Input);
+
+    /* Process the data through the Complex Magnitude Module for calculating the magnitude at each bin */
+    arm_cmplx_mag_f32(Input, Output, FFT_SIZE);
+
+    /* Calculates maxValue and returns corresponding value */
+    arm_max_f32(Output, FFT_SIZE, &maxValue, &maxIndex);
+
+    for (uint32_t j = 0; j < FFT_SIZE; j++){
+    	char FFTOut[30];
+    	sprintf(FFTOut,"FFT Out %f \r\n", Output[j]);
+    	HAL_UART_Transmit(&huart2, (uint8_t*)FFTOut, 30, 100);
+    	}
+}
 /* USER CODE END 4 */
 
 /**

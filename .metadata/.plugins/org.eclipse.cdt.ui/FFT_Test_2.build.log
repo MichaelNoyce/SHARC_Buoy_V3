@@ -1,0 +1,7 @@
+17:19:46 **** Incremental Build of configuration Debug for project FFT_Test_2 ****
+Info: Internal Builder is used for build
+arm-atollic-eabi-objcopy.exe -O ihex FFT_Test_2.elf FFT_Test_2.hex 
+Info: Parallel threads used: 0
+
+17:19:46 Build Finished (took 216ms)
+

@@ -1,7 +1,22 @@
-12:27:12 **** Incremental Build of configuration Debug for project FFT_Test ****
+16:29:11 **** Incremental Build of configuration Debug for project FFT_Test ****
 Info: Internal Builder is used for build
+arm-atollic-eabi-gcc -c -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -std=gnu11 -DUSE_HAL_DRIVER -DSTM32L476xx -I../Core/Inc -IC:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\Libs -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -specs=nano.specs -o Core\Src\main.o ..\Core\Src\main.c 
+..\Core\Src\main.c:84:26: warning: 'WAVES' defined but not used [-Wunused-const-variable=]
+ static const test_wave_t WAVES[] = {
+                          ^~~~~
+arm-atollic-eabi-gcc -o FFT_Test.elf Core\Src\main.o Core\Src\stm32l4xx_hal_msp.o Core\Src\stm32l4xx_it.o Core\Src\syscalls.o Core\Src\system_stm32l4xx.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_cortex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_dma.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_dma_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_exti.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_flash.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_flash_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_flash_ramfunc.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_gpio.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_i2c.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_i2c_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_pwr.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_pwr_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_rcc.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_rcc_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_tim.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_tim_ex.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_uart.o Drivers\STM32L4xx_HAL_Driver\Src\stm32l4xx_hal_uart_ex.o startup\startup_stm32l476xx.o -larm_cortexM4lf_math -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T../STM32L476RG_FLASH.ld -specs=nosys.specs -static -LC:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\Libs -Wl,-Map=FFT_Test.map -Wl,--gc-sections -Wl,--defsym=malloc_getpagesize_P=0x80 -Wl,--start-group -lc -lm -Wl,--end-group -specs=nano.specs 
+C:\Program Files (x86)\Atollic\TrueSTUDIO for STM32 9.3.0\ide\jre\bin\java -jar C:\Program Files (x86)\Atollic\TrueSTUDIO for STM32 9.3.0\Tools\arm-atollic-reports.jar sizeinfo list FFT_Test.elf 
+Generate build reports...
+Print size information
+   text	   data	    bss	    dec	    hex	filename
+  22008	     24	   7036	  29068	   718c	FFT_Test.elf
+Print size information done
+Generate listing file
+Output sent to: FFT_Test.list
+Generate listing file done
+Generate build reports done
 arm-atollic-eabi-objcopy.exe -O ihex FFT_Test.elf FFT_Test.hex 
-Info: Parallel threads used: 0
+Info: Parallel threads used: 1
 
-12:27:12 Build Finished (took 225ms)
+16:29:12 Build Finished (took 1s.351ms)
 

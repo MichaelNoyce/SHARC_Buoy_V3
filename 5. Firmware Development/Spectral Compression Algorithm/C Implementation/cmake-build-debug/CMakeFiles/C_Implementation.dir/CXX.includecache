@@ -1,0 +1,14 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/5. Firmware Development/Spectral Compression Algorithm/C Implementation/main.cpp
+iostream
+-
+cmath
+-
+
