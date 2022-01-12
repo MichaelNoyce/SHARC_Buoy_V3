@@ -1,0 +1,26 @@
+#
+#Fri Jan 07 11:21:59 CAT 2022
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.o=1
+Debug/Core/Src/main.o=1
+Debug/CMSIS_Test_1.elf=1
+Core/Src/main.c=1
+Debug/Core/Src/syscalls.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ex.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.o=1
+Debug/CMSIS_Test_1=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_dma_ex.o=1
+Debug/Core/Src/system_stm32l4xx.o=1
+Core/Src/arm_fir_init_f32.c=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash_ramfunc.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.o=1
+Debug/Core/Src/stm32l4xx_it.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_exti.o=1
+Debug/Core/Src/arm_fir_f32.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.o=1
+Debug/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.o=1
+Debug/Core/Src/arm_fir_init_f32.o=1
+Debug/Core/Src/stm32l4xx_hal_msp.o=1
+Core/Src/arm_fir_f32.c=1

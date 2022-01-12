@@ -23,6 +23,7 @@
 #include "main.h"
 #include "arm_math.h"
 #include "arm_const_structs.h"
+#include "697hz.inc"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -36,7 +37,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TEST_LENGTH_SAMPLES 2048
+#define TEST_LENGTH_SAMPLES 512
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,10 +49,10 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-extern float32_t testInput_f32_10khz[TEST_LENGTH_SAMPLES];
+extern float32_t testInput_f32_697Hz[TEST_LENGTH_SAMPLES];
 static float32_t testOutput[TEST_LENGTH_SAMPLES/2];
 
-uint32_t fftSize = 1024;
+uint32_t fftSize = 512;
 uint32_t ifftFlag = 0;
 uint32_t doBitReverse = 1;
 arm_cfft_instance_f32 varInstCfftF32;
@@ -111,19 +112,17 @@ int main(void)
 
   status = ARM_MATH_SUCCESS;
 
-  //status = arm_cfft_init_f32(&varInstCfftF32,fftSize);
+  status = arm_cfft_init_f32(&varInstCfftF32,fftSize);
 
-  /* Process the data through the CFFT/CIFFT module */
-  arm_cfft_f32(&varInstCfftF32, testInput_f32_10khz, ifftFlag, doBitReverse);
+   //Process the data through the CFFT/CIFFT module
+   arm_cfft_f32(&varInstCfftF32, testInput_f32_697Hz, ifftFlag, doBitReverse);
 
-  /* Process the data through the Complex Magnitude Module for
-  calculating the magnitude at each bin */
-  arm_cmplx_mag_f32(testInput_f32_10khz, testOutput, fftSize);
+  //Process the data through the Complex Magnitude Module for calculating the magnitude at each bin
+   arm_cmplx_mag_f32(testInput_f32_697Hz, testOutput, fftSize);
 
-  /* Calculates maxValue and returns corresponding BIN value */
-  arm_max_f32(testOutput, fftSize, &maxValue, &testIndex);
 
-  status = (testIndex != refIndex) ? ARM_MATH_TEST_FAILURE : ARM_MATH_SUCCESS;
+   //Calculates maxValue and returns corresponding BIN value
+   arm_max_f32(testOutput, fftSize, &maxValue, &testIndex);
 
   if (status != ARM_MATH_SUCCESS)
   {
@@ -139,7 +138,7 @@ int main(void)
 
   for (uint32_t j = 0; j < fftSize; j++){
   	char FFTOut[30];
-  	sprintf(FFTOut,"FFT Out %f \r\n", testOutput[j]);
+  	sprintf(FFTOut,"FFT Out %d \r\n", testOutput[j]);
   	HAL_UART_Transmit(&huart2, (uint8_t*)FFTOut, 30, 100);
   	}
   /* USER CODE END 2 */
