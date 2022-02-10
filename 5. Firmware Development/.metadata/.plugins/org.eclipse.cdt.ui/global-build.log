@@ -1,10 +1,10 @@
-17:21:48 **** Incremental Build of configuration Debug for project FIRDecimateTest2 ****
+18:41:29 **** Incremental Build of configuration Debug for project FIRDecimateTest2 ****
 make -j4 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DARM_MATH_CM4 -DSTM32L476xx -DDEBUG -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 ../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:176:8: warning: 'status' is used uninitialized in this function [-Wuninitialized]
-  176 |     if (status != ARM_MATH_SUCCESS)
-      |        ^
+../Core/Src/main.c:138:16: warning: unused variable 'status' [-Wunused-variable]
+  138 |     arm_status status;
+      |                ^~~~~~
 arm-none-eabi-gcc -o "FIRDecimateTest2.elf" @"objects.list"  -larm_cortexM4lf_math -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\Functions\FIR_Decimate\FIRDecimateTest2\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FIRDecimateTest2.map" -Wl,--gc-sections -static -L../Drivers/CMSIS/Lib/GCC --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: FIRDecimateTest2.elf
  
@@ -12,17 +12,17 @@ arm-none-eabi-size   FIRDecimateTest2.elf
 arm-none-eabi-objdump -h -S  FIRDecimateTest2.elf  > "FIRDecimateTest2.list"
 arm-none-eabi-objcopy  -O binary  FIRDecimateTest2.elf  "FIRDecimateTest2.bin"
    text	   data	    bss	    dec	    hex	filename
-  36964	   2544	   4016	  43524	   aa04	FIRDecimateTest2.elf
+  36844	   2544	   4016	  43404	   a98c	FIRDecimateTest2.elf
 Finished building: default.size.stdout
  
 Finished building: FIRDecimateTest2.bin
  
 Finished building: FIRDecimateTest2.list
  
-17:21:59 **** Incremental Build of configuration Debug for project FIRDecimateTest2 ****
+18:41:56 **** Incremental Build of configuration Debug for project FIRDecimateTest2 ****
 make -j4 all 
 arm-none-eabi-size   FIRDecimateTest2.elf 
    text	   data	    bss	    dec	    hex	filename
-  36964	   2544	   4016	  43524	   aa04	FIRDecimateTest2.elf
+  36844	   2544	   4016	  43404	   a98c	FIRDecimateTest2.elf
 Finished building: default.size.stdout
  
