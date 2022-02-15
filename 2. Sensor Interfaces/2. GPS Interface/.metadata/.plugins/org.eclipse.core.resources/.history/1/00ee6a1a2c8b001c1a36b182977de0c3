@@ -1,0 +1,24 @@
+8 lines (370 sloc)  14.6 KB
+
+/*
+ * debug.h
+ *
+ *  Created on: 11 Feb 2022
+ *      Author: Mike Noyce
+ *      Description: Simple file to include printf interface and other useful debugging functions
+ */
+
+/* Private includes ----------------------------------------------------------*/
+#include <stdio.h>
+
+#include <string.h>
+
+#include <stdlib.h>
+
+
+//The following lines of code allow for printf statements to output to serial via USART2. Remove code if not neccessary
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif

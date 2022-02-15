@@ -1,0 +1,81 @@
+/*
+ * debug.c
+ *
+ *  Created on: 11 Feb 2022
+ *      Author: Mike Noyce
+ *      Description: Simple file to include printf interface and other useful debugging functions
+ */
+
+
+/* Private includes ----------------------------------------------------------*/
+#include <stdio.h>
+
+#include <string.h>
+
+#include <stdlib.h>
+
+#include "stm32l476xx.h"
+
+#include "stm32l4xx_hal.h"
+
+#include "debug.h"
+
+HAL_StatusTypeDef Init_Debug(void)
+{
+// set up clock output on GPIO Pin A8 for testing
+	#ifdef DEBUG_HSE_OUTPUT_ENABLE
+	//configure pin
+	/*Configure GPIO pin : PA8 */
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.Pin = GPIO_PIN_8;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	//map clock output to PIN PA8
+	HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
+	#endif
+	//initialise USART 2 for USB comms
+	#ifdef DEBUG_USART_ENABLE
+	huart2.Instance = USART2;
+	huart2.Init.BaudRate = 115200;
+	huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	huart2.Init.StopBits = UART_STOPBITS_1;
+	huart2.Init.Parity = UART_PARITY_NONE;
+	huart2.Init.Mode = UART_MODE_TX_RX;
+	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+	huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	if (HAL_UART_Init(&huart2) != HAL_OK)
+		{
+		return HAL_ERROR;
+		}
+		setbuf(stdout, NULL);
+	#endif
+
+	#ifdef DEBUG_LED1_ENABLE
+	/*Configure GPIO pin Output Level */
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		/*Configure GPIO pin : PD2 */
+		GPIO_InitStruct.Pin = GPIO_PIN_2;
+		GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+		HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+	#endif
+
+	#ifdef DEBUG_LP_ENABLE
+		   HAL_DBGMCU_EnableDBGStandbyMode();	//enable for shutdown mode
+		   HAL_DBGMCU_EnableDBGStopMode();
+	#endif
+		return HAL_OK;
+		}
+
+
+PUTCHAR_PROTOTYPE
+{
+	HAL_UART_Transmit(&huart2,(uint8_t*) &ch,1,0xFFFF);
+	return ch;
+}

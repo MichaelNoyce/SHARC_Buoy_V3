@@ -1,0 +1,52 @@
+2022-02-11 11:08:19,613 [INFO] Activator:177 - 
+
+
+2022-02-11 11:08:19,614 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-11 11:08:22,748 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2022-02-11 13:35:45,541 [INFO] Activator:177 - 
+
+
+2022-02-11 13:35:45,543 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-11 13:35:54,017 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2022-02-11 13:37:31,068 [INFO] Activator:177 - 
+
+
+2022-02-11 13:37:31,070 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-11 13:37:37,094 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2022-02-11 13:51:09,998 [INFO] Activator:177 - 
+
+
+2022-02-11 13:51:10,000 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-11 13:51:14,809 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+2022-02-11 13:51:14,815 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Defaulting to no-operation (NOP) logger implementation
+2022-02-11 13:51:14,856 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2022-02-11 13:51:17,191 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2022-02-11 13:51:17,958 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Feb 11, 2022 1:51:17 PM org.glassfish.grizzly.http.server.NetworkListener start
+2022-02-11 13:51:17,959 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] INFO: Started listener bound to [localhost:1598]
+2022-02-11 13:51:17,960 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-11 13:51:17,962 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Feb 11, 2022 1:51:17 PM org.glassfish.grizzly.http.server.HttpServer start
+2022-02-11 13:51:17,964 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] INFO: [HttpServer] Started.
+2022-02-11 13:51:17,964 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-11 14:47:37,777 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-11 16:29:29,315 [INFO] Activator:177 - 
+
+
+2022-02-11 16:29:29,321 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-11 16:29:35,480 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+2022-02-11 16:29:35,501 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Defaulting to no-operation (NOP) logger implementation
+2022-02-11 16:29:35,503 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+2022-02-11 16:29:38,811 [ERROR] AnalyticsContext:980 - The ST intranet updater server is unknown: mcucrossselector.codex.cro.st.com
+2022-02-11 16:29:39,527 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Feb 11, 2022 4:29:39 PM org.glassfish.grizzly.http.server.NetworkListener start
+2022-02-11 16:29:39,528 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] INFO: Started listener bound to [localhost:1597]
+2022-02-11 16:29:39,528 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-11 16:29:39,530 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] Feb 11, 2022 4:29:39 PM org.glassfish.grizzly.http.server.HttpServer start
+2022-02-11 16:29:39,531 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] INFO: [HttpServer] Started.
+2022-02-11 16:29:39,531 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-11 18:13:40,515 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] 
+2022-02-15 12:50:24,654 [INFO] Activator:177 - 
+
+
+2022-02-15 12:50:24,656 [INFO] Activator:178 - !SESSION log4j initialized
+2022-02-15 12:50:30,458 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+2022-02-15 12:50:30,462 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: Defaulting to no-operation (NOP) logger implementation
+2022-02-15 12:50:30,463 [ERROR] LogOutputStream:74 - [STDERR_REDIRECT] SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;GPS_Interface/Core/Inc/SHarc_Frame.h&apos; to &apos;Sharc_Frame.h&apos;" description="Rename resource &apos;SHarc_Frame.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Inc/SHarc_Frame.h" name="Sharc_Frame.h" stamp="1644925639823" updateReferences="true"/>
+</session>
