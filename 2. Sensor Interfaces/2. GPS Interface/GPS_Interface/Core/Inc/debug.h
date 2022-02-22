@@ -52,6 +52,17 @@ HAL_StatusTypeDef Init_Debug(void);
  * @brief: enables initialisation of USART2 to allow buoy to print data to  computer
  */
 #define DEBUG_USART_ENABLE
+
+#define DEBUG_LD1_ENABLE
+
+//define GPIO Port for LED
+#define LD2_GPIO_Port GPIOA
+
+//define GPIO Pin for LED
+#define LD2_Pin GPIO_PIN_5
+
+
+
 /*
  * @brief: enables initialisation of LED1: on the NUCLEO-L4 development board
  */
@@ -61,6 +72,7 @@ HAL_StatusTypeDef Init_Debug(void);
 #ifdef DEBUG_USART_ENABLE
 UART_HandleTypeDef huart2;
 #endif
+
 
 
 

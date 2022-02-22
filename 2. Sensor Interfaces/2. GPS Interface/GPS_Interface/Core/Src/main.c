@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "debug.h"
 #include "HAL_GPS.h"
+#include "Sharc_Frame.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +47,7 @@
 	 //GPS  Init Routine
 	  GPS_Data_t Gdata;
 	  uint8_t GPS_On = 0; //flag to show if sensor is online
+	  uint8_t retries = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +70,7 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-Init_Debug();
+ Init_Debug();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -90,7 +92,7 @@ Init_Debug();
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  printf("Hello World!\r\n");
+  printf("Starting GPS Test: NEO M9N!\r\n");
 
   do
   	  {
@@ -101,6 +103,7 @@ Init_Debug();
   			 GPS_On = 1;
   			 break;
   		  }
+  		printf("Init attempt unsuccessful");
   		deinit_GPS(&hgps);
   		retries++;
   	  }

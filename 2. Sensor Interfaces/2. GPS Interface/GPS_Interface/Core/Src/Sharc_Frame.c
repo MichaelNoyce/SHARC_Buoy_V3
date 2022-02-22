@@ -1,0 +1,120 @@
+/*
+ * Sharc_Frame.c
+ *
+ *  Created on: Jun 7, 2020
+ *      Author: jamie
+ */
+
+#include "Sharc_Frame.h"
+#include "HAL_GPS.h"
+#include "debug.h"
+
+
+static uint8_t driftbuffer[DRIFTBUFFER_SIZE] = {0};
+
+HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
+{
+	//step 1, wait for ongoing uart transmissions to finish
+	printf("Heading to Sleep\r\n");
+
+	//disable systick timer
+
+	HAL_RCCEx_WakeUpStopCLKConfig(RCC_STOP_WAKEUPCLOCK_HSI);
+	HAL_UARTEx_EnableClockStopMode(huart);
+	while(__HAL_UART_GET_FLAG(&huart2,UART_FLAG_BUSY) == SET);
+	//clear all interrupts
+	while(__HAL_UART_GET_FLAG(huart, USART_ISR_REACK) == RESET);
+	UART_WakeUpTypeDef hwake;
+	//configure wake up to wake up on start bit
+	hwake.WakeUpEvent = UART_WAKEUP_ON_STARTBIT;
+
+	if(HAL_UARTEx_StopModeWakeUpSourceConfig(huart,hwake)!= HAL_OK)
+	{
+		//error setting sleep state
+		return HAL_ERROR;
+	}
+	//set device to generate interrupt on wake up
+	__HAL_UART_ENABLE_IT(huart,UART_IT_RXNE);
+	__HAL_UART_ENABLE_IT(huart,UART_IT_WUF);
+	//configure wake up clock source to MSI and enable
+	//enable stop mode
+	HAL_UARTEx_EnableClockStopMode(huart);
+	HAL_UARTEx_EnableStopMode(huart);
+	HAL_PWREx_EnterSTOP1Mode(PWR_STOPENTRY_WFI);
+	return HAL_OK;
+}
+
+uint8_t* to_binary_format(GPS_Data_t gps_data ,uint8_t ID)
+{
+	//define union to convert 32 bit float to unsigned uint8_t array
+	union
+	{
+		float a;					//for 32 bit floats
+		unsigned char bytes[4];		//for 4 byte long unsigned integer arrays
+		uint32_t num;				//for long numbers
+	} byte_converter;
+	//define union to convert uint16_t/int16_t into unsigned 8-bit byte arrays
+	union
+	{
+		int16_t  s_halfword;
+		unsigned char bytes[2];
+	}halfword_converter;
+
+	/*0. Byte 0: Packet ID*/
+	*driftbuffer = ID;
+	/*1. Bytes 1 - 4:  Epoch Time*/
+	byte_converter.num = gps_data.Etime;
+	memcpy(&driftbuffer[1],(byte_converter).bytes,4);
+
+	/* Add coordinates bytes 1 - 5 = lat, bytes 6 - 10 = long*/
+	byte_converter.a = gps_data.coordinates.lat;
+	memcpy(&driftbuffer[5],byte_converter.bytes,4);
+	byte_converter.a = gps_data.coordinates.longi;
+	memcpy(&driftbuffer[9],byte_converter.bytes,4);
+
+
+	//convert HDOP,VDOP, PDOP to 2 bytes big endian
+	driftbuffer[13] = gps_data.diag.HDOP.digit;
+	driftbuffer[14] = gps_data.diag.HDOP.precision;
+	driftbuffer[15] = gps_data.diag.VDOP.digit;
+	driftbuffer[16] = gps_data.diag.VDOP.precision;
+	driftbuffer[17] = gps_data.diag.PDOP.digit;
+	driftbuffer[18] = gps_data.diag.PDOP.precision;
+	driftbuffer[19] = (gps_data.diag.num_sats);
+	driftbuffer[19] = driftbuffer[19]<<2;
+	driftbuffer[19] |= gps_data.diag.fix_type;
+
+	//breakdown temperature into 4 unsigned bytes
+	byte_converter.num = (uint32_t)gps_data.env_Temp;
+	memcpy(&driftbuffer[20],byte_converter.bytes,sizeof(uint32_t));
+
+	//break down pressure into 4 unsigned bytes
+	byte_converter.num = gps_data.atm_Press;
+	memcpy(&driftbuffer[24],byte_converter.bytes,sizeof(uint32_t));
+
+	//shunt voltage
+	halfword_converter.s_halfword = gps_data.shunt_v;
+	memcpy(&driftbuffer[29],halfword_converter.bytes,sizeof(int16_t));
+
+	//bus voltage
+	halfword_converter.s_halfword = gps_data.bus_v;
+	memcpy(&driftbuffer[31],halfword_converter.bytes,sizeof(int16_t));
+
+	//current
+	halfword_converter.s_halfword = gps_data.current;
+	memcpy(&driftbuffer[33],halfword_converter.bytes,sizeof(int16_t));
+
+	//power
+	halfword_converter.s_halfword = gps_data.power;
+	memcpy(&driftbuffer[35],halfword_converter.bytes,sizeof(int16_t));
+
+	driftbuffer[get_driftBuffer_Size() -1] = 0xd; //end of packet character
+
+	//return a pointer the the array driftbuffer;
+	return driftbuffer;
+}
+
+uint8_t  get_driftBuffer_Size(void)
+{
+	return DRIFTBUFFER_SIZE;
+}

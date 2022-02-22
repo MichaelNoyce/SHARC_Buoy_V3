@@ -1,64 +1,14 @@
-13:34:30 **** Incremental Build of configuration Debug for project GPS_Interface ****
+15:22:28 **** Incremental Build of configuration Debug for project GPS_Interface ****
 make -j4 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L476xx -DDEBUG -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c:47:4: error: unknown type name 'GPS_Data_t'
-   47 |    GPS_Data_t Gdata;
-      |    ^~~~~~~~~~
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:100:7: error: 'GPS_On' undeclared (first use in this function)
-  100 |       GPS_On = 1;
-      |       ^~~~~~
-../Core/Src/main.c:100:7: note: each undeclared identifier is reported only once for each function it appears in
-../Core/Src/main.c:104:5: error: 'retries' undeclared (first use in this function)
-  104 |     retries++;
-      |     ^~~~~~~
-../Core/Src/main.c:126:26: error: 'LD2_GPIO_Port' undeclared (first use in this function)
-  126 |        HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-      |                          ^~~~~~~~~~~~~
-../Core/Src/main.c:126:40: error: 'LD2_Pin' undeclared (first use in this function)
-  126 |        HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-      |                                        ^~~~~~~
-../Core/Src/main.c:127:13: error: request for member 'coordinates' in something not a structure or union
-  127 |        Gdata.coordinates = GPS_coord;
-      |             ^
-../Core/Src/main.c:128:13: error: request for member 'Etime' in something not a structure or union
-  128 |        Gdata.Etime = eTime;
-      |             ^
-../Core/Src/main.c:129:13: error: request for member 'diag' in something not a structure or union
-  129 |        Gdata.diag = diag;
-      |             ^
-../Core/Src/main.c:130:70: error: request for member 'Etime' in something not a structure or union
-  130 |        printf("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-      |                                                                      ^
-../Core/Src/main.c:130:83: error: request for member 'coordinates' in something not a structure or union
-  130 |        printf("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-      |                                                                                   ^
-../Core/Src/main.c:130:106: error: request for member 'coordinates' in something not a structure or union
-  130 |        printf("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-      |                                                                                                          ^
-../Core/Src/main.c:131:72: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                        ^
-../Core/Src/main.c:131:95: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                                               ^
-../Core/Src/main.c:131:123: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                                                                           ^
-../Core/Src/main.c:131:146: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                                                                                                  ^
-../Core/Src/main.c:131:174: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                                                                                                                              ^
-../Core/Src/main.c:131:197: error: request for member 'diag' in something not a structure or union
-  131 |        printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-      |                                                                                                                                                                                                     ^
-../Core/Src/main.c:132:66: error: request for member 'diag' in something not a structure or union
-  132 |        printf("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
-      |                                                                  ^
-../Core/Src/main.c:132:87: error: request for member 'diag' in something not a structure or union
-  132 |        printf("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
-      |                                                                                       ^
-make: *** [Core/Src/subdir.mk:40: Core/Src/main.o] Error 1
-"make -j4 all" terminated with exit code 2. Build might be incomplete.
+arm-none-eabi-size   GPS_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  41516	    484	   8404	  50404	   c4e4	GPS_Interface.elf
+Finished building: default.size.stdout
+ 
+15:22:33 **** Incremental Build of configuration Debug for project GPS_Interface ****
+make -j4 all 
+arm-none-eabi-size   GPS_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  41516	    484	   8404	  50404	   c4e4	GPS_Interface.elf
+Finished building: default.size.stdout
+ 

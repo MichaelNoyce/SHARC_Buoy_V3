@@ -61,7 +61,7 @@ main-build: GPS_Interface.elf secondary-outputs
 
 # Tool invocations
 GPS_Interface.elf: $(OBJS) $(USER_OBJS) C:\Users\mpnoy\OneDrive\Documents\Masters\ 2021\SHARC_Buoy_V3\2.\ Sensor\ Interfaces\2.\ GPS\ Interface\GPS_Interface\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "GPS_Interface.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\2. GPS Interface\GPS_Interface\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GPS_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "GPS_Interface.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\2. GPS Interface\GPS_Interface\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GPS_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

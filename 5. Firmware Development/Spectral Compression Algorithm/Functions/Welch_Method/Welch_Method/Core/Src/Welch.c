@@ -1,23 +1,12 @@
 /*
-* FFT EEG Feature Extraction
+* Welch Method Implementation for SHARC Buoy
 * -----------------------------
-* This code takes an EEG input signal and computes
-* Power Spectral Density (PSD) using Welch ’s method .
-*
-* Author : David Barahona Pereira
-*
-* Email address : davidbp .13 @gmail .com
-*
-* Institution : Costa Rica Institute of Technology
-* Karlsruhe Institute of Technology
-*
-* Last revision : 13/09/2016
+* Author: Michael Noyce
+* Last revision : 16/2/2022
 */
-# include < stdio .h >
-# include "msp.h"
 # include " arm_math .h"
 # include " arm_const_structs .h"
-# include " driverlib .h"
+
 
 // Elements in input array ( Power of 2 and MINIMUM 256)
 # define TEST_LENGTH_SAMPLES 512
@@ -38,7 +27,6 @@ void Welch ( float32_t * testInput , float32_t * testOutput ) ;
 void Init ( void ) ;
 int32_t main ( void )
 {
-Init () ;
 Welch ( EEG_Input , PSD) ;
 }
 /*
@@ -139,3 +127,5 @@ testOutput [i] = testOutput_aux / NUMBER_OF_WINDOWS ;
 }
 testOutput [0] /= 2;
 }
+
+

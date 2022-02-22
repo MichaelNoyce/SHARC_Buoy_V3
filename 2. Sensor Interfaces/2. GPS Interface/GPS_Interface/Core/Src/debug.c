@@ -36,23 +36,23 @@ HAL_StatusTypeDef Init_Debug(void)
 	//map clock output to PIN PA8
 	HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_SYSCLK, RCC_MCODIV_1);
 	#endif
-	//initialise USART 2 for USB comms
+
 	#ifdef DEBUG_USART_ENABLE
-	huart2.Instance = USART2;
-	huart2.Init.BaudRate = 115200;
-	huart2.Init.WordLength = UART_WORDLENGTH_8B;
-	huart2.Init.StopBits = UART_STOPBITS_1;
-	huart2.Init.Parity = UART_PARITY_NONE;
-	huart2.Init.Mode = UART_MODE_TX_RX;
-	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-    huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart2) != HAL_OK)
-		{
-		return HAL_ERROR;
-		}
-		setbuf(stdout, NULL);
+	  huart2.Instance = USART2;
+	  huart2.Init.BaudRate = 115200;
+	  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	  huart2.Init.StopBits = UART_STOPBITS_1;
+	  huart2.Init.Parity = UART_PARITY_NONE;
+	  huart2.Init.Mode = UART_MODE_TX_RX;
+	  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+	  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	  if (HAL_UART_Init(&huart2) != HAL_OK)
+	  {
+	    return HAL_ERROR;
+	  }
+	  setbuf(stdout, NULL);
 	#endif
 
 	#ifdef DEBUG_LED1_ENABLE
