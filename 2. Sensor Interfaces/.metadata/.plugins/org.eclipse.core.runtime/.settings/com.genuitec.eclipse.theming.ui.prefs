@@ -1,9 +1,9 @@
 applyBackground=false
 approved.defs.file.last.changed.time=1624986146000
-configurationInstallLocation=/C\:/Program Files (x86)/Atollic/TrueSTUDIO for STM32 9.3.0/ide/
+configurationInstallLocation=/C\:/ST/STM32CubeIDE_1.8.0/STM32CubeIDE/
 eclipse.preferences.version=1
 iconcolormode=primary
-last.download.attempt.time=1626078344979
-lastConfiguration=1626078333824
+last.download.attempt.time=1645608077420
+lastConfiguration=1645608067604
 newinstall=true
 workbench.theme=Dark Gray

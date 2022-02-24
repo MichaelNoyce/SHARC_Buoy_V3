@@ -1,1 +1,0 @@
-[height, period, TM1, TM10, HRMS] = spectral_analysis(t_trunc(10000:15000), waveHeightIMU(10000:15000), 4);

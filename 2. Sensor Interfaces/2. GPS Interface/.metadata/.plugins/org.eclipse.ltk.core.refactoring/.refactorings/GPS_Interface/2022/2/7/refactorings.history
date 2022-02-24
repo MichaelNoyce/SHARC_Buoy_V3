@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;GPS_Interface/Core/Inc/debug.c&apos; to &apos;debug.h&apos;" description="Rename resource &apos;debug.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Core/Inc/debug.c" name="debug.h" stamp="1644577283664" updateReferences="true"/>
-</session>

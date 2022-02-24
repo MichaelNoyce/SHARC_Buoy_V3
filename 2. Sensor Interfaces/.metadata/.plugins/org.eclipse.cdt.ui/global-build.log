@@ -1,8 +1,87 @@
-10:40:50 **** Incremental Build of configuration Debug for project Test_Accelerometer_L4 ****
-Info: Internal Builder is used for build
-arm-atollic-eabi-gcc -c -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -std=gnu11 -DUSE_HAL_DRIVER -DSTM32L476xx -I../Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -g -fstack-usage -Wall -specs=nano.specs -o Src\main.o ..\Src\main.c 
-..\Src\main.c: In function 'main':
-..\Src\main.c:167:26: error: 'A_x' undeclared (first use in this function)
-    sprintf(msg2, "%.2f", A_x);
-                          ^~~
-..\Src\main.c:167:26: note: each undeclared identifier is reported only once for each function it appears in
+12:36:41 **** Incremental Build of configuration Debug for project SD_Interface ****
+make -j4 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L476xx -DDEBUG -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:134:45: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  134 |               res = f_write(&SDFile, wtext, strlen((char *)wtext), (void *)&byteswritten);
+      |                                             ^~~~~~
+../Core/Src/main.c:134:45: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:23:1: note: include '<string.h>' or provide a declaration of 'strlen'
+   22 | #include "fatfs.h"
+  +++ |+#include <string.h>
+   23 | 
+../Core/Src/main.c:79:25: warning: unused variable 'bytesread' [-Wunused-variable]
+   79 |  uint32_t byteswritten, bytesread; /* File write/read counts */
+      |                         ^~~~~~~~~
+../Core/Src/main.c: In function 'Error_Handler':
+../Core/Src/main.c:368:1: warning: control reaches end of non-void function [-Wreturn-type]
+  368 | }
+      | ^
+arm-none-eabi-gcc -o "SD_Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\3. SD Interface\SD_Interface\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SD_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: SD_Interface.elf
+ 
+arm-none-eabi-size   SD_Interface.elf 
+arm-none-eabi-objdump -h -S  SD_Interface.elf  > "SD_Interface.list"
+arm-none-eabi-objcopy  -O binary  SD_Interface.elf  "SD_Interface.bin"
+   text	   data	    bss	    dec	    hex	filename
+  37736	     20	   4844	  42600	   a668	SD_Interface.elf
+Finished building: default.size.stdout
+ 
+Finished building: SD_Interface.bin
+ 
+Finished building: SD_Interface.list
+ 
+12:37:26 **** Incremental Build of configuration Debug for project SD_Interface ****
+make -j4 all 
+arm-none-eabi-size   SD_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  37736	     20	   4844	  42600	   a668	SD_Interface.elf
+Finished building: default.size.stdout
+ 
+12:37:49 **** Incremental Build of configuration Debug for project SD_Interface ****
+make -j4 all 
+arm-none-eabi-size   SD_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  37736	     20	   4844	  42600	   a668	SD_Interface.elf
+Finished building: default.size.stdout
+ 
+12:38:37 **** Incremental Build of configuration Debug for project SD_Interface ****
+make -j4 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L476xx -DDEBUG -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:134:45: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  134 |               res = f_write(&SDFile, wtext, strlen((char *)wtext), (void *)&byteswritten);
+      |                                             ^~~~~~
+../Core/Src/main.c:134:45: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:23:1: note: include '<string.h>' or provide a declaration of 'strlen'
+   22 | #include "fatfs.h"
+  +++ |+#include <string.h>
+   23 | 
+../Core/Src/main.c:79:25: warning: unused variable 'bytesread' [-Wunused-variable]
+   79 |  uint32_t byteswritten, bytesread; /* File write/read counts */
+      |                         ^~~~~~~~~
+../Core/Src/main.c: In function 'Error_Handler':
+../Core/Src/main.c:369:1: warning: control reaches end of non-void function [-Wreturn-type]
+  369 | }
+      | ^
+arm-none-eabi-gcc -o "SD_Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\3. SD Interface\SD_Interface\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="SD_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: SD_Interface.elf
+ 
+arm-none-eabi-size   SD_Interface.elf 
+arm-none-eabi-objdump -h -S  SD_Interface.elf  > "SD_Interface.list"
+arm-none-eabi-objcopy  -O binary  SD_Interface.elf  "SD_Interface.bin"
+   text	   data	    bss	    dec	    hex	filename
+  37744	     20	   4844	  42608	   a670	SD_Interface.elf
+Finished building: default.size.stdout
+ 
+Finished building: SD_Interface.bin
+ 
+Finished building: SD_Interface.list
+ 
+12:38:57 **** Incremental Build of configuration Debug for project SD_Interface ****
+make -j4 all 
+arm-none-eabi-size   SD_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  37744	     20	   4844	  42608	   a670	SD_Interface.elf
+Finished building: default.size.stdout
+ 

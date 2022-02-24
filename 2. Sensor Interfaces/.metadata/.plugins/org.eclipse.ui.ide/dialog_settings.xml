@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
-	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
-		<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\Test_Accelerometer_L4"/>
-	</list>
-	<section name="NewWizardAction">
-		<item value="org.eclipse.cdt.ui.wizards.NewCWizard2" key="NewWizardSelectionPage.STORE_SELECTED_ID"/>
-		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
-			<item value="org.eclipse.cdt.ui.newCWizards"/>
+	<section name="ExternalProjectImportWizard">
+		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="true"/>
+	</section>
+	<section name="SmartImportWizard">
+		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
+		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
+		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\2. GPS Interface\GPS_Interface"/>
 		</list>
 	</section>
 </section>
