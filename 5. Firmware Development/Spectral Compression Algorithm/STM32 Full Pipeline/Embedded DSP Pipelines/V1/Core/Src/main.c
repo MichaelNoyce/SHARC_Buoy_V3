@@ -22,6 +22,8 @@
 #include "debug.h"
 #include "welch.h"
 #include "waveData.h"
+#include "WaveFunctions.h"
+//#include "string.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -42,7 +44,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart2;
+//UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -92,6 +94,20 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   printf("DSP Pipeline V1 Start!\r\n");
+
+  float32_t testOutput[1000];
+  uint32_t i;
+
+  calibrate(testInput, testOutput);
+
+	for (i = 0; i < RAW_DATA_LENGTH ; i++)
+	{
+		//printf("%.2f \r\n", testOutput[i]);
+		float32_t TEMP[4];
+		sprintf(TEMP, "%.2f\r\n", testOutput[i]);
+		HAL_UART_Transmit(&huart2, TEMP, strlen(TEMP), HAL_MAX_DELAY);
+	}
+
 
   /* USER CODE END 2 */
   /* Infinite loop */

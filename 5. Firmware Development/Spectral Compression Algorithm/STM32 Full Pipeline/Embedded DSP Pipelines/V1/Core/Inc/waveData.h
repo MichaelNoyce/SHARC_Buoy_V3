@@ -9,6 +9,6 @@
 
 
 
-float32_t testInput[4096];
+float32_t testInput[1000];
 
-float32_t testOutput[1024];
+float32_t testOutput[1000];
