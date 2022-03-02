@@ -19,14 +19,16 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "debug.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include "string.h"
+#include <stdint.h>
+#include <stdarg.h>
 #include "welch.h"
 #include "waveData.h"
 #include "WaveFunctions.h"
-//#include "string.h"
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +46,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-//UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
@@ -53,8 +55,9 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void printmsg(char *format,...);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -90,26 +93,29 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  Init_Debug();
-
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  printf("DSP Pipeline V1 Start!\r\n");
-
-  float32_t testOutput[1000];
+  //printmsg("DSP Pipeline V1 Start!\r\n");
   uint32_t i;
 
-  calibrate(testInput, testOutput);
+  calibrate(rawData, dataOutput);
 
 	for (i = 0; i < RAW_DATA_LENGTH ; i++)
 	{
-		//printf("%.2f \r\n", testOutput[i]);
-		float32_t TEMP[4];
-		sprintf(TEMP, "%.2f\r\n", testOutput[i]);
-		HAL_UART_Transmit(&huart2, TEMP, strlen(TEMP), HAL_MAX_DELAY);
+		//printmsg("%f \r\n", dataOutputOutput[i]);
 	}
 
+	//float32_t detrendOutput[RAW_DATA_LENGTH];
+	detrend(dataOutput, dataOutput);
+
+
+	for (i = 0; i < RAW_DATA_LENGTH ; i++)
+	{
+		printmsg("%f \r\n", dataOutput[i]);
+	}
 
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -176,9 +182,46 @@ void SystemClock_Config(void)
 }
 
 /**
- * @brief GPIO Init
- * @retval none
- */
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -208,7 +251,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void printmsg(char *format,...) {
+    char str[80];
 
+    /*Extract the the argument list using VA apis */
+    va_list args;
+    va_start(args, format);
+    vsprintf(str, format,args);
+    HAL_UART_Transmit(&huart2,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+    va_end(args);
+}
 /* USER CODE END 4 */
 
 /**

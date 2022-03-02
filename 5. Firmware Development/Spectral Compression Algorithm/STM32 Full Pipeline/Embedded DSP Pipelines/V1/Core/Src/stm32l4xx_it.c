@@ -21,7 +21,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32l4xx_it.h"
-#include "debug.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -85,11 +84,10 @@ void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
 	volatile uint32_t cfsr = SCB-> CFSR ; // load into variable
-	printf ( "SCB-> CSFR 0x%08x \n", cfsr); // print
+	printmsg( "SCB-> CSFR 0x%08x \r\n", cfsr); // print
 
 
   /* USER CODE END HardFault_IRQn 0 */
-
   while (1)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */

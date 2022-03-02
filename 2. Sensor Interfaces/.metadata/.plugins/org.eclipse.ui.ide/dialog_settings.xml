@@ -9,6 +9,9 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\STM32 Full Pipeline\Embedded DSP Pipelines\V1"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\Functions\Welch_Method\Welch_Method_V2"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\Functions\Welch_Method_V2\Welch_Method_V2"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\2. GPS Interface\GPS_Interface"/>
 		</list>
 	</section>

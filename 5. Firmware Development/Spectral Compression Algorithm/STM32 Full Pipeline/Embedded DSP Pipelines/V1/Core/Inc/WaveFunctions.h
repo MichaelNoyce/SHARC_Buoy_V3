@@ -11,7 +11,7 @@
 /*End User Includes-------------------------------------------*/
 
 /*Definitions-------------------------------------------------*/
-#define RAW_DATA_LENGTH 1000
+#define RAW_DATA_LENGTH 51200
 /*End Definitions ---------------------------------------------*/
 
 
