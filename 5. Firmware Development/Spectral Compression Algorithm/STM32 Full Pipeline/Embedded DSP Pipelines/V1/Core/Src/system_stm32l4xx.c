@@ -203,6 +203,14 @@ void SystemInit(void)
   /* Disable all interrupts */
   RCC->CIER = 0x00000000U;
 
+  /* Enable Optional Fault Handlers */
+  SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk
+		  	 | SCB_SHCSR_BUSFAULTENA_Msk
+			 | SCB_SHCSR_MEMFAULTENA_Msk; //enable Usage-/Bus-/MPU Fault
+
+  /* Enable Divide by Zero Trap */
+  SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
+
   /* Configure the Vector Table location add offset address ------------------*/
 #ifdef VECT_TAB_SRAM
   SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */

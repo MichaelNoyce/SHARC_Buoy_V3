@@ -21,9 +21,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, DATA
   8 .data         000009e8  20000000  08008ffc  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          000009b0  200009e8  080099e4  000209e8  2**2
+  9 .bss          000065b0  200009e8  080099e4  000209e8  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20001398  080099e4  00021398  2**0
+ 10 ._user_heap_stack 00000600  20006f98  080099e4  00026f98  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000209e8  2**0
                   CONTENTS, READONLY
@@ -37,9 +37,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_line   0000acc1  00000000  00000000  0005890a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_str    000ebf62  00000000  00000000  000635cb  2**0
+ 17 .debug_str    000ebf63  00000000  00000000  000635cb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .comment      000000c8  00000000  00000000  0014f52d  2**0
+ 18 .comment      000000c8  00000000  00000000  0014f52e  2**0
                   CONTENTS, READONLY
  19 .debug_ranges 00000878  00000000  00000000  0014f5f8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -1461,7 +1461,7 @@ int main(void)
  80010ac:	3301      	adds	r3, #1
  80010ae:	62bb      	str	r3, [r7, #40]	; 0x28
  80010b0:	6abb      	ldr	r3, [r7, #40]	; 0x28
- 80010b2:	f5b3 7f00 	cmp.w	r3, #512	; 0x200
+ 80010b2:	f5b3 5fc8 	cmp.w	r3, #6400	; 0x1900
  80010b6:	d3d6      	bcc.n	8001066 <main+0x7a>
  80010b8:	2300      	movs	r3, #0
     	}
@@ -1475,11 +1475,11 @@ int main(void)
  80010c4:	20000000 	.word	0x20000000
  80010c8:	20000a04 	.word	0x20000a04
  80010cc:	20000800 	.word	0x20000800
- 80010d0:	20001204 	.word	0x20001204
+ 80010d0:	20006e04 	.word	0x20006e04
  80010d4:	08008a78 	.word	0x08008a78
  80010d8:	20000804 	.word	0x20000804
  80010dc:	08008a68 	.word	0x08008a68
- 80010e0:	20001300 	.word	0x20001300
+ 80010e0:	20006f00 	.word	0x20006f00
 
 080010e4 <SystemClock_Config>:
 /**
@@ -1695,7 +1695,7 @@ static void MX_USART2_UART_Init(void)
  8001222:	bf00      	nop
  8001224:	bd80      	pop	{r7, pc}
  8001226:	bf00      	nop
- 8001228:	20001300 	.word	0x20001300
+ 8001228:	20006f00 	.word	0x20006f00
  800122c:	40004400 	.word	0x40004400
 
 08001230 <MX_GPIO_Init>:
@@ -2430,8 +2430,8 @@ void *_sbrk(ptrdiff_t incr)
  80015b2:	bd80      	pop	{r7, pc}
  80015b4:	20018000 	.word	0x20018000
  80015b8:	00000400 	.word	0x00000400
- 80015bc:	200012f4 	.word	0x200012f4
- 80015c0:	20001398 	.word	0x20001398
+ 80015bc:	20006ef4 	.word	0x20006ef4
+ 80015c0:	20006f98 	.word	0x20006f98
 
 080015c4 <SystemInit>:
   * @param  None
@@ -2604,7 +2604,7 @@ LoopForever:
 	ldr	r2, =_sbss
  8001678:	200009e8 	.word	0x200009e8
 	ldr	r3, = _ebss
- 800167c:	20001398 	.word	0x20001398
+ 800167c:	20006f98 	.word	0x20006f98
 
 08001680 <ADC1_2_IRQHandler>:
  * @retval : None
@@ -2793,7 +2793,7 @@ __weak void HAL_IncTick(void)
  8001758:	4770      	bx	lr
  800175a:	bf00      	nop
  800175c:	20000810 	.word	0x20000810
- 8001760:	20001384 	.word	0x20001384
+ 8001760:	20006f84 	.word	0x20006f84
 
 08001764 <HAL_GetTick>:
   * @note This function is declared as __weak to be overwritten in case of other
@@ -2813,7 +2813,7 @@ __weak uint32_t HAL_GetTick(void)
  8001770:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001774:	4770      	bx	lr
  8001776:	bf00      	nop
- 8001778:	20001384 	.word	0x20001384
+ 8001778:	20006f84 	.word	0x20006f84
 
 0800177c <__NVIC_SetPriorityGrouping>:
            In case of a conflict between priority grouping and available
@@ -15503,7 +15503,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8007b02:	e7c7      	b.n	8007a94 <_free_r+0x28>
  8007b04:	b003      	add	sp, #12
  8007b06:	bd30      	pop	{r4, r5, pc}
- 8007b08:	200012f8 	.word	0x200012f8
+ 8007b08:	20006ef8 	.word	0x20006ef8
 
 08007b0c <_malloc_r>:
  8007b0c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
@@ -15582,8 +15582,8 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8007bb2:	d1dd      	bne.n	8007b70 <_malloc_r+0x64>
  8007bb4:	e7cf      	b.n	8007b56 <_malloc_r+0x4a>
  8007bb6:	bf00      	nop
- 8007bb8:	200012f8 	.word	0x200012f8
- 8007bbc:	200012fc 	.word	0x200012fc
+ 8007bb8:	20006ef8 	.word	0x20006ef8
+ 8007bbc:	20006efc 	.word	0x20006efc
 
 08007bc0 <__ssputs_r>:
  8007bc0:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -15891,7 +15891,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8007e9e:	b103      	cbz	r3, 8007ea2 <_sbrk_r+0x1a>
  8007ea0:	6023      	str	r3, [r4, #0]
  8007ea2:	bd38      	pop	{r3, r4, r5, pc}
- 8007ea4:	20001388 	.word	0x20001388
+ 8007ea4:	20006f88 	.word	0x20006f88
 
 08007ea8 <strncmp>:
  8007ea8:	b510      	push	{r4, lr}
@@ -15994,13 +15994,13 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8007f7c:	4801      	ldr	r0, [pc, #4]	; (8007f84 <__malloc_lock+0x8>)
  8007f7e:	f000 bc09 	b.w	8008794 <__retarget_lock_acquire_recursive>
  8007f82:	bf00      	nop
- 8007f84:	20001390 	.word	0x20001390
+ 8007f84:	20006f90 	.word	0x20006f90
 
 08007f88 <__malloc_unlock>:
  8007f88:	4801      	ldr	r0, [pc, #4]	; (8007f90 <__malloc_unlock+0x8>)
  8007f8a:	f000 bc04 	b.w	8008796 <__retarget_lock_release_recursive>
  8007f8e:	bf00      	nop
- 8007f90:	20001390 	.word	0x20001390
+ 8007f90:	20006f90 	.word	0x20006f90
 
 08007f94 <_realloc_r>:
  8007f94:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
@@ -16741,25 +16741,25 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8008628:	4801      	ldr	r0, [pc, #4]	; (8008630 <__sfp_lock_acquire+0x8>)
  800862a:	f000 b8b3 	b.w	8008794 <__retarget_lock_acquire_recursive>
  800862e:	bf00      	nop
- 8008630:	20001394 	.word	0x20001394
+ 8008630:	20006f94 	.word	0x20006f94
 
 08008634 <__sfp_lock_release>:
  8008634:	4801      	ldr	r0, [pc, #4]	; (800863c <__sfp_lock_release+0x8>)
  8008636:	f000 b8ae 	b.w	8008796 <__retarget_lock_release_recursive>
  800863a:	bf00      	nop
- 800863c:	20001394 	.word	0x20001394
+ 800863c:	20006f94 	.word	0x20006f94
 
 08008640 <__sinit_lock_acquire>:
  8008640:	4801      	ldr	r0, [pc, #4]	; (8008648 <__sinit_lock_acquire+0x8>)
  8008642:	f000 b8a7 	b.w	8008794 <__retarget_lock_acquire_recursive>
  8008646:	bf00      	nop
- 8008648:	2000138f 	.word	0x2000138f
+ 8008648:	20006f8f 	.word	0x20006f8f
 
 0800864c <__sinit_lock_release>:
  800864c:	4801      	ldr	r0, [pc, #4]	; (8008654 <__sinit_lock_release+0x8>)
  800864e:	f000 b8a2 	b.w	8008796 <__retarget_lock_release_recursive>
  8008652:	bf00      	nop
- 8008654:	2000138f 	.word	0x2000138f
+ 8008654:	20006f8f 	.word	0x20006f8f
 
 08008658 <__sinit>:
  8008658:	b510      	push	{r4, lr}
@@ -17054,7 +17054,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  80088ea:	6023      	str	r3, [r4, #0]
  80088ec:	bd38      	pop	{r3, r4, r5, pc}
  80088ee:	bf00      	nop
- 80088f0:	20001388 	.word	0x20001388
+ 80088f0:	20006f88 	.word	0x20006f88
 
 080088f4 <_getpid_r>:
  80088f4:	f7f8 bda0 	b.w	8001438 <_getpid>
@@ -17135,7 +17135,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  800899a:	b103      	cbz	r3, 800899e <_write_r+0x1e>
  800899c:	6023      	str	r3, [r4, #0]
  800899e:	bd38      	pop	{r3, r4, r5, pc}
- 80089a0:	20001388 	.word	0x20001388
+ 80089a0:	20006f88 	.word	0x20006f88
 
 080089a4 <_close_r>:
  80089a4:	b538      	push	{r3, r4, r5, lr}
@@ -17151,7 +17151,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  80089ba:	b103      	cbz	r3, 80089be <_close_r+0x1a>
  80089bc:	6023      	str	r3, [r4, #0]
  80089be:	bd38      	pop	{r3, r4, r5, pc}
- 80089c0:	20001388 	.word	0x20001388
+ 80089c0:	20006f88 	.word	0x20006f88
 
 080089c4 <_fstat_r>:
  80089c4:	b538      	push	{r3, r4, r5, lr}
@@ -17169,7 +17169,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  80089de:	6023      	str	r3, [r4, #0]
  80089e0:	bd38      	pop	{r3, r4, r5, pc}
  80089e2:	bf00      	nop
- 80089e4:	20001388 	.word	0x20001388
+ 80089e4:	20006f88 	.word	0x20006f88
 
 080089e8 <_isatty_r>:
  80089e8:	b538      	push	{r3, r4, r5, lr}
@@ -17185,7 +17185,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  80089fe:	b103      	cbz	r3, 8008a02 <_isatty_r+0x1a>
  8008a00:	6023      	str	r3, [r4, #0]
  8008a02:	bd38      	pop	{r3, r4, r5, pc}
- 8008a04:	20001388 	.word	0x20001388
+ 8008a04:	20006f88 	.word	0x20006f88
 
 08008a08 <_lseek_r>:
  8008a08:	b538      	push	{r3, r4, r5, lr}
@@ -17203,7 +17203,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8008a22:	b103      	cbz	r3, 8008a26 <_lseek_r+0x1e>
  8008a24:	6023      	str	r3, [r4, #0]
  8008a26:	bd38      	pop	{r3, r4, r5, pc}
- 8008a28:	20001388 	.word	0x20001388
+ 8008a28:	20006f88 	.word	0x20006f88
 
 08008a2c <_read_r>:
  8008a2c:	b538      	push	{r3, r4, r5, lr}
@@ -17221,7 +17221,7 @@ HAL_StatusTypeDef UART_WaitOnFlagUntilTimeout(UART_HandleTypeDef *huart, uint32_
  8008a46:	b103      	cbz	r3, 8008a4a <_read_r+0x1e>
  8008a48:	6023      	str	r3, [r4, #0]
  8008a4a:	bd38      	pop	{r3, r4, r5, pc}
- 8008a4c:	20001388 	.word	0x20001388
+ 8008a4c:	20006f88 	.word	0x20006f88
 
 08008a50 <_init>:
  8008a50:	b5f8      	push	{r3, r4, r5, r6, r7, lr}

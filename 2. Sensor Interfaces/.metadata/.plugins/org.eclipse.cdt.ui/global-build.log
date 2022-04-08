@@ -1,23 +1,14 @@
-14:51:46 **** Incremental Build of configuration Debug for project V1 ****
+15:54:51 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
 make -j4 all 
-arm-none-eabi-gcc "../Core/Src/WaveFunctions.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DARM_MATH_CM4 -DSTM32L476xx -DDEBUG -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/WaveFunctions.d" -MT"Core/Src/WaveFunctions.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/WaveFunctions.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DARM_MATH_CM4 -DSTM32L476xx -DDEBUG -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc "../Core/Src/waveData.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DARM_MATH_CM4 -DSTM32L476xx -DDEBUG -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/waveData.d" -MT"Core/Src/waveData.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/waveData.o"
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:101:13: warning: passing argument 1 of 'calibrate' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-  101 |   calibrate(rawData, dataOutput);
-      |             ^~~~~~~
-In file included from ../Core/Inc/waveData.h:9,
-                 from ../Core/Src/main.c:30:
-../Core/Inc/waveFunctions.h:23:27: note: expected 'float32_t *' {aka 'float *'} but argument is of type 'const float32_t *' {aka 'const float *'}
-   23 | void calibrate(float32_t* rawData, float32_t* calOutput);
-      |                ~~~~~~~~~~~^~~~~~~
-../Core/Src/waveData.c:15:24: warning: 'rawData' defined but not used [-Wunused-const-variable=]
-   15 | static const float32_t rawData[RAW_DATA_LENGTH] =
-      |                        ^~~~~~~
-arm-none-eabi-gcc -o "V1.elf" @"objects.list"  -larm_cortexM4lf_math -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\STM32 Full Pipeline\Embedded DSP Pipelines\V1\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="V1.map" -Wl,--gc-sections -static -L"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\5. Firmware Development\Spectral Compression Algorithm\STM32 Full Pipeline\Embedded DSP Pipelines\V1\Drivers\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_2.0.0.202105311346\tools\arm-none-eabi\bin\ld.exe: V1.elf section `.bss' will not fit in region `RAM'
-c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_2.0.0.202105311346\tools\arm-none-eabi\bin\ld.exe: region `RAM' overflowed by 109720 bytes
-collect2.exe: error: ld returned 1 exit status
-make: *** [makefile:64: V1.elf] Error 1
-"make -j4 all" terminated with exit code 2. Build might be incomplete.
+arm-none-eabi-size   SDMMC_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  42480	    120	   5752	  48352	   bce0	SDMMC_Interface.elf
+Finished building: default.size.stdout
+ 
+15:54:57 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+make -j4 all 
+arm-none-eabi-size   SDMMC_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  42480	    120	   5752	  48352	   bce0	SDMMC_Interface.elf
+Finished building: default.size.stdout
+ 

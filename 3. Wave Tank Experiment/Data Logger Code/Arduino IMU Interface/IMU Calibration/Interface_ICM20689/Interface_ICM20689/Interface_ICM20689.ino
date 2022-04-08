@@ -8,6 +8,7 @@
 
 #include "ICM20689.h" 
 #include "I2Cdev.h"
+#include "Wire.h" 
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -44,15 +45,16 @@ void setup() {
 
 void loop() {
 
-   ICM20689Test.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); 
+   //ICM20689Test.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); 
+   az = ICM20689Test.getAccelerationX(); 
 
    Serial.print("a/g:\t");
-   Serial.print(ax, DEC); Serial.print("\t");
-   Serial.print(ay, DEC); Serial.print("\t");
+   //Serial.print(ax, DEC); Serial.print("\t");
+   //Serial.print(ay, DEC); Serial.print("\t");
    Serial.print(az, DEC); Serial.print("\t");
-   Serial.print(gx, DEC); Serial.print("\t");
-   Serial.print(gy, DEC); Serial.print("\t");
-   Serial.print(gz, DEC); Serial.print("\t");   
+   //Serial.print(gx, DEC); Serial.print("\t");
+   //Serial.print(gy, DEC); Serial.print("\t");
+   //Serial.print(gz, DEC); Serial.print("\t");   
    Serial.print("\n"); 
 
 

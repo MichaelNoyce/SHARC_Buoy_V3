@@ -47,7 +47,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-
+//extern float32_t testOutput[TEST_LENGTH_SAMPLES];
+float32_t *outputF32, *inputF32;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -95,24 +96,31 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  //printmsg("DSP Pipeline V1 Start!\r\n");
+  printmsg("DSP Pipeline V1 Start!\r\n");
   uint32_t i;
 
-  calibrate(rawData, dataOutput);
+  	calibrate(rawData, dataOutput);
 
 	for (i = 0; i < RAW_DATA_LENGTH ; i++)
 	{
-		//printmsg("%f \r\n", dataOutputOutput[i]);
+		//printmsg("%f \r\n", dataOutput[i]);
 	}
 
-	//float32_t detrendOutput[RAW_DATA_LENGTH];
 	detrend(dataOutput, dataOutput);
 
 
 	for (i = 0; i < RAW_DATA_LENGTH ; i++)
 	{
-		printmsg("%f \r\n", dataOutput[i]);
+		//printmsg("%f \r\n", dataOutput[i]);
 	}
+
+	FourStepDFT(dataOutput, testOutput);
+
+	for (i = 0; i < RAW_DATA_LENGTH ; i++)
+	{
+		printmsg("%f \r\n", testOutput[i]);
+	}
+
 
   /* USER CODE END 2 */
 
@@ -252,7 +260,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {
-    char str[80];
+    char str[30];
 
     /*Extract the the argument list using VA apis */
     va_list args;

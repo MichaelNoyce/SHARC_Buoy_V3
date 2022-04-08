@@ -9,6 +9,10 @@
 #include "waveFunctions.h"
 
 
-const float32_t rawData[RAW_DATA_LENGTH];
+float32_t rawData[RAW_DATA_LENGTH];
 
 float32_t dataOutput[RAW_DATA_LENGTH];
+
+float32_t testOutput[RAW_DATA_LENGTH];
+
+

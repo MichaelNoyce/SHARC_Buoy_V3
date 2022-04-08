@@ -110,7 +110,7 @@ void ICM20689::getAcceleration(int16_t* x, int16_t* y, int16_t* z) {
 /** Get X-axis accelerometer reading.
  * @return X-axis acceleration measurement in 16-bit 2's complement format
  * @see getMotion6()
- * @see MPU6050_RA_ACCEL_XOUT_H
+ * @see ICM20689_RA_ACCEL_XOUT_H
  */
 int16_t ICM20689::getAccelerationX() {
     I2Cdev::readBytes(devAddr, ICM20689_ACCEL_XOUT_H, 2, buffer);
@@ -119,7 +119,7 @@ int16_t ICM20689::getAccelerationX() {
 /** Get Y-axis accelerometer reading.
  * @return Y-axis acceleration measurement in 16-bit 2's complement format
  * @see getMotion6()
- * @see MPU6050_RA_ACCEL_YOUT_H
+ * @see ICM20689_RA_ACCEL_YOUT_H
  */
 int16_t ICM20689::getAccelerationY() {
     I2Cdev::readBytes(devAddr, ICM20689_ACCEL_YOUT_H, 2, buffer);
@@ -128,7 +128,7 @@ int16_t ICM20689::getAccelerationY() {
 /** Get Z-axis accelerometer reading.
  * @return Z-axis acceleration measurement in 16-bit 2's complement format
  * @see getMotion6()
- * @see MPU6050_RA_ACCEL_ZOUT_H
+ * @see ICM20689_RA_ACCEL_ZOUT_H
  */
 int16_t ICM20689::getAccelerationZ() {
     I2Cdev::readBytes(devAddr, ICM20689_ACCEL_ZOUT_H, 2, buffer);
@@ -156,7 +156,7 @@ int16_t ICM20689::getTemperature() {
  * @param gz 16-bit signed integer container for gyroscope Z-axis value
  * @see getAcceleration()
  * @see getRotation()
- * @see MPU6050_RA_ACCEL_XOUT_H
+ * @see ICM20689_RA_ACCEL_XOUT_H
  */
 
 void ICM20689::getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz) {

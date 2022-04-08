@@ -53,6 +53,8 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -82,9 +84,10 @@ void NMI_Handler(void)
   */
 void HardFault_Handler(void)
 {
+
   /* USER CODE BEGIN HardFault_IRQn 0 */
-	volatile uint32_t cfsr = SCB-> CFSR ; // load into variable
-	printmsg( "SCB-> CSFR 0x%08x \r\n", cfsr); // print
+	volatile uint32_t hfsr = SCB-> HFSR ; // load into variable
+	printmsg( "HARDFAULT: SCB-> HSFR 0x%08x \r\n", hfsr); // print
 
 
   /* USER CODE END HardFault_IRQn 0 */
@@ -101,7 +104,8 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-
+	volatile uint32_t mmfar = SCB-> MMFAR ; // load into variable
+	printmsg( "MEMMANAGE: SCB-> MMFAR 0x%08x \r\n", mmfar); // print
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -116,7 +120,8 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
-
+	volatile uint32_t bfar = SCB-> CFSR ; // load into variable
+	printmsg( "BUSFAULT: SCB-> CFSR 0x%08x \r\n", bfar); // print
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -131,7 +136,8 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
-
+	volatile uint32_t ufsr = SCB-> CFSR ; // load into variable
+	printmsg( "USAGEFAULT: SCB-> CFSR 0x%08x \r\n", ufsr); // print
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {

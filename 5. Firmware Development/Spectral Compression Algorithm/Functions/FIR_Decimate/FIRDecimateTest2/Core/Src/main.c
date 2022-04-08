@@ -42,7 +42,7 @@
 /* ----------------------------------------------------------------------
 ** Macro Defines
 ** ------------------------------------------------------------------- */
-#define TEST_LENGTH_SAMPLES  512
+#define TEST_LENGTH_SAMPLES  6400
 #define SNR_THRESHOLD_F32    75.0f
 #define BLOCK_SIZE            32
 /* Must be a multiple of 16 */
