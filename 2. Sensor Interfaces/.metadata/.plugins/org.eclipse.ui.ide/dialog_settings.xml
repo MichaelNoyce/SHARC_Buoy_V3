@@ -9,6 +9,8 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - HAL Driver code\STM32L4\Buoy_Firmware_V1"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\SW4STM32\STM32F401xx"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L476RG Interfaces\3. SD Interface\SD_Interface"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Basic Interface"/>
 			<item value="C:\Users\mpnoy\Downloads\en.stm32cubel4_v1-17-0_v1.17.0\STM32Cube_FW_L4_V1.17.0\Projects\STM32L476G-EVAL\Applications\FatFs\FatFs_uSD_Standalone\SW4STM32\STM32L476G_EVAL"/>

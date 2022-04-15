@@ -1,14 +1,37 @@
-15:54:51 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+17:33:26 **** Incremental Build of configuration Debug for project ICM20689 Interface ****
 make -j4 all 
-arm-none-eabi-size   SDMMC_Interface.elf 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:73:10: warning: unused variable 'acc' [-Wunused-variable]
+   73 |    float acc;
+      |          ^~~
+../Core/Src/main.c:72:17: warning: unused variable 'flag' [-Wunused-variable]
+   72 |    imu_status_t flag;
+      |                 ^~~~
+../Core/Src/main.c:71:12: warning: unused variable 'val' [-Wunused-variable]
+   71 |    int16_t val;
+      |            ^~~
+../Core/Src/main.c:70:12: warning: unused variable 'buf' [-Wunused-variable]
+   70 |    uint8_t buf[12];
+      |            ^~~
+arm-none-eabi-gcc -o "ICM20689 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20689 Interface\ICM20689 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20689 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: ICM20689 Interface.elf
+ 
+arm-none-eabi-size   ICM20689\ Interface.elf 
+arm-none-eabi-objdump -h -S  ICM20689\ Interface.elf  > "ICM20689 Interface.list"
+arm-none-eabi-objcopy  -O binary  ICM20689\ Interface.elf  "ICM20689 Interface.bin"
    text	   data	    bss	    dec	    hex	filename
-  42480	    120	   5752	  48352	   bce0	SDMMC_Interface.elf
+  37356	    484	   3124	  40964	   a004	ICM20689 Interface.elf
 Finished building: default.size.stdout
  
-15:54:57 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+Finished building: ICM20689 Interface.bin
+ 
+Finished building: ICM20689 Interface.list
+ 
+17:33:31 **** Incremental Build of configuration Debug for project ICM20689 Interface ****
 make -j4 all 
-arm-none-eabi-size   SDMMC_Interface.elf 
+arm-none-eabi-size   ICM20689\ Interface.elf 
    text	   data	    bss	    dec	    hex	filename
-  42480	    120	   5752	  48352	   bce0	SDMMC_Interface.elf
+  37356	    484	   3124	  40964	   a004	ICM20689 Interface.elf
 Finished building: default.size.stdout
  
