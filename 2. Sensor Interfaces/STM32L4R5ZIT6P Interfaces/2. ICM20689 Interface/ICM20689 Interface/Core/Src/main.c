@@ -25,6 +25,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "HAL_ICM20689.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,48 +94,75 @@ int main(void)
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  if((ICM20689_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_2G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_1) != IMU_OK))
+  //Clear Interrupt
+  //__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
+
+  //Check i2c communication
+  if((ICM20689_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_1) != IMU_OK))
   {
 	  printmsg("Error in i2c init \r\n");
   }
-
-  if((ICM20689_Init_TempSensor(&hi2c1, ENABLE)) != IMU_OK)
-  {
-	  printmsg("Error in temp init \r\n");
-  }
-
-  char rmsg[2];
-  i2cErrorCode = HAL_I2C_Mem_Read(&hi2c1, 0xD0, 0x0, I2C_MEMADD_SIZE_8BIT, (uint8_t*)rmsg, 1, HAL_MAX_DELAY);
-
-  if((i2cErrorCode) == HAL_OK)
-  {
-	  printmsg("i2c read is fine \r\n");
-  }
   else
   {
-	 printmsg("Error in i2c read \r\n");
-	 printmsg("HAL_Error Code: %d \r\n", i2cErrorCode);
+	  printmsg("Init successful! \r\n");
   }
 
-  printmsg("WHOAMI, 0x%x \r\n", rmsg[0]);
+
+  //get raw data
+
+  int8_t imu[12] = {0};
+  ICM20689_Get_IMU_RawData(&hi2c1, imu);
+
+  float rawAccX = (int16_t)imu[0]<<8 | (int16_t)imu[1];
+  float rawAccY = (int16_t)imu[2]<<8 | (int16_t)imu[3];
+  float rawAccZ = (int16_t)imu[4]<<8 | (int16_t)imu[5];
+  float rawRoll = (int16_t)imu[6]<<8 | (int16_t)imu[7];
+  float rawPitch = (int16_t)imu[8]<<8 | (int16_t)imu[9];
+  float rawYaw = (int16_t)imu[10]<<8 | (int16_t)imu[11];
+
+  printmsg("rawAccX: %f \r\n", rawAccX/8192*9.81);
+  printmsg("rawAccY: %f \r\n", rawAccY/8192*9.81);
+  printmsg("rawAccZ: %f \r\n", rawAccZ/8192*9.81);
+  printmsg("rawRoll: %f \r\n", rawRoll/65.5);
+  printmsg("rawPitch: %f \r\n", rawPitch/65.5);
+  printmsg("rawYaw: %f \r\n", rawYaw/65.5);
+
+  int8_t temp[2] = {0};
+  if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, TEMP_OUT_H,I2C_MEMADD_SIZE_8BIT, temp,2,100)!= HAL_OK)
+ {
+ 	return IMU_I2C_ERROR;
+ }
+ else
+ {
+
+	float temperature =  (int16_t)temp[0]<<8 | (int16_t)temp[1];
+ 	printmsg("temp %f \r\n", (temperature/333.81+21));
+ }
+
+  //Enable FIFO
+
+  uint8_t int_status = 0;
+
+ /*  if(ICM20689_Get_Interrupt_Status(&hi2c1, FIFO_WATERMARK, &int_status) != IMU_OK)
+ {
+ 	return IMU_I2C_ERROR;
+ }
+ else
+ {
+ 	printmsg("Interrupt status %d \r\n", int_status);
+ }
+
+ */
+
+ //HAL_Delay(3000);
+
+ //uint16_t* count = {0};
+
+ //ICM20689_Get_FIFO_Count(&hi2c1, count);
+
+ //printmsg("FIFO count size: %d \r\n", *count);
 
 
-  printmsg("Reading Temp !\r\n");
-
-  uint8_t temp_reading[2] = {0};
-
-
-  if(HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, TEMP_OUT_H, I2C_MEMADD_SIZE_8BIT, (uint8_t*)temp_reading, 2, 100) !=HAL_OK)
-  {
-	  printmsg("Error reading Temp \r\n");
-  }
-  else
-  {
-	  int16_t temp = ((int16_t)temp_reading[0]<<8)|((int16_t)temp_reading[1]);
-	  printmsg("Raw temp value %i \r\n", temp);
-	  float temp_calc = ((float)(temp)/333.87) + 21;
-	  printmsg("temp_calc value, %f \r\n", temp_calc);
-  }
 
   /* USER CODE END 2 */
 

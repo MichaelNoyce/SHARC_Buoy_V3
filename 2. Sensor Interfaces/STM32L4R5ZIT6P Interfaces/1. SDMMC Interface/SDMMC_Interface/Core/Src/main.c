@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -26,6 +25,7 @@
 #include "string.h"
 #include <stdint.h>
 #include <stdarg.h>
+#include "HAL_SD.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,11 +43,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- CRC_HandleTypeDef hcrc;
-
-UART_HandleTypeDef hlpuart1;
-
-SD_HandleTypeDef hsd1;
 
 /* USER CODE BEGIN PV */
 
@@ -55,18 +50,14 @@ SD_HandleTypeDef hsd1;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
 static void MX_LPUART1_UART_Init(void);
-static void MX_SDMMC1_SD_Init(void);
-static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 void printmsg(char *format,...);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-FATFS SDFatFs = {0};
-FIL myFile;
+
 /* USER CODE END 0 */
 
 /**
@@ -76,13 +67,7 @@ FIL myFile;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	FRESULT res; /* FatFs function common result code */
-	uint32_t byteswritten, bytesread; /* File write/read counts */
-	uint8_t wtext[] = "STM32 FATFS still works great!"; /* File write buffer */
-	uint8_t rtext[_MAX_SS];/* File read buffer */
-	uint8_t errorCode = 0;
-	char myPath[] = "STM32.TXT\0";
-	uint8_t status;
+
 
   /* USER CODE END 1 */
 
@@ -103,46 +88,35 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
   MX_LPUART1_UART_Init();
-  MX_SDMMC1_SD_Init();
-  MX_CRC_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   printmsg("SDMMC Interface Starting! \r\n");
+  FATFS SDFatFs; /* File system object for User logical drive */
+  FIL File; /* File object */
+  char diskPath[4]; /* User logical drive path */
+  uint8_t dataBuffer[] = "Hello World!";
+  sd_status_t errorCode;
+  FRESULT res;
+  uint32_t byteswritten = 0 ;
 
-  if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) != FR_OK)
-    {
-  	  printmsg("Issue with mounting \r\n");
-  	  errorCode = 1;
-    }
-    else
-    {
+  errorCode = SD_Init();
+  printmsg("Error Code, %d \r\n", errorCode);
+  errorCode = SD_Mount(SDFatFs, diskPath);
+  printmsg("Error Code, %d \r\n", errorCode);
+  errorCode= SD_File_Open(File, 1);
+  printmsg("Error Code, %d \r\n", errorCode);
+  errorCode = SD_File_Write(File, dataBuffer);
+  printmsg("Error Code, %d \r\n", errorCode);
+  //res = f_write(&File, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten);
+  //printmsg("Res Code, %d \r\n", res);
+  errorCode = SD_File_Close(File);
+  printmsg("Error Code, %d \r\n", errorCode);
 
-  	  	  status = f_open(&myFile, myPath, FA_WRITE | FA_CREATE_ALWAYS);
-            //Open file for writing (Create)
-            if( status != FR_OK)
-            {
-                printmsg(" Unable to open file \r\n");
-                printmsg("Error Code: %d \r\n", status);
-            }
-            else
-            {
-                //Write to the text file
-                res = f_write(&myFile, wtext, strlen((char *)wtext), (void *)&byteswritten);
-                if((byteswritten == 0) || (res != FR_OK))
-                {
-              	  printmsg(" Unable to write to file \r\n");
-              	  errorCode = 4;
-                }
-                else
-                {
-              	  printmsg("Write successful? \r\n");
-                    f_close(&myFile);
-                }
-            }
-    }
-    f_mount(&SDFatFS, (TCHAR const*)NULL, 0);
+
+
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -206,36 +180,6 @@ void SystemClock_Config(void)
   }
 }
 
-/**
-  * @brief CRC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CRC_Init(void)
-{
-
-  /* USER CODE BEGIN CRC_Init 0 */
-
-  /* USER CODE END CRC_Init 0 */
-
-  /* USER CODE BEGIN CRC_Init 1 */
-
-  /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
-  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
-  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
-  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
-  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
-  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN CRC_Init 2 */
-
-  /* USER CODE END CRC_Init 2 */
-
-}
 
 /**
   * @brief LPUART1 Initialization Function
@@ -285,69 +229,9 @@ static void MX_LPUART1_UART_Init(void)
 
 }
 
-/**
-  * @brief SDMMC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SDMMC1_SD_Init(void)
-{
 
-  /* USER CODE BEGIN SDMMC1_Init 0 */
 
-  /* USER CODE END SDMMC1_Init 0 */
 
-  /* USER CODE BEGIN SDMMC1_Init 1 */
-
-  /* USER CODE END SDMMC1_Init 1 */
-  hsd1.Instance = SDMMC1;
-  hsd1.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
-  hsd1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-  hsd1.Init.BusWide = SDMMC_BUS_WIDE_1B;
-  hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  hsd1.Init.ClockDiv = 1;
-  hsd1.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
-  /* USER CODE BEGIN SDMMC1_Init 2 */
-
-  /* USER CODE END SDMMC1_Init 2 */
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  HAL_PWREx_EnableVddIO2();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : SD_Detect_Pin */
-  GPIO_InitStruct.Pin = SD_Detect_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(SD_Detect_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LD3_Pin */
-  GPIO_InitStruct.Pin = LD3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
-
-}
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {

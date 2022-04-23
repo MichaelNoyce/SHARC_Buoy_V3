@@ -83,7 +83,7 @@ typedef enum
 	GYRO_ZOUT_H = 0X37,
 	GYRO_ZOUT_L = 0X38,
 	TEMP_OUT_H = 0X39,
-	TEMP_OUT_Y = 0X3A,
+	TEMP_OUT_L = 0X3A,
 	FIFO_EN_1 = 0X66,
 	FIFO_EN_2 = 0X67,
 	FIFO_RST = 0X68,
@@ -185,6 +185,7 @@ typedef enum
 typedef enum
 {
 	FIFO_OVERFLOW,
+	FIFO_WATERMARK,
 	I2C_MST_INT,
 	DATA_READY
 }Interrupt_source_t;
@@ -283,7 +284,7 @@ typedef struct
 #define PWR_MGMT_1_DEVICE_RESET 0b1<<7
 #define PWR_MGMT_1_SLEEP_EN 	0b1<<6
 #define PWR_MGMT_1_LP_EN 	0b1<<5
-#define PWR_MGMT_1_TEMP_DIS 	0b1<<3
+#define PWR_MGMT_1_TEMP_DIS 0b1<<3
 
 //PWR_MGMT_2
 
@@ -319,6 +320,15 @@ typedef struct
 //INT_ENABLE_2
 #define INT_ENABLE_FIFO_OFLOW_EN 0b1<<4
 
+//INT_STATUS_1
+#define RAW_DATA_0_RDY_INT 0b1
+
+//INT_STATUS_2
+#define FIFO_OVERFLOW_INT 0b11111
+
+//INT_STATUS 3
+#define FIFO_WM_INT 0b11111
+
 //SIGNAL_PATH_RESET
 #define SIGNAL_PATH_ACC_RESET  0b1<<1
 #define SIGNAL_PATH_TEMP_RESET 0b1
@@ -335,14 +345,16 @@ typedef struct
 //a sensor�s respective FIFO_EN bit is set to 1 in this register.
 
 //FIFO_EN_2 (FIFO_EN_1 is for an external sensor i2c)
-#define FIFO_EN_TEMP 0b1<<0
-#define FIFO_EN_XG	 0b1<<1
-#define FIFO_EN_YG	 0b1<<2
-#define FIFO_EN_ZG	 0b1<<3
-#define FIFO_EN_ACC	 0b1<<4
+#define ACCEL_FIFO_EN   0b1<<4
+#define GYRO_Z_FIFO_EN	0b1<<3
+#define GYRO_Y_FIFO_EN	0b1<<2
+#define GYRO_X_FIFO_EN	0b1<<1
+#define TEMP_FIFO_EN	0b1<<0
 
 //FIFO_RST
 #define FIFO_RESET 0b1111
+
+
 //--------------------------------------------------------------------------------------
 //User Bank 2 Registers
 //--------------------------------------------------------------------------------------
@@ -384,10 +396,10 @@ typedef struct
 
 //ACC_CONFIG Macros
 #define ACC_CONFIG_AFSSEL_MSK 0b11
-#define ACC_CONFIG_AFSSEL_2G	0<<3
-#define ACC_CONFIG_AFSSEL_4G	1<<3
-#define ACC_CONFIG_AFSSEL_8G	2<<3
-#define ACC_CONFIG_AFSSEL_16G	ACC_CONFIG_AFSSEL_MSK<<3
+#define ACC_CONFIG_AFSSEL_4G	0<<3
+#define ACC_CONFIG_AFSSEL_8G	1<<3
+#define ACC_CONFIG_AFSSEL_16G	2<<3
+#define ACC_CONFIG_AFSSEL_30G	ACC_CONFIG_AFSSEL_MSK<<3
 
 #define ACCEL_DPLFCFG_1 0<<3
 #define ACCEL_DPLFCFG_2 1<<3
@@ -395,15 +407,18 @@ typedef struct
 #define ACCEL_DPLFCFG_4 3<<3
 #define ACCEL_DPLFCFG_5 4<<3
 #define ACCEL_DPLFCFG_6 5<<3
-#define ACCEL_DPLFCFG_7 6<<3
-#define ACCEL_DPLFCFG_8 7<<3
 
 #define ACC_CONFIG_ST_EN_X	0b1<<7
 #define ACC_CONFIG_ST_EN_Y	0b1<<6
 #define ACC_CONFIG_ST_EN_Z	0b1<<5
 
+#define ACC_FCHOICE_DIS 0 //DLPF disabled
+#define ACC_FCHOICE_EN 1 //DLPF Enabled
+//Sample Rate Value
 
-
+#define SAMPLE_RATE 100//Hz
+#define ACC_OUTPUT_RATE_DLPF_EN 1125 //Hz
+#define ACC_OUTPUT_RATE_DLPF_DIS 4500 //Hz
 
 
 /* I2C Definitions:
@@ -428,15 +443,16 @@ typedef struct
 #define WHO_AM_I_VALUE  0xE1
 
 //Sample Rate Value
-#define SAMPLE_RATE 5//Hz
-#define GYRO_OUTPUT_RATE_DLPF_EN 1000 //Hz
-#define GYRO_OUTPUT_RATE_DLPF_DIS 8000 //Hz
+#define SAMPLE_RATE 100//Hz
+#define GYRO_OUTPUT_RATE_DLPF_EN 1125 //Hz
+#define GYRO_OUTPUT_RATE_DLPF_DIS 4400 //Hz
 
 //ACC ressolution values
 #define ACC_2G_WORD_LENGTH 16384 //LSB/g
 #define ACC_4G_WORD_LENGTH 8192
 #define ACC_8G_WORD_LENGTH 4096
 #define ACC_16G_WORD_LENGTH 2048
+#define ACC_30G_WORD_LENGTH 1024
 
 //Data Defines
 #define N_Samples 100
@@ -478,14 +494,15 @@ uint8_t IMU_Buffer[IMU_BUFFER_SIZE];	//Buffer to store data from the IMU
 imu_status_t ICM20689_Set_Gyro_FSR(I2C_HandleTypeDef *hi2c, uint8_t FSR);
 imu_status_t ICM20689_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR);
 imu_status_t ICM20689_Set_FSync(I2C_HandleTypeDef *hi2c, uint8_t Fsync);
-imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF);
-imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF);
+imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
+imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
 imu_status_t ICM20689_Set_Sample_Rate(I2C_HandleTypeDef *hi2c);
 imu_status_t ICM20689_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL);
-imu_status_t ICM20689_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t fifo_mask, uint8_t cmd);
+imu_status_t  ICM20689_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  uint8_t gyroEnable, uint8_t tempEnable, uint8_t cmd );
 imu_status_t ICM20689_Config_Interrupt_Pin(Interrupt_source_t interrupt, uint8_t level, uint8_t latch);
 imu_status_t ICM20689_FIFO_CMD(I2C_HandleTypeDef *hi2c,uint8_t cmd);
 imu_status_t ICM20689_Register_Bank_Select(I2C_HandleTypeDef *i2c, uint8_t regNo);
+imu_status_t ICM20689_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf, uint8_t gyro_dis_lpf);
 
 //======================= 9. Initializaiton Function Prototypes ========================================
 
@@ -497,7 +514,7 @@ imu_status_t ICM20689_Register_Bank_Select(I2C_HandleTypeDef *i2c, uint8_t regNo
 
 imu_status_t ICM20689_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff, uint8_t dlpf_acc_coeff);
 imu_status_t ICM20689_Deinit_IMU(void);
-imu_status_t ICM20689_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts);
+imu_status_t ICM20689_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber);
 imu_status_t ICM20689_Disable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts);
 
 /* Function Name imu_status_t ICM20689_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
@@ -533,7 +550,7 @@ imu_status_t ICM20689_Set_Low_Power_Mode_Acc(I2C_HandleTypeDef *hi2c,uint8_t Cyc
 imu_status_t ICM20689_Set_Sleep_Power_Mode(I2C_HandleTypeDef *hi2c);
 imu_status_t ICM20689_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_source_t interrupt_src,uint8_t* res);
 imu_status_t ICM20689_Signal_conditioned_Reset(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c,uint8_t* imu);
+imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu);
 imu_status_t ICM20689_reset(I2C_HandleTypeDef *hi2c);
 
 void ICM20689_DMA_PeriphIRQHandler(void);

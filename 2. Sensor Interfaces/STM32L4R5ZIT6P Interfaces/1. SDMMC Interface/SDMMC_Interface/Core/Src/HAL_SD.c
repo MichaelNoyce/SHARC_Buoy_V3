@@ -1,0 +1,211 @@
+/*
+ * HAL_SD.c
+ *
+ *  Created on: Apr 20, 2022
+ *      Author: Michael Noyce
+ */
+
+
+//======================== 1. Includes ==============================================================
+
+#include "HAL_SD.h"
+
+
+//======================== 2. Private Variables =====================================================
+
+//uint8_t I2C_TX_CPLT;	//Flag signaling completion of I2C DMA transfer
+
+//======================== 3. Static Functions Prototypes ===========================================
+static void MX_GPIO_Init(void);
+static void MX_SDMMC1_SD_Init(void);
+static void MX_CRC_Init(void);
+
+//======================== 4. Static Functions Definition ===========================================
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
+  HAL_PWREx_EnableVddIO2();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : SD_Detect_Pin */
+  GPIO_InitStruct.Pin = SD_Detect_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(SD_Detect_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LD3_Pin */
+  GPIO_InitStruct.Pin = LD3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LD3_GPIO_Port, &GPIO_InitStruct);
+
+}
+
+/**
+  * @brief SDMMC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SDMMC1_SD_Init(void)
+{
+
+  /* USER CODE BEGIN SDMMC1_Init 0 */
+
+  /* USER CODE END SDMMC1_Init 0 */
+
+  /* USER CODE BEGIN SDMMC1_Init 1 */
+
+  /* USER CODE END SDMMC1_Init 1 */
+  hsd1.Instance = SDMMC1;
+  hsd1.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
+  hsd1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+  hsd1.Init.BusWide = SDMMC_BUS_WIDE_1B;
+  hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd1.Init.ClockDiv = 1;
+  hsd1.Init.Transceiver = SDMMC_TRANSCEIVER_DISABLE;
+  /* USER CODE BEGIN SDMMC1_Init 2 */
+
+  /* USER CODE END SDMMC1_Init 2 */
+
+}
+
+/**
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CRC_Init(void)
+{
+
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  hcrc.Instance = CRC;
+  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
+  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
+  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
+  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
+  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
+  if (HAL_CRC_Init(&hcrc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
+
+}
+
+
+
+
+
+
+//======================== 5. MSP Function Definitions ==================================
+/* MSP FUNCTIONS:
+ *
+ *  Functions designed to replace the _weak MSP peripheral initialization
+ *  function definitions in the HAL Library files.
+ *
+ *  NB!!!! before running the code do the following:
+ *
+ *  1. Uncomment the desired MSP Function
+ *
+ *  2. Cut the function and paste it in the stm32l4xx_hal_msp.c file
+ *
+ *  3. In the stm32l4xx_hal_msp.c file, include the header "HAL_BMP280.h"
+ */
+
+
+
+//======================== 6. SD Configuration Functions =========================================
+
+
+sd_status_t SD_Init(void)
+{
+	MX_GPIO_Init();
+	MX_SDMMC1_SD_Init();
+	MX_CRC_Init();
+
+	return SD_OK;
+}
+
+sd_status_t SD_Mount(FATFS SDFatFs, char myPath[])
+{
+
+	char diskPath[] = "STM32.txt"; /* User logical drive path */
+
+	if(f_mount(&SDFatFs, (TCHAR const*)diskPath, 0) != FR_OK)
+	{
+	  return SD_MOUNT_ERROR;
+	}
+
+	return SD_OK;
+}
+
+sd_status_t SD_File_Open(FIL myFile, uint32_t fileNumber)
+{
+
+	char myPath[20];
+
+	sprintf(myPath, "FileNo-%ld.txt", fileNumber);
+
+	if(f_open(&myFile, "STM32.txt", FA_WRITE | FA_CREATE_ALWAYS) != FR_OK)
+	{
+		return SD_OPEN_ERROR;
+	}
+
+	return SD_OK;
+}
+
+sd_status_t SD_File_Write(FIL myFile, uint8_t dataBuffer[])
+{
+
+	uint32_t byteswritten = 0 ;  /* File write counts */
+
+	if(f_write(&myFile, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten)!= FR_OK)
+	{
+		return SD_WRITE_ERROR;
+	}
+
+	if(byteswritten == 0)
+    {
+  	  return SD_WRITE_ERROR;
+    }
+
+
+
+	return SD_OK;
+}
+
+sd_status_t SD_File_Close(FIL myFile)
+{
+	if(f_close(&myFile) != FR_OK)
+	{
+		return SD_CLOSE_ERROR;
+	}
+
+	return SD_OK;
+}
+

@@ -1,37 +1,60 @@
-17:33:26 **** Incremental Build of configuration Debug for project ICM20689 Interface ****
+16:28:58 **** Incremental Build of configuration Debug for project SD_Logger_Test ****
 make -j4 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-size   SD_Logger_Test.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32900	    120	   4936	  37956	   9444	SD_Logger_Test.elf
+Finished building: default.size.stdout
+ 
+16:29:09 **** Incremental Build of configuration Debug for project SD_Logger_Test ****
+make -j4 all 
+arm-none-eabi-size   SD_Logger_Test.elf 
+   text	   data	    bss	    dec	    hex	filename
+  32900	    120	   4936	  37956	   9444	SD_Logger_Test.elf
+Finished building: default.size.stdout
+ 
+16:30:16 **** Incremental Build of configuration Debug for project SD_Logger_Test ****
+make -j4 all 
+arm-none-eabi-gcc "../Core/Src/HAL_ICM20689.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_ICM20689.d" -MT"Core/Src/HAL_ICM20689.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_ICM20689.o"
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/HAL_ICM20689.c: In function 'MX_I2C1_Init':
+../Core/Src/HAL_ICM20689.c:59:5: warning: implicit declaration of function 'Error_Handler' [-Wimplicit-function-declaration]
+   59 |     Error_Handler();
+      |     ^~~~~~~~~~~~~
+../Core/Src/HAL_ICM20689.c: In function 'ICM20689_Config_FIFO':
+../Core/Src/HAL_ICM20689.c:562:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  562 |   if((accEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20689.c:566:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  566 |   if((gyroEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20689.c:570:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  570 |   if((tempEnable) = ENABLE)
+      |      ^
 ../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:73:10: warning: unused variable 'acc' [-Wunused-variable]
-   73 |    float acc;
-      |          ^~~
-../Core/Src/main.c:72:17: warning: unused variable 'flag' [-Wunused-variable]
-   72 |    imu_status_t flag;
-      |                 ^~~~
-../Core/Src/main.c:71:12: warning: unused variable 'val' [-Wunused-variable]
-   71 |    int16_t val;
-      |            ^~~
-../Core/Src/main.c:70:12: warning: unused variable 'buf' [-Wunused-variable]
-   70 |    uint8_t buf[12];
-      |            ^~~
-arm-none-eabi-gcc -o "ICM20689 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20689 Interface\ICM20689 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20689 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: ICM20689 Interface.elf
+../Core/Src/main.c:111:36: warning: pointer targets in passing argument 2 of 'ICM20689_Get_IMU_RawData' differ in signedness [-Wpointer-sign]
+  111 |   ICM20689_Get_IMU_RawData(&hi2c1, imu);
+      |                                    ^~~
+      |                                    |
+      |                                    int8_t * {aka signed char *}
+In file included from ../Core/Src/main.c:25:
+../Core/Inc/HAL_ICM20689.h:553:73: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'int8_t *' {aka 'signed char *'}
+  553 | imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu);
+      |                                                                ~~~~~~~~~^~~
+../Core/Src/HAL_ICM20689.c: In function 'ICM20689_Get_IMU_RawData':
+../Core/Src/HAL_ICM20689.c:744:2: warning: implicit declaration of function 'printmsg' [-Wimplicit-function-declaration]
+  744 |  printmsg("Getting IMU Raw data \r\n");
+      |  ^~~~~~~~
+arm-none-eabi-gcc -o "SD_Logger_Test.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\7. Hardware Development\SHARC Buoy V1.3 Pinout\SD_Logger_Test\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="SD_Logger_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: SD_Logger_Test.elf
  
-arm-none-eabi-size   ICM20689\ Interface.elf 
-arm-none-eabi-objdump -h -S  ICM20689\ Interface.elf  > "ICM20689 Interface.list"
-arm-none-eabi-objcopy  -O binary  ICM20689\ Interface.elf  "ICM20689 Interface.bin"
+arm-none-eabi-size   SD_Logger_Test.elf 
+arm-none-eabi-objdump -h -S  SD_Logger_Test.elf  > "SD_Logger_Test.list"
+arm-none-eabi-objcopy  -O binary  SD_Logger_Test.elf  "SD_Logger_Test.bin"
    text	   data	    bss	    dec	    hex	filename
-  37356	    484	   3124	  40964	   a004	ICM20689 Interface.elf
+  32100	    120	   4936	  37156	   9124	SD_Logger_Test.elf
 Finished building: default.size.stdout
  
-Finished building: ICM20689 Interface.bin
+Finished building: SD_Logger_Test.bin
  
-Finished building: ICM20689 Interface.list
- 
-17:33:31 **** Incremental Build of configuration Debug for project ICM20689 Interface ****
-make -j4 all 
-arm-none-eabi-size   ICM20689\ Interface.elf 
-   text	   data	    bss	    dec	    hex	filename
-  37356	    484	   3124	  40964	   a004	ICM20689 Interface.elf
-Finished building: default.size.stdout
+Finished building: SD_Logger_Test.list
  

@@ -68,6 +68,7 @@ static HAL_StatusTypeDef MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
   //printmsg("i2c init successful! \r\n");
   /* USER CODE END I2C1_Init 2 */
+  return HAL_OK;
 
 }
 
@@ -108,7 +109,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : PA5 */
   GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
@@ -163,7 +164,6 @@ imu_status_t ICM20689_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	if(whoami != WHO_AM_I_VALUE)
 	{
 		return IMU_I2C_ID_ERROR;
-		printmsg("WHOAMI: %x", whoami);
 	}
 
 	//Initialise registers
@@ -175,15 +175,21 @@ imu_status_t ICM20689_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Configure sensor settings
 	ICM20689_Set_Acc_FSR(&hi2c1,a_fsr);
 	ICM20689_Set_Gyro_FSR(&hi2c1,g_fsr);
-	ICM20689_Set_Acc_DLPF(&hi2c1,dlpf_acc_coeff);
-	ICM20689_Set_Gyro_DLPF(&hi2c1,dlpf_gyro_coeff);
+	ICM20689_Set_Acc_DLPF(&hi2c1,dlpf_acc_coeff, ENABLE);
+	ICM20689_Set_Gyro_DLPF(&hi2c1,dlpf_gyro_coeff, ENABLE);
+	//ICM20689_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
 	ICM20689_Set_Sample_Rate(&hi2c1);
 
+	//Enable Temperature Sensor
+	ICM20689_Init_TempSensor(&hi2c1, ENABLE);
+
+	//Enable and config FIFO
+	//ICM20689_Init_FIFO(&hi2c1, ENABLE);
+	//ICM20689_Config_FIFO(&hi2c1, ENABLE, ENABLE, ENABLE, ENABLE);
+
 	//configure interrupt pin
-	ICM20689_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
-	ICM20689_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_EN);
-	ICM20689_Get_Interrupt_Status(&hi2c1,DATA_READY,(uint8_t*)0xFF);
-	ICM20689_Init_FIFO(&hi2c1, ENABLE);
+	//ICM20689_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
+	//ICM20689_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
 	return IMU_OK;
 }
 
@@ -211,6 +217,8 @@ imu_status_t ICM20689_Deinit_IMU(void)
 
 imu_status_t ICM20689_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
 	//get USER_CTRL register Data
 	uint8_t uc_byte;
 	uint8_t fifo_rst_byte;
@@ -227,39 +235,31 @@ imu_status_t ICM20689_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
 		uc_byte &= ~USER_CTRL_FIFO_EN;
 	}else if(enable == IMU_RESET)
 	{
-		uc_byte &= ~USER_CTRL_FIFO_EN;
-		fifo_rst_byte |= ~FIFO_RESET;
+		fifo_rst_byte |= FIFO_RESET;
 	}
 	//write values to data register
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)||(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,USER_CTRL,1,&uc_byte,1,100) != HAL_OK))
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
-	if(enable == IMU_RESET)
+	else
 	{
-		//poll User control FIFO reset bit until it resets
-		while((uc_byte& FIFO_RESET) != 0 )
-		{
-			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,FIFO_RESET,1,&uc_byte,1,100) != HAL_OK)
-			{
-				return IMU_RESET_FAIL;
-			}
-		}
-
-		//Reassert for full reset
-		uc_byte |= ~FIFO_RESET;
-		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,(&uc_byte),1, 100)!= HAL_OK)
+		//Deassert Reset (need to assert and deassert for full reset
+		fifo_rst_byte &= ~FIFO_RESET;
+		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)!= HAL_OK)
 		{
 			return IMU_I2C_ERROR;
 		}
-
 	}
+
 	return IMU_OK;
 
 }
 
 imu_status_t ICM20689_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd)
  {
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
  	//get register data
  	uint8_t pwrmgmtbyte = 0;
  	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,100) != HAL_OK)
@@ -284,17 +284,44 @@ imu_status_t ICM20689_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd)
  	return IMU_OK;
  }
 
-imu_status_t ICM20689_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts)
+imu_status_t ICM20689_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
 	uint8_t iconfigbyte = 0;
+	uint8_t address;
+
+	switch(intNumber)
+	{
+	case 1:
+		address = INT_ENABLE_1;
+	case 2:
+		address = INT_ENABLE_2;
+	case 3:
+		address = INT_ENABLE_3;
+	default:
+		break;
+	}
+
 	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_1, 1, &iconfigbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
+
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_2, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	{
+	   return IMU_I2C_ERROR;
+	}
+
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_3, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
 	//set enable bit
 	iconfigbyte |= interrupts;
 	//write to register
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,INT_ENABLE_1,1,&iconfigbyte,1,100) != HAL_OK)
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, address,1,&iconfigbyte,1,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
@@ -322,6 +349,7 @@ imu_status_t ICM20689_Disable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interru
 
 imu_status_t ICM20689_Set_Gyro_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
 	  uint8_t byte =0;
 	  byte |= FSR;
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,GYRO_CONFIG_1,1,&byte,1,100)!= HAL_OK)
@@ -333,6 +361,7 @@ imu_status_t ICM20689_Set_Gyro_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR)
 
 imu_status_t ICM20689_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
 	uint8_t byte = 0;
 	byte = FSR ;
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,ACCEL_CONFIG,1,&byte,1,100)!= HAL_OK)
@@ -344,15 +373,18 @@ imu_status_t ICM20689_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR)
 
 imu_status_t ICM20689_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
+
 	//check if DLPF is enabled
 	uint8_t configbyte = 0;
 	uint8_t smplrtdiv= 0;
-	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, LP_CONFIG, 1, &configbyte, 1, 100) != HAL_OK)
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, GYRO_CONFIG_1, 1, &configbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
+
 	//digital low pass value is last 3 bits of CONFIG register
-	if((configbyte &0b111) > 0)
+	if((configbyte &0b1) > 0)
 	{
 		smplrtdiv= (uint8_t)(GYRO_OUTPUT_RATE_DLPF_EN/SAMPLE_RATE - 1);
 	}else
@@ -360,12 +392,34 @@ imu_status_t ICM20689_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 		smplrtdiv = (uint8_t)(GYRO_OUTPUT_RATE_DLPF_DIS/SAMPLE_RATE -1);
 	}
 
+
 	if(HAL_I2C_Mem_Write(hi2c, IMU_Device_Address, GYRO_SMPLRT_DIV, 1, &smplrtdiv, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
 
-	return HAL_OK;
+	configbyte = 0;
+	smplrtdiv = 0;
+
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, ACCEL_CONFIG, 1, &configbyte, 1, 100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	if((configbyte &0b1) > 0)
+	{
+		smplrtdiv= (uint16_t)(ACC_OUTPUT_RATE_DLPF_EN/SAMPLE_RATE - 1);
+	}else
+	{
+		smplrtdiv = (uint16_t)(ACC_OUTPUT_RATE_DLPF_DIS/SAMPLE_RATE -1);
+	}
+
+	if(HAL_I2C_Mem_Write(hi2c, IMU_Device_Address, ACCEL_SMPLRT_DIV_1, 1, &smplrtdiv, 2, 100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	return IMU_OK;
 }
 
 imu_status_t ICM20689_Set_FSync(I2C_HandleTypeDef *hi2c, uint8_t Fsync)
@@ -385,14 +439,30 @@ imu_status_t ICM20689_Set_FSync(I2C_HandleTypeDef *hi2c, uint8_t Fsync)
 	return IMU_OK;
 }
 
-imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF)
+imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd)
 {
+
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
+
 	//mask unwanted bits
 	uint8_t configbyte = 0;
 	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, ACCEL_CONFIG, 1, &configbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
+
+	if((cmd = DISABLE))
+	{
+		configbyte &= ~(ACC_FCHOICE_EN);
+	}
+	if((cmd = ENABLE))
+	{
+		configbyte |= (ACC_FCHOICE_EN);
+	}else
+ 	{
+ 		return IMU_INIT_CMD_ERROR;
+ 	}
+
 	configbyte |= (DLPF&(0b111<<3));
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,ACCEL_CONFIG,1,&configbyte,1,100) != HAL_OK)
 	{
@@ -401,14 +471,30 @@ imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF)
 	return IMU_OK;
 }
 
-imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF)
+imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
+
 	//mask unwanted bits
 	uint8_t configbyte = 0;
 	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, GYRO_CONFIG_1, 1, &configbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
+
+
+	if((cmd = DISABLE))
+	{
+		configbyte &= ~(GYRO_FCHOICE_EN);
+	}
+	if((cmd = ENABLE))
+	{
+		configbyte |=  (GYRO_FCHOICE_EN);
+	}else
+ 	{
+ 		return IMU_INIT_CMD_ERROR;
+ 	}
+
     configbyte |= (DLPF&(0b111<<3));
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, GYRO_CONFIG_1,1,&configbyte,1,100) != HAL_OK)
 	{
@@ -421,6 +507,9 @@ imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF)
 
 imu_status_t ICM20689_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL)
 {
+
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
 	//get PWR_MGMT_1 reg data
 	uint8_t pwrmgmtbyte = 0;
 	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,100) != HAL_OK)
@@ -428,7 +517,7 @@ imu_status_t ICM20689_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL)
 		return IMU_I2C_ERROR;
 	}
 	//configure PLL source
-	pwrmgmtbyte = (pwrmgmtbyte &0b11111000)| PLL;
+	pwrmgmtbyte = (pwrmgmtbyte&0b11111000)|PLL;
 
 	//write byte to register
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,100) != HAL_OK)
@@ -440,6 +529,8 @@ imu_status_t ICM20689_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL)
 
 imu_status_t ICM20689_Config_Interrupt_Pin( uint8_t level,uint8_t open,  uint8_t latch)
 {
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
 	//get configbyte
 	uint8_t byte = 0;
 	if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address,INT_PIN_CFG,1,&byte,1,100) != HAL_OK)
@@ -457,20 +548,34 @@ imu_status_t ICM20689_Config_Interrupt_Pin( uint8_t level,uint8_t open,  uint8_t
 	return IMU_OK;
 }
 
-imu_status_t  ICM20689_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t fifo_mask, uint8_t cmd )
+imu_status_t  ICM20689_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  uint8_t gyroEnable, uint8_t tempEnable, uint8_t cmd )
 {
-	uint8_t fifobyte;
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
+	uint8_t fifobyte = 0;
 	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address, FIFO_EN_2, 1 , &fifobyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
 	if(cmd == ENABLE)
 	{
-		fifobyte |= fifo_mask;
+		if((accEnable) = ENABLE)
+		{
+			fifobyte |= ACCEL_FIFO_EN;
+		}
+		if((gyroEnable) = ENABLE)
+		{
+			fifobyte |= GYRO_X_FIFO_EN|GYRO_Y_FIFO_EN|GYRO_Z_FIFO_EN;
+		}
+		if((tempEnable) = ENABLE)
+		{
+			fifobyte |= TEMP_FIFO_EN;
+		}
+
 	}
 	else if(cmd == DISABLE)
 	{
-		fifobyte &= ~fifo_mask;
+		fifobyte &= 0;
 	}
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_EN_2, 1,&fifobyte,1,100) != HAL_OK)
 	{
@@ -516,6 +621,39 @@ imu_status_t ICM20689_Register_Bank_Select(I2C_HandleTypeDef *hi2c,uint8_t reg)
 		return IMU_I2C_ERROR;
 	}
 	 return IMU_OK;
+}
+
+imu_status_t ICM20689_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf, uint8_t gyro_dis_lpf)
+{
+	ICM20689_Register_Bank_Select(&hi2c1, 2);
+	uint8_t iconfigbyte = 0;
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, ACCEL_CONFIG, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+	//set enable bit
+	iconfigbyte |= accel_dis_lpf;
+	//write to register
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, ACCEL_CONFIG,1,&iconfigbyte,1,100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	iconfigbyte = 0;
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, gyro_dis_lpf, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	//set enable bit
+	iconfigbyte |= gyro_dis_lpf;
+	//write to register
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, GYRO_CONFIG_1,1,&iconfigbyte,1,100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	return IMU_OK;
 }
 
 //======================= 8. Sensor Read Functions Definitions =============================================
@@ -567,46 +705,73 @@ imu_status_t ICM20689_Get_SelfTestResponse_Values(I2C_HandleTypeDef *hi2c,IMU_Se
 
 imu_status_t ICM20689_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_source_t interrupt_src,uint8_t* res)
 {
-	uint8_t istatus = 0;
-	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_1,1,&istatus,1,100) != HAL_OK)
-	{
-		return IMU_I2C_ERROR;
-	}
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
 
-	switch (interrupt_src)
+	uint8_t istatus = 0;
+
+
+	 switch (interrupt_src)
 	{
 		case FIFO_OVERFLOW:
-			//*res = (istatus&INT_STATUS_FIFO_OVERFLOW)>>4;
+				if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_1,1,&istatus,1,100) != HAL_OK)
+				{
+					return IMU_I2C_ERROR;
+				}
+			*res = (istatus&FIFO_OVERFLOW_INT);
 			break;
 		case DATA_READY:
-			//*res = (istatus&INT_STATUS_DATA_RDY);
+			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_2,1,&istatus,1,100) != HAL_OK)
+			{
+				return IMU_I2C_ERROR;
+			}
+			*res = (istatus&RAW_DATA_0_RDY_INT);
+		case FIFO_WATERMARK:
+			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_3,1,&istatus,1,100) != HAL_OK)
+			{
+				return IMU_I2C_ERROR;
+			}
+			*res = (istatus&FIFO_WM_INT);
 		default:
 			break;
 
 	}
 
-	return HAL_OK;
+	return IMU_OK;
 }
 
-imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c,uint8_t* imu)
+imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
 {
-	  __HAL_DMA_ENABLE_IT(&hdma_i2c1_rx, DMA_IT_TC);
-	if( HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address,ACCEL_XOUT_H,1,imu,12,100) != HAL_OK)
+	printmsg("Getting IMU Raw data \r\n");
+	if( HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, ACCEL_XOUT_H, 1, imu, 12, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
 	return IMU_OK;
 }
 
+
 imu_status_t ICM20689_Get_FIFO_Count(I2C_HandleTypeDef *hi2c,uint16_t* count)
 {
 	uint8_t fifo_reg[2] = {0};
-	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,FIFO_COUNTH,1,fifo_reg,2,100) != HAL_OK)
+	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,FIFO_COUNTH,2,fifo_reg,2,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
 
-	*count = ((fifo_reg[0]&0xFF)<<8) | (fifo_reg[1] &0xFF);
+	*count = (fifo_reg[0]<<8) | (fifo_reg[1]);
+	return IMU_OK;
+
+}
+
+imu_status_t ICM20689_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count)
+{
+	 __HAL_DMA_ENABLE_IT(&hdma_i2c1_rx, DMA_IT_TC);
+	if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, imu, *count) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+		printmsg("DMA tranmission failed");
+	}
+
 	return IMU_OK;
 
 }
@@ -654,13 +819,15 @@ imu_status_t ICM20689_Set_Low_Power_Mode_Acc(I2C_HandleTypeDef *hi2c,uint8_t Cyc
 
 imu_status_t ICM20689_Set_Wake(I2C_HandleTypeDef *hi2c)
  {
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+
 	 uint8_t byte[2] = {0x00,00};
 
 	 if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&byte[0],1,100)!= HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&byte[1],1,100)!= HAL_OK)
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_2,1,&byte[1],1,100)!= HAL_OK)
 	{
 	 	return IMU_I2C_ERROR;
 	}
@@ -795,7 +962,7 @@ imu_status_t ICM20689_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 	ICM20689_Set_PLLSrc(&hi2c1, PWR_MGMT_1_CLK_SEL_1); // set clock source to PLL gyro x axis
 	HAL_Delay(400);
 	//ICM20689_Disable_Interrupt(&hi2c1,(INT_ENABLE_DATA_RDY_EN|INT_ENABLE_FIFO_OFLOW_EN | INT_ENABLE_I2C_MST_INT_EN)); //Disable all interrupts
-	ICM20689_Config_FIFO(&hi2c1,0xFF,DISABLE); 	//reset FIFO
+	//ICM20689_Config_FIFO(&hi2c1,0xFF,DISABLE); 	//reset FIFO
 	ICM20689_Init_FIFO(&hi2c1,DISABLE);
 	ICM20689_Init_FIFO(&hi2c1,IMU_RESET);
 
@@ -803,19 +970,19 @@ imu_status_t ICM20689_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 	ICM20689_Set_Gyro_FSR(&hi2c1,GYRO_CONFIG_FSSEL_500DPS); //set Gyro FSR to 500 dps
 	ICM20689_Set_Acc_FSR(&hi2c1,ACC_CONFIG_AFSSEL_8G);		//set Acc FSR to +-8g
 	int32_t acc_res =ACC_8G_WORD_LENGTH;
-	ICM20689_Set_Gyro_DLPF(&hi2c1, GYRO_DPLFCFG_1);					//set dlpf to 188 Hz
+	ICM20689_Set_Gyro_DLPF(&hi2c1, GYRO_DPLFCFG_1, ENABLE);					//set dlpf to 188 Hz
 	ICM20689_Set_Sample_Rate(&hi2c1);						// set sample rate to user defined value in HAL_ICM20689.h
 	ICM20689_Init_FIFO(&hi2c1,ENABLE);						//enable FIFO
 	//enable acc and gyro in FIFO buffer
-	ICM20689_Enable_Interrupt(&hi2c1, INT_ENABLE_FIFO_OFLOW_EN);
-	ICM20689_Config_FIFO(&hi2c1,FIFO_EN_ACC,ENABLE);
+	ICM20689_Enable_Interrupt(&hi2c1, INT_ENABLE_FIFO_OFLOW_EN, 2);
+	//ICM20689_Config_FIFO(&hi2c1,FIFO_EN_ACC,ENABLE);
 	//wait until fifo is completed
 	uint8_t interrupt_status = 0;
 	while(!interrupt_status)
 	{
 		 ICM20689_Get_Interrupt_Status(&hi2c1,FIFO_OVERFLOW,&interrupt_status);
 	}
-	ICM20689_Config_FIFO(&hi2c1,FIFO_EN_ACC,DISABLE);
+	//ICM20689_Config_FIFO(&hi2c1,FIFO_EN_ACC,DISABLE);
 	uint16_t count = 0;
 	ICM20689_Get_FIFO_Count(&hi2c1,&count);
 	uint8_t buffer[1024];
@@ -831,7 +998,7 @@ imu_status_t ICM20689_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 		while(I2C_TX_CPLT != 1);
 
 	}
-	//Processing algorythm:
+	//Processing algorithm:
 	int32_t n_s = count/6; //3 axes, 2 bytes per axis
 	int32_t imu_bias[3] = {0};	//data array for storing the
 	int16_t acc_temp[3] ={0};// gyro_temp[3] = {0};
@@ -872,11 +1039,39 @@ void ICM20689_IntPin_IRQ(void)
   if(imu_sample_count < N_Samples)
   {
   	  uint8_t data_ready;
-  	  ICM20689_Get_IMU_RawData(&hi2c1,&IMU_Buffer[imu_sample_count*12]);
+  	  //ICM20689_Get_IMU_RawData_DMA(&hi2c1,&IMU_Buffer[imu_sample_count*12], count);
   	  ICM20689_Get_Interrupt_Status(&hi2c1,DATA_READY,&data_ready);
   	  imu_sample_count++;
   }
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  //Note: Interrupt has been cleared already
+ if (GPIO_Pin == GPIO_PIN_5)
+ {
+	uint16_t* count = {0};
+
+	ICM20689_Get_FIFO_Count(&hi2c1, count);
+
+	printmsg("FIFO count size: %d \r\n", *count);
+
+	ICM20689_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer[*count], count);
+ }
+ else
+ {
+	 printmsg("Another interrupt triggered!");
+ }
+}
+
+
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	printmsg("Memory is transfer is complete \r\n");
+}
+
+
+
 
  /*
  * NB!!! In order to use the functions, you need to call them in the respective IRQ Handlers as per the vector table
