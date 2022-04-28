@@ -1,3 +1,4 @@
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -97,8 +98,8 @@ int main(void)
   //Clear Interrupt
   //__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
 
-  //Check i2c communication
-  if((ICM20689_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_1) != IMU_OK))
+
+  if((ICM20689_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
   {
 	  printmsg("Error in i2c init \r\n");
   }
@@ -107,27 +108,136 @@ int main(void)
 	  printmsg("Init successful! \r\n");
   }
 
+  flag = ICM20689_reset(&hi2c1);
+  if(flag!=IMU_OK)
+    {
+  	  printmsg("Error in i2c init \r\n");
+  	  printmsg("Reset error, %d \r\n", flag);
+    }
+    else
+    {
+  	  printmsg("Reset successful! \r\n");
+    }
 
+
+	uint8_t whoami = 0;
+	if(ICM20689_Get_ID(&hi2c1,&whoami) != IMU_OK)
+	{
+		return IMU_I2C_DEVICE_OFFLINE;
+		printmsg("offline error \r\n");
+
+	}
+	else if(whoami != WHO_AM_I_VALUE)
+	{
+		return IMU_I2C_ID_ERROR;
+		printmsg("i2c id error \r\n");
+	}
+	else
+	{
+		printmsg("WHO_AM_I, %d", whoami);
+	}
+
+flag =  ICM20689_Set_Wake(&hi2c1);
+if(flag!=IMU_OK)
+{
+	  printmsg("Error in wake \r\n");
+	  printmsg("Wake error, %d \r\n", flag);
+}
+else
+{
+	  printmsg("Wake successful! \r\n");
+}
+
+
+  //read out all power and control registers
+  //user control register
+
+  uint8_t usr_ctrl_reg = 0;
+  uint8_t pwr_mgmt1_reg = 0;
+  uint8_t pwr_mgmt2_reg = 0;
+
+
+  if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address,USER_CTRL,1,&usr_ctrl_reg,1,100) != HAL_OK)
+  {
+  	  return IMU_I2C_ERROR;
+  	printmsg("i2c read error");
+
+  }
+  else
+  {
+	  printmsg("USR_CTRL %d \r\n", usr_ctrl_reg);
+  }
+
+
+  if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, PWR_MGMT_1, 1,&pwr_mgmt1_reg,1,100) != HAL_OK)
+  {
+	  return IMU_I2C_ERROR;
+	  printmsg("i2c read error");
+  }
+  else
+  {
+	  printmsg("PWR_MGMT_1 %d \r\n", pwr_mgmt1_reg);
+  }
+
+  if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, PWR_MGMT_2, 1, &pwr_mgmt1_reg, 1, 100) != HAL_OK)
+   {
+        return IMU_I2C_ERROR;
+        printmsg("i2c read error");
+   }
+  else
+  {
+	  printmsg("PWR_MGMT_2 %d \r\n", pwr_mgmt1_reg);
+  }
+
+
+  printmsg("Interface started \r\n");
+
+  if(HAL_I2C_IsDeviceReady(&hi2c1,IMU_Device_Address,10,100)== HAL_OK)
+  {
+   printmsg("i2c interface working! \r\n");
+  }
+  else
+  {
+	  printmsg("i2c not working");
+  }
+
+  HAL_Delay(500);
+
+/*
+  if(ICM20689_Deinit_IMU()!= IMU_OK)
+  {
+	  printmsg("Error in i2c init \r\n");
+  }
+  else
+  {
+	  printmsg("Init successful! \r\n");
+  }
+
+*/
+
+  HAL_Delay(1000);
   //get raw data
 
-  int8_t imu[12] = {0};
+  uint8_t imu[12] = {0};
   ICM20689_Get_IMU_RawData(&hi2c1, imu);
 
-  float rawAccX = (int16_t)imu[0]<<8 | (int16_t)imu[1];
-  float rawAccY = (int16_t)imu[2]<<8 | (int16_t)imu[3];
-  float rawAccZ = (int16_t)imu[4]<<8 | (int16_t)imu[5];
-  float rawRoll = (int16_t)imu[6]<<8 | (int16_t)imu[7];
-  float rawPitch = (int16_t)imu[8]<<8 | (int16_t)imu[9];
-  float rawYaw = (int16_t)imu[10]<<8 | (int16_t)imu[11];
+  printmsg("Accel x high %i low %i \r\n", imu[0], imu[1]);
 
-  printmsg("rawAccX: %f \r\n", rawAccX/8192*9.81);
-  printmsg("rawAccY: %f \r\n", rawAccY/8192*9.81);
-  printmsg("rawAccZ: %f \r\n", rawAccZ/8192*9.81);
-  printmsg("rawRoll: %f \r\n", rawRoll/65.5);
-  printmsg("rawPitch: %f \r\n", rawPitch/65.5);
-  printmsg("rawYaw: %f \r\n", rawYaw/65.5);
+  int16_t rawAccX = (int16_t)imu[0]<<8 | (int16_t)imu[1];
+  int16_t rawAccY = (int16_t)imu[2]<<8 | (int16_t)imu[3];
+  int16_t rawAccZ = (int16_t)imu[4]<<8 | (int16_t)imu[5];
+  int16_t rawRoll = (int16_t)imu[6]<<8 | (int16_t)imu[7];
+  int16_t rawPitch = (int16_t)imu[8]<<8 | (int16_t)imu[9];
+  int16_t rawYaw = (int16_t)imu[10]<<8 | (int16_t)imu[11];
 
-  int8_t temp[2] = {0};
+  printmsg("rawAccX: %f \r\n", (float)rawAccX/8192*9.81);
+  printmsg("rawAccY: %f \r\n", (float)rawAccY/8192*9.81);
+  printmsg("rawAccZ: %f \r\n", (float)rawAccZ/8192*9.81);
+  printmsg("rawRoll: %f \r\n", (float)rawRoll/65.5);
+  printmsg("rawPitch: %f \r\n", (float)rawPitch/65.5);
+  printmsg("rawYaw: %f \r\n", (float)rawYaw/65.5);
+
+  uint8_t temp[2] = {0};
   if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, TEMP_OUT_H,I2C_MEMADD_SIZE_8BIT, temp,2,100)!= HAL_OK)
  {
  	return IMU_I2C_ERROR;
@@ -135,8 +245,8 @@ int main(void)
  else
  {
 
-	float temperature =  (int16_t)temp[0]<<8 | (int16_t)temp[1];
- 	printmsg("temp %f \r\n", (temperature/333.81+21));
+	int16_t temperature =  (int16_t)temp[0]<<8 | (int16_t)temp[1];
+ 	printmsg("temp %f \r\n", ((float)temperature/333.81+21));
  }
 
   //Enable FIFO

@@ -91,21 +91,21 @@ sd_status_t SD_Mount(FATFS SDFatFs, char myPath[]);
  * @brief: Open file on SD Card
  *
  */
-sd_status_t SD_File_Open(FIL myFile, uint32_t fileNo);
+sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNo);
 
 /*Function Name sd_status_t SD_File_Write(FIL myfile, uint8_t dataBuffer[]);
  *
  * @brief: Write to SD Card
  *
  */
-sd_status_t SD_File_Write(FIL myFile, uint8_t dataBuffer[]);
+sd_status_t SD_File_Write(FIL *myFile, uint8_t *dataBuffer);
 
 /*Function Name sd_status_t SD_File_Close(FIL myfile)
  *
  * @brief: Close File on SD Card
  *
  */
-sd_status_t SD_File_Close(FIL myFile);
+sd_status_t SD_File_Close(FIL *myFile);
 
 
 //======================== 6. SD Read/Write Functions ============================================

@@ -178,7 +178,7 @@ imu_status_t ICM20689_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	ICM20689_Set_Acc_DLPF(&hi2c1,dlpf_acc_coeff, ENABLE);
 	ICM20689_Set_Gyro_DLPF(&hi2c1,dlpf_gyro_coeff, ENABLE);
 	//ICM20689_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
-	ICM20689_Set_Sample_Rate(&hi2c1);
+	//ICM20689_Set_Sample_Rate(&hi2c1);
 
 	//Enable Temperature Sensor
 	ICM20689_Init_TempSensor(&hi2c1, ENABLE);
@@ -363,7 +363,7 @@ imu_status_t ICM20689_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR)
 {
 	ICM20689_Register_Bank_Select(&hi2c1, 2);
 	uint8_t byte = 0;
-	byte = FSR ;
+	byte |= FSR ;
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,ACCEL_CONFIG,1,&byte,1,100)!= HAL_OK)
 	{
 		return IMU_I2C_ERROR;
@@ -741,7 +741,8 @@ imu_status_t ICM20689_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 
 imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
 {
-	printmsg("Getting IMU Raw data \r\n");
+	ICM20689_Register_Bank_Select(&hi2c1, 0);
+	//printmsg("Getting IMU Raw data \r\n");
 	if( HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, ACCEL_XOUT_H, 1, imu, 12, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
@@ -821,13 +822,13 @@ imu_status_t ICM20689_Set_Wake(I2C_HandleTypeDef *hi2c)
  {
 	ICM20689_Register_Bank_Select(&hi2c1, 0);
 
-	 uint8_t byte[2] = {0x00,00};
+	 uint8_t byte[2] = {0b00000000,0b00000000};
 
-	 if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&byte[0],1,100)!= HAL_OK)
+	 if(HAL_I2C_Mem_Write(hi2c, IMU_Device_Address, PWR_MGMT_1, 1, &byte[0], 1, 100)!= HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_2,1,&byte[1],1,100)!= HAL_OK)
+	if(HAL_I2C_Mem_Write(hi2c, IMU_Device_Address, PWR_MGMT_2, 1, &byte[1], 1, 100)!= HAL_OK)
 	{
 	 	return IMU_I2C_ERROR;
 	}
@@ -873,7 +874,7 @@ imu_status_t ICM20689_reset(I2C_HandleTypeDef *hi2c)
 		}
 	}
 
-	return HAL_OK;
+	return IMU_OK;
 }
 
 //======================= 10. Data Processing Function Definitions =======================================

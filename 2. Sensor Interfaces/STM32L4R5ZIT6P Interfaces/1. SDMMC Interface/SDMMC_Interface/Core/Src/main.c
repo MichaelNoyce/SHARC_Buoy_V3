@@ -91,32 +91,11 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-  printmsg("SDMMC Interface Starting! \r\n");
-  FATFS SDFatFs; /* File system object for User logical drive */
   FIL File; /* File object */
-  char diskPath[4]; /* User logical drive path */
   uint8_t dataBuffer[] = "Hello World!";
-  sd_status_t errorCode;
-  FRESULT res;
-  uint32_t byteswritten = 0 ;
-
-  errorCode = SD_Init();
-  printmsg("Error Code, %d \r\n", errorCode);
-  errorCode = SD_Mount(SDFatFs, diskPath);
-  printmsg("Error Code, %d \r\n", errorCode);
-  errorCode= SD_File_Open(File, 1);
-  printmsg("Error Code, %d \r\n", errorCode);
-  errorCode = SD_File_Write(File, dataBuffer);
-  printmsg("Error Code, %d \r\n", errorCode);
-  //res = f_write(&File, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten);
-  //printmsg("Res Code, %d \r\n", res);
-  errorCode = SD_File_Close(File);
-  printmsg("Error Code, %d \r\n", errorCode);
-
-
-
-
-
+  SD_File_Open(&File, 1);
+  SD_File_Write(&File, dataBuffer);
+  SD_File_Close(&File);
   /* USER CODE END 2 */
 
   /* Infinite loop */

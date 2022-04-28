@@ -9,7 +9,8 @@
 //======================== 1. Includes ==============================================================
 
 #include "HAL_SD.h"
-
+#include "string.h"
+#include "main.h"
 
 //======================== 2. Private Variables =====================================================
 
@@ -151,12 +152,10 @@ sd_status_t SD_Init(void)
 	return SD_OK;
 }
 
-sd_status_t SD_Mount(FATFS SDFatFs, char myPath[])
+sd_status_t SD_Mount(FATFS SDFatFs, char diskPath[])
 {
 
-	char diskPath[] = "STM32.txt"; /* User logical drive path */
-
-	if(f_mount(&SDFatFs, (TCHAR const*)diskPath, 0) != FR_OK)
+	if(f_mount(&SDFatFS, (TCHAR const*)diskPath, 0) != FR_OK)
 	{
 	  return SD_MOUNT_ERROR;
 	}
@@ -164,33 +163,51 @@ sd_status_t SD_Mount(FATFS SDFatFs, char myPath[])
 	return SD_OK;
 }
 
-sd_status_t SD_File_Open(FIL myFile, uint32_t fileNumber)
+sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 {
+	  printmsg("SDMMC Interface Starting! \r\n");
+	  FATFS SDFatFs; /* File system object for User logical drive */
+	  char diskPath[4]; /* User logical drive path */
+	  sd_status_t errorCode;
+	  FRESULT res;
+	  uint32_t byteswritten = 0;
 
-	char myPath[20];
+	  errorCode = SD_Init();
+	  printmsg("Error Code, %d \r\n", errorCode);
 
-	sprintf(myPath, "FileNo-%ld.txt", fileNumber);
+	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+	  {
+		  printmsg("Mounted successfully!");
+		  if(f_open(myFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		    {
+			  printmsg("Opened file!");
+		    }
+		  else
+		  {
+			printmsg("Open failed!");
+		  }
+	  }
+	  else
+	  {
+		  printmsg("Mount failed");
+	  }
 
-	if(f_open(&myFile, "STM32.txt", FA_WRITE | FA_CREATE_ALWAYS) != FR_OK)
-	{
-		return SD_OPEN_ERROR;
-	}
-
-	return SD_OK;
 }
 
-sd_status_t SD_File_Write(FIL myFile, uint8_t dataBuffer[])
+sd_status_t SD_File_Write(FIL *myFile, uint8_t *dataBuffer)
 {
 
 	uint32_t byteswritten = 0 ;  /* File write counts */
 
-	if(f_write(&myFile, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten)!= FR_OK)
+	if(f_write(myFile, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten)!= FR_OK)
 	{
+		printmsg("Write failed!");
 		return SD_WRITE_ERROR;
 	}
 
 	if(byteswritten == 0)
     {
+	  printmsg("Write failed!");
   	  return SD_WRITE_ERROR;
     }
 
@@ -199,10 +216,11 @@ sd_status_t SD_File_Write(FIL myFile, uint8_t dataBuffer[])
 	return SD_OK;
 }
 
-sd_status_t SD_File_Close(FIL myFile)
+sd_status_t SD_File_Close(FIL *myFile)
 {
-	if(f_close(&myFile) != FR_OK)
+	if(f_close(myFile) != FR_OK)
 	{
+		printmsg("Close Failed!");
 		return SD_CLOSE_ERROR;
 	}
 
