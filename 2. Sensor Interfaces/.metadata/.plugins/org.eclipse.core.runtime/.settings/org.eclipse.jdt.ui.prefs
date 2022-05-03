@@ -153,5 +153,6 @@ semanticHighlighting.typeParameter.strikethrough=false
 semanticHighlighting.typeParameter.underline=false
 sourceHoverBackgroundColor=0,0,0
 spelling_locale_initialized=true
+typefilter_migrated_2=true
 useAnnotationsPrefPage=true
 useQuickDiffPrefPage=true

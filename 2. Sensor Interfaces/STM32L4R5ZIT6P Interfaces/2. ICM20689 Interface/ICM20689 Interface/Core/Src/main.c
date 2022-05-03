@@ -18,6 +18,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <HAL_ICM20649.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -25,7 +26,6 @@
 #include <stdarg.h>
 #include "stdio.h"
 #include "string.h"
-#include "HAL_ICM20689.h"
 #include "math.h"
 /* USER CODE END Includes */
 
@@ -99,7 +99,9 @@ int main(void)
   //__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
 
 
-  if((ICM20689_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
+//======================== 1. Testing Initialisation ==============================================================
+
+  if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
   {
 	  printmsg("Error in i2c init \r\n");
   }
@@ -108,20 +110,9 @@ int main(void)
 	  printmsg("Init successful! \r\n");
   }
 
-  flag = ICM20689_reset(&hi2c1);
-  if(flag!=IMU_OK)
-    {
-  	  printmsg("Error in i2c init \r\n");
-  	  printmsg("Reset error, %d \r\n", flag);
-    }
-    else
-    {
-  	  printmsg("Reset successful! \r\n");
-    }
-
 
 	uint8_t whoami = 0;
-	if(ICM20689_Get_ID(&hi2c1,&whoami) != IMU_OK)
+	if(ICM20649_Get_ID(&hi2c1,&whoami) != IMU_OK)
 	{
 		return IMU_I2C_DEVICE_OFFLINE;
 		printmsg("offline error \r\n");
@@ -134,19 +125,9 @@ int main(void)
 	}
 	else
 	{
-		printmsg("WHO_AM_I, %d", whoami);
+		printmsg("WHO_AM_I, %d \r\n", whoami);
 	}
 
-flag =  ICM20689_Set_Wake(&hi2c1);
-if(flag!=IMU_OK)
-{
-	  printmsg("Error in wake \r\n");
-	  printmsg("Wake error, %d \r\n", flag);
-}
-else
-{
-	  printmsg("Wake successful! \r\n");
-}
 
 
   //read out all power and control registers
@@ -204,7 +185,7 @@ else
   HAL_Delay(500);
 
 /*
-  if(ICM20689_Deinit_IMU()!= IMU_OK)
+  if(ICM20649_Deinit_IMU()!= IMU_OK)
   {
 	  printmsg("Error in i2c init \r\n");
   }
@@ -218,8 +199,10 @@ else
   HAL_Delay(1000);
   //get raw data
 
+//======================== 2. Testing Non-Blocking Communication and raw data acquisition ==============================================================
+
   uint8_t imu[12] = {0};
-  ICM20689_Get_IMU_RawData(&hi2c1, imu);
+  ICM20649_Get_IMU_RawData(&hi2c1, imu);
 
   printmsg("Accel x high %i low %i \r\n", imu[0], imu[1]);
 
@@ -253,7 +236,7 @@ else
 
   uint8_t int_status = 0;
 
- /*  if(ICM20689_Get_Interrupt_Status(&hi2c1, FIFO_WATERMARK, &int_status) != IMU_OK)
+ /*  if(ICM20649_Get_Interrupt_Status(&hi2c1, FIFO_WATERMARK, &int_status) != IMU_OK)
  {
  	return IMU_I2C_ERROR;
  }
@@ -264,15 +247,107 @@ else
 
  */
 
- //HAL_Delay(3000);
-
- //uint16_t* count = {0};
-
- //ICM20689_Get_FIFO_Count(&hi2c1, count);
-
- //printmsg("FIFO count size: %d \r\n", *count);
+ HAL_Delay(5000);
 
 
+ //======================== 3. Testing FIFO Interface ==============================================================
+
+ uint8_t user_ctrl = 0;
+ uint8_t fifo_rst = 0;
+ uint8_t fifo_en_1 = 0;
+ uint8_t fifo_en_2 = 0;
+
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, USER_CTRL, 1, &user_ctrl, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("User control:  %d \r\n", user_ctrl);
+ }
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_RST, 1, &fifo_rst, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("FIFO Reset:  %d \r\n", fifo_rst);
+ }
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_EN_1, 1, &fifo_en_1, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("FIFO_EN_1:  %d \r\n", fifo_en_1);
+ }
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_EN_2, 1, &fifo_en_2, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("FIFO_EN_2: %d \r\n", fifo_en_2);
+ }
+
+
+ uint16_t count = 0;
+ ICM20649_Get_FIFO_Count(&hi2c1, &count);
+
+ printmsg("FIFO count size: %f \r\n", (float)count);
+
+
+
+ //Read data from fifo buffer
+
+ printmsg("Getting data from FIFO buffer ...");
+
+ uint8_t imu_fifo[14] = {0};
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_R_W, I2C_MEMADD_SIZE_8BIT, imu_fifo, 14,100)!= HAL_OK)
+{
+	return IMU_I2C_ERROR;
+}
+else
+{
+
+ printmsg("Accel x high %i low %i \r\n", imu_fifo[0], imu_fifo[1]);
+
+ int16_t rawTemp = (int16_t)imu_fifo[0]<<8 | (int16_t)imu_fifo[1];
+ int16_t rawAccX = (int16_t)imu_fifo[2]<<8 | (int16_t)imu_fifo[3];
+ int16_t rawAccY = (int16_t)imu_fifo[4]<<8 | (int16_t)imu_fifo[5];
+ int16_t rawAccZ = (int16_t)imu_fifo[6]<<8 | (int16_t)imu_fifo[7];
+ int16_t rawRoll = (int16_t)imu_fifo[8]<<8 | (int16_t)imu_fifo[9];
+ int16_t rawPitch = (int16_t)imu_fifo[10]<<8 | (int16_t)imu_fifo[11];
+ int16_t rawYaw = (int16_t)imu_fifo[12]<<8 | (int16_t)imu_fifo[13];
+
+
+
+ printmsg("rawAccX: %f \r\n", (float)rawAccX/8192*9.81);
+ printmsg("rawAccY: %f \r\n", (float)rawAccY/8192*9.81);
+ printmsg("rawAccZ: %f \r\n", (float)rawAccZ/8192*9.81);
+ printmsg("rawRoll: %f \r\n", (float)rawRoll/65.5);
+ printmsg("rawPitch: %f \r\n", (float)rawPitch/65.5);
+ printmsg("rawYaw: %f \r\n", (float)rawYaw/65.5);
+ printmsg("temp %f \r\n", ((float)rawTemp/333.81+21));
+
+}
+
+
+ //======================== 4. Testing DMA Transfer via i2c ==============================================================
+
+
+
+
+ //======================== 5. Testing Interrupts ==============================================================
 
   /* USER CODE END 2 */
 

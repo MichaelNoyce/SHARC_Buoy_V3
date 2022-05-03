@@ -20,12 +20,34 @@
  *  Configurations are performed using UBX commands (refer to the U-Blox Neo 7 receiver description guide)
  *  A Timer has configured in slave reset mode to signal the following has occurred:
  *
- *  1. No data has been received after a predefined period of time (# of Data bytes  //StandardPeriph Driver Header
+ *  1. No data has been received after a predefined period of time (# of Data bytes < DMA Buffer Size )
+ *  2. The Device has timed out on communications (# of Data bytes == 0)
+ *
+ *  The library contains the following:
+ *
+ *  1. Init/ De init functions
+ *  2. GPS Module configuration functions
+ *  3. NMEA Message Parsers
+ *  4. UBX configuration functions
+ *
+ */
+
+#ifndef HAL_GPS_H_
+#define HAL_GPS_H_
+
+/* The following macros allow for the time.h library to be ported to embedded systems*/
+
+#define _XOPEN_SOURCE // Definition for time.h to work
+#define ARM_MATH_CM4  // Also defined for the time.h embedded implementation
+
+//============================= 1. Includes ==============================================
+
+#include <stm32l4xx_hal.h> //StandardPeriph Driver Header
 #include "string.h"	   // for string handlings
 #include "stdio.h"
 #include "stdlib.h"
-#include   //Header for additional Math Functions
-#include 		// contains function to convert UTC to Epoch Time
+#include <math.h>  //Header for additional Math Functions
+#include <time.h>		// contains function to convert UTC to Epoch Time
 
 //========================== 2. Structs & Enums ===========================================
 
@@ -152,7 +174,7 @@ typedef struct
 /*
  * GPS versions are monitered through UBLOX_NEOx. This library has support for Neo-6m,7m and M9N
  */
-#define UBLOX_NEO6
+#define UBLOX_NEO9
 
 /* TIM Defines */
 #define GPS_TIM_PORT TIM2					//General Purpose Timer

@@ -1,16 +1,71 @@
-14:43:36 **** Build of configuration Debug for project SD_Logger_Test_2 ****
+16:26:56 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
 make -j4 all 
-arm-none-eabi-gcc -o "SD_Logger_Test_2.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\8. Testing\Cold Temperature Testing\Code\SD_Logger_Test_2\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="SD_Logger_Test_2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: SD_Logger_Test_2.elf
+arm-none-eabi-gcc "../Core/Src/HAL_ICM20649.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_ICM20649.d" -MT"Core/Src/HAL_ICM20649.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_ICM20649.o"
+../Core/Src/HAL_ICM20649.c: In function 'MX_I2C1_Init':
+../Core/Src/HAL_ICM20649.c:59:5: warning: implicit declaration of function 'Error_Handler' [-Wimplicit-function-declaration]
+   59 |     Error_Handler();
+      |     ^~~~~~~~~~~~~
+../Core/Src/HAL_ICM20649.c: In function 'ICM20649_Init_FIFO':
+../Core/Src/HAL_ICM20649.c:240:3: warning: implicit declaration of function 'printmsg' [-Wimplicit-function-declaration]
+  240 |   printmsg("FIFO reset occured");
+      |   ^~~~~~~~
+../Core/Src/HAL_ICM20649.c: In function 'ICM20649_Config_FIFO':
+../Core/Src/HAL_ICM20649.c:573:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  573 |   if((accEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20649.c:577:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  577 |   if((gyroEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20649.c:581:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  581 |   if((tempEnable) = ENABLE)
+      |      ^
+arm-none-eabi-gcc -o "ICM20649 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20689 Interface\ICM20689 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20649 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: ICM20649 Interface.elf
  
-arm-none-eabi-size   SD_Logger_Test_2.elf 
-arm-none-eabi-objdump -h -S  SD_Logger_Test_2.elf  > "SD_Logger_Test_2.list"
-arm-none-eabi-objcopy  -O binary  SD_Logger_Test_2.elf  "SD_Logger_Test_2.bin"
+arm-none-eabi-size   ICM20649\ Interface.elf 
+arm-none-eabi-objdump -h -S  ICM20649\ Interface.elf  > "ICM20649 Interface.list"
    text	   data	    bss	    dec	    hex	filename
-  72056	    488	   4480	  77024	  12ce0	SD_Logger_Test_2.elf
+  44684	    484	   3124	  48292	   bca4	ICM20649 Interface.elf
 Finished building: default.size.stdout
  
-Finished building: SD_Logger_Test_2.bin
+Finished building: ICM20649 Interface.list
  
-Finished building: SD_Logger_Test_2.list
+16:27:17 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
+make -j4 all 
+arm-none-eabi-size   ICM20649\ Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  44684	    484	   3124	  48292	   bca4	ICM20649 Interface.elf
+Finished building: default.size.stdout
+ 
+19:57:19 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
+make -j4 all 
+arm-none-eabi-gcc "../Core/Src/HAL_ICM20649.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_ICM20649.d" -MT"Core/Src/HAL_ICM20649.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_ICM20649.o"
+../Core/Src/HAL_ICM20649.c: In function 'MX_I2C1_Init':
+../Core/Src/HAL_ICM20649.c:59:5: warning: implicit declaration of function 'Error_Handler' [-Wimplicit-function-declaration]
+   59 |     Error_Handler();
+      |     ^~~~~~~~~~~~~
+../Core/Src/HAL_ICM20649.c: In function 'ICM20649_Config_FIFO':
+../Core/Src/HAL_ICM20649.c:573:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  573 |   if((accEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20649.c:577:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  577 |   if((gyroEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20649.c:581:6: warning: suggest parentheses around assignment used as truth value [-Wparentheses]
+  581 |   if((tempEnable) = ENABLE)
+      |      ^
+../Core/Src/HAL_ICM20649.c: In function 'ICM20649_Get_IMU_RawData_DMA':
+../Core/Src/HAL_ICM20649.c:787:3: warning: implicit declaration of function 'printmsg' [-Wimplicit-function-declaration]
+  787 |   printmsg("DMA tranmission failed");
+      |   ^~~~~~~~
+arm-none-eabi-gcc -o "ICM20649 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20689 Interface\ICM20689 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20649 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: ICM20649 Interface.elf
+ 
+arm-none-eabi-size   ICM20649\ Interface.elf 
+arm-none-eabi-objdump -h -S  ICM20649\ Interface.elf  > "ICM20649 Interface.list"
+   text	   data	    bss	    dec	    hex	filename
+  44660	    484	   3124	  48268	   bc8c	ICM20649 Interface.elf
+Finished building: default.size.stdout
+ 
+Finished building: ICM20649 Interface.list
  

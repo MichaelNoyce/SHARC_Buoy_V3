@@ -282,7 +282,7 @@ uint8_t is_valid(char* nmeamsg)
 	uint8_t flag = 0;
 
 	char msg[4] = {0};
-	for (int i = 0; i ='0') &&(c ='a') &&(c ='A') &&(c tm_hour = (temp[0]-48)*10+ (temp[1]-48)+2;
+	for (int i = 0; i ='0') &&(c ='a') &&(c ='A') &&(c tm_hour) = (temp[0]-48)*10+ (temp[1]-48)+2;
 	timepointer->tm_min = (temp[2]-48)*10+ (temp[3]-48)-1;
 	timepointer->tm_sec = (temp[4]-48)*10+ (temp[5]-48) -1 ;
 	while(*ZDAstring++ != ',');

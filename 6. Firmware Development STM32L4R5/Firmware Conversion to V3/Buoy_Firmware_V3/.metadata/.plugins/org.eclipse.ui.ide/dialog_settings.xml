@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="ExternalProjectImportWizard">
+		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="true"/>
+	</section>
+	<section name="SmartImportWizard">
+		<item key="SmartImportRootWizardPage.STORE_HIDE_ALREADY_OPEN" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_CLOSE_IMPORTED" value="false"/>
+		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
+		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
+		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\6. Test Data\Test_Anemometer_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\6. Test Data\Test_SD_F4\Template"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\2. Synthesis\STM32L4\Synthesis_GPS_l4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\2. Synthesis\STM32L4\Synthesis_GPSMEM_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\2. Synthesis\STM32L4\BUOY_Frame_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_USART_Iridium_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_USART_GPS_L4_2"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_RTC_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_INA219_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_BMP280_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_Accelerometer_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V2.0 Resources\Template\Buoy_Template"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\Template\Template"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\Template\STM32F4_StdPeriph_Template - Copy"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\Template\STM32F4_StdPeriph_Template"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - SPL Driver code\STM32F4_Discovery 1.0\BUOY_FiRMWARE_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - SPL Driver code\Final_Firmware\Debug_version"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - HAL Driver code\STM32L4\Buoy_Firmware_V1_1"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\UBLOX_Neo_6_7_m"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\Test_SD_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\Test_Iridium_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\MPU_60x0"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\Davies Anemometer"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\SPL\BMP280"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\HAL\Test_GPS_L4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32F4\HAL\HAL_Test_GPS_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\Arduino\Ds18B20\Test_I2C_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\Arduino\Ds18B20\Test_BoschSense_Nucleo"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - SPL Driver code\STM32F4_Nucleo 1.0\SD_Card Logging\FIRMWARE_Data_Log"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - SPL Driver code\STM32F4_Nucleo 1.0\GPS ONLY\BUOY_FiRMWARE_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - SPL Driver code\STM32F4_Discovery 1.0\Version_1_2\BUOY_FiRMWARE_F4"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F429_439xx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F427_437xx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F413_423xx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F412xG"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F411xE"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\TrueSTUDIO\STM32F410xx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\SW4STM32\STM32F410xx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\SW4STM32\STM32F40_41xxx"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\SW4STM32\STM32F401xx"/>
+		</list>
+	</section>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item key="DIALOG_X_ORIGIN" value="497"/>
+		<item key="DIALOG_Y_ORIGIN" value="217"/>
+	</section>
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
+</section>

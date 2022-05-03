@@ -9,6 +9,7 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\8. Testing\Cold Temperature Testing"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_USART_GPS_L4_2"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - HAL Driver code\STM32L4\Buoy_Firmware_V1"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\4. Resources\V1.0 Resources\STM32F4xx_DSP_StdPeriph_Lib_V1.8.0\Project\STM32F4xx_StdPeriph_Templates\SW4STM32\STM32F401xx"/>
