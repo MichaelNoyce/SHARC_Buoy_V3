@@ -216,7 +216,7 @@ RTC_DateTypeDef hdate;
 RTC_TimeTypeDef htime;
 //__IO uint8_t in_Shutdown = 0;
 #ifdef DEBUG_USART_ENABLE
-UART_HandleTypeDef huart2;
+UART_HandleTypeDef hlpuart1;
 #endif
 
 //uint32_t time;

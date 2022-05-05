@@ -30,7 +30,7 @@ HAL_StatusTypeDef Init_Debug(void)
 #endif
 	//initialise USART 2 for USB comms
 #ifdef DEBUG_USART_ENABLE
-	 hlpuart1.Instance = LPUART1;
+	  hlpuart1.Instance = LPUART1;
 	  hlpuart1.Init.BaudRate = 115200;
 	  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
 	  hlpuart1.Init.StopBits = UART_STOPBITS_1;
@@ -196,7 +196,7 @@ HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
 
 	HAL_RCCEx_WakeUpStopCLKConfig(RCC_STOP_WAKEUPCLOCK_HSI);
 	HAL_UARTEx_EnableClockStopMode(huart);
-	while(__HAL_UART_GET_FLAG(&huart2,UART_FLAG_BUSY) == SET);
+	while(__HAL_UART_GET_FLAG(huart,UART_FLAG_BUSY) == SET);
 	//clear all interrupts
 	while(__HAL_UART_GET_FLAG(huart, USART_ISR_REACK) == RESET);
 	UART_WakeUpTypeDef hwake;
@@ -295,11 +295,6 @@ void set_WUP_Pin(uint32_t Pin, PinMode_typedef mode)
 	__HAL_RCC_PWR_CLK_DISABLE();
 }
 
-PUTCHAR_PROTOTYPE
-{
-	HAL_UART_Transmit(&huart2,(uint8_t*) &ch,1,0xFFFF);
-	return ch;
-}
 
 void GPIO_Set_Pin_LP(void)
 {
@@ -612,7 +607,7 @@ void BOR_Handler(void)
 	  // transmit log to PC
 
 	  char* msg= "Warning! Device encountered a Brown Out. Exiting Program...\r\n";
-	  HAL_UART_Transmit(&huart2,(uint8_t*)msg,strlen(msg),100);
+	  HAL_UART_Transmit(&hlpuart1,(uint8_t*)msg,strlen(msg),100);
 	  //perform system reset
 	  POR_Handler();
 	  HAL_NVIC_SystemReset();

@@ -1,4 +1,3 @@
-
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -18,7 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <HAL_ICM20649.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -27,6 +25,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "math.h"
+#include "HAL_ICM20649.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +43,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef hlpuart1;
+ UART_HandleTypeDef hlpuart1;
 
 /* USER CODE BEGIN PV */
 HAL_StatusTypeDef i2cErrorCode;
@@ -53,9 +52,11 @@ HAL_StatusTypeDef i2cErrorCode;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_LPUART1_UART_Init(void);
+
 /* USER CODE BEGIN PFP */
 void printmsg(char *format,...);
 /* USER CODE END PFP */
+static void MX_LPUART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
@@ -232,21 +233,6 @@ int main(void)
  	printmsg("temp %f \r\n", ((float)temperature/333.81+21));
  }
 
-  //Enable FIFO
-
-  uint8_t int_status = 0;
-
- /*  if(ICM20649_Get_Interrupt_Status(&hi2c1, FIFO_WATERMARK, &int_status) != IMU_OK)
- {
- 	return IMU_I2C_ERROR;
- }
- else
- {
- 	printmsg("Interrupt status %d \r\n", int_status);
- }
-
- */
-
  HAL_Delay(5000);
 
 
@@ -308,9 +294,9 @@ int main(void)
 
  //Read data from fifo buffer
 
- printmsg("Getting data from FIFO buffer ...");
+ printmsg("Getting data from FIFO buffer ... \r\n");
 
- uint8_t imu_fifo[14] = {0};
+ uint8_t imu_fifo[6] = {0};
 
  if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_R_W, I2C_MEMADD_SIZE_8BIT, imu_fifo, 14,100)!= HAL_OK)
 {
@@ -319,25 +305,23 @@ int main(void)
 else
 {
 
- printmsg("Accel x high %i low %i \r\n", imu_fifo[0], imu_fifo[1]);
-
- int16_t rawTemp = (int16_t)imu_fifo[0]<<8 | (int16_t)imu_fifo[1];
- int16_t rawAccX = (int16_t)imu_fifo[2]<<8 | (int16_t)imu_fifo[3];
- int16_t rawAccY = (int16_t)imu_fifo[4]<<8 | (int16_t)imu_fifo[5];
- int16_t rawAccZ = (int16_t)imu_fifo[6]<<8 | (int16_t)imu_fifo[7];
- int16_t rawRoll = (int16_t)imu_fifo[8]<<8 | (int16_t)imu_fifo[9];
- int16_t rawPitch = (int16_t)imu_fifo[10]<<8 | (int16_t)imu_fifo[11];
- int16_t rawYaw = (int16_t)imu_fifo[12]<<8 | (int16_t)imu_fifo[13];
+ //int16_t rawTemp = (int16_t)imu_fifo[0]<<8 | (int16_t)imu_fifo[1];
+ int16_t rawAccY = (int16_t)imu_fifo[0]<<8 | (int16_t)imu_fifo[1];
+ int16_t rawAccZ = (int16_t)imu_fifo[2]<<8 | (int16_t)imu_fifo[3];
+ int16_t rawAccX = (int16_t)imu_fifo[4]<<8 | (int16_t)imu_fifo[5];
+ //int16_t rawRoll = (int16_t)imu_fifo[8]<<8 | (int16_t)imu_fifo[9];
+ //int16_t rawPitch = (int16_t)imu_fifo[10]<<8 | (int16_t)imu_fifo[11];
+ //int16_t rawYaw = (int16_t)imu_fifo[12]<<8 | (int16_t)imu_fifo[13];
 
 
 
  printmsg("rawAccX: %f \r\n", (float)rawAccX/8192*9.81);
  printmsg("rawAccY: %f \r\n", (float)rawAccY/8192*9.81);
  printmsg("rawAccZ: %f \r\n", (float)rawAccZ/8192*9.81);
- printmsg("rawRoll: %f \r\n", (float)rawRoll/65.5);
- printmsg("rawPitch: %f \r\n", (float)rawPitch/65.5);
- printmsg("rawYaw: %f \r\n", (float)rawYaw/65.5);
- printmsg("temp %f \r\n", ((float)rawTemp/333.81+21));
+ //printmsg("rawRoll: %f \r\n", (float)rawRoll/65.5);
+ //printmsg("rawPitch: %f \r\n", (float)rawPitch/65.5);
+ //printmsg("rawYaw: %f \r\n", (float)rawYaw/65.5);
+ //printmsg("temp %f \r\n", ((float)rawTemp/333.81+21));
 
 }
 
@@ -348,6 +332,108 @@ else
 
 
  //======================== 5. Testing Interrupts ==============================================================
+
+
+ uint8_t int_pin_config = 0;
+ uint8_t int_enable = 0;
+ uint8_t int_enable_1 = 0;
+ uint8_t int_enable_2 = 0;
+ uint8_t int_enable_3 = 0;
+ uint8_t int_status = 0;
+ uint8_t int_status_1 = 0;
+ uint8_t int_status_2 = 0;
+ uint8_t int_status_3 = 0;
+
+
+ //Print out int_config register
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_PIN_CFG, 1, &int_pin_config, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("INT_PIN_CONFIG: %d \r\n", int_pin_config);
+ }
+
+
+ //Print out interrupt enable registers
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE, 1, &int_enable, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("INT_ENABLE: %d \r\n", int_enable);
+ }
+
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE_1, 1, &int_enable_1, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("INT_ENABLE_1: %d \r\n", int_enable_1);
+ }
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE_2, 1, &int_enable_2, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("INT_ENABLE_2: %d \r\n", int_enable_2);
+ }
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE_3, 1, &int_enable_3, 1, 100) != HAL_OK)
+  {
+       return IMU_I2C_ERROR;
+       printmsg("i2c read error");
+  }
+ else
+ {
+	  printmsg("INT_ENABLE_3: %d \r\n", int_enable_3);
+ }
+
+ if(ICM20649_Get_Interrupt_Status(&hi2c1, INT_STATUS, &int_status) != IMU_OK)
+{
+	return IMU_I2C_ERROR;
+}
+else
+{
+	printmsg("INT_STATUS %d \r\n", int_status);
+}
+
+ if(ICM20649_Get_Interrupt_Status(&hi2c1, INT_STATUS_1, &int_status_1) != IMU_OK)
+{
+	return IMU_I2C_ERROR;
+}
+else
+{
+	printmsg("INT_STATUS_1 %d \r\n", int_status_1);
+}
+
+ if(ICM20649_Get_Interrupt_Status(&hi2c1, INT_STATUS_2, &int_status_2) != IMU_OK)
+{
+	return IMU_I2C_ERROR;
+}
+else
+{
+	printmsg("INT_STATUS_2 %d \r\n", int_status_2);
+}
+
+ if(ICM20649_Get_Interrupt_Status(&hi2c1, INT_STATUS_3, &int_status_3) != IMU_OK)
+{
+	return IMU_I2C_ERROR;
+}
+else
+{
+	printmsg("INT_STATUS_3 %d \r\n", int_status_3);
+}
+
 
   /* USER CODE END 2 */
 
@@ -453,7 +539,6 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE END LPUART1_Init 2 */
 
 }
-
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {

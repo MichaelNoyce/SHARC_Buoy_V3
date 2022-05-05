@@ -106,16 +106,17 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
   HAL_PWREx_EnableVddIO2();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pin = GPIO_PIN_14;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+  HAL_NVIC_SetPriority(EXTI14_14_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI14_14_IRQn);
 
 }
 
@@ -186,11 +187,12 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Enable and config FIFO
 	ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
 	ICM20649_Init_FIFO(&hi2c1, ENABLE);
-	ICM20649_Config_FIFO(&hi2c1, ENABLE, ENABLE, ENABLE, ENABLE);
+	ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
+	ICM20649_Config_FIFO(&hi2c1, ENABLE, DISABLE, DISABLE, ENABLE);
 
 	//configure interrupt pin
-	//ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
-	//ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
+	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
+	ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
 	return IMU_OK;
 }
 
@@ -222,7 +224,7 @@ imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
 
 	//get USER_CTRL register Data
 	uint8_t uc_byte;
-	uint8_t fifo_rst_byte;
+	uint8_t fifo_rst_byte = 0;
 	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,USER_CTRL,1,&uc_byte,1,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
@@ -564,21 +566,28 @@ imu_status_t  ICM20649_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  
 	ICM20649_Register_Bank_Select(&hi2c1, 0);
 
 	uint8_t fifobyte = 0;
+
 	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address, FIFO_EN_2, 1 , &fifobyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
-	if(cmd == ENABLE)
+
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_EN_2, 1,&fifobyte,1,100) != HAL_OK)
 	{
-		if((accEnable) = ENABLE)
+		return IMU_I2C_ERROR;
+	}
+
+	 if(cmd == ENABLE)
+	{
+		if(accEnable == ENABLE)
 		{
 			fifobyte |= ACCEL_FIFO_EN;
 		}
-		if((gyroEnable) = ENABLE)
+		if(gyroEnable == ENABLE)
 		{
 			fifobyte |= GYRO_X_FIFO_EN|GYRO_Y_FIFO_EN|GYRO_Z_FIFO_EN;
 		}
-		if((tempEnable) = ENABLE)
+		if(tempEnable == ENABLE)
 		{
 			fifobyte |= TEMP_FIFO_EN;
 		}
@@ -592,6 +601,9 @@ imu_status_t  ICM20649_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  
 	{
 		return IMU_I2C_ERROR;
 	}
+
+
+
 	return IMU_OK;
 }
 
@@ -784,7 +796,7 @@ imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu,
 	if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, imu, *count) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
-		printmsg("DMA tranmission failed");
+		printmsg("DMA transmission failed");
 	}
 
 	return IMU_OK;
@@ -1072,6 +1084,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	printmsg("FIFO count size: %d \r\n", *count);
 
 	ICM20649_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer[*count], count);
+
+	//Reset IMU  FIFO here :)
+	//Reset Interrupt if not done so in function before callback already
+
+
  }
  else
  {
