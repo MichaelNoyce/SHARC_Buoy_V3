@@ -61,8 +61,8 @@ all: main-build
 main-build: Buoy_Firmware_V1_2_IMU.elf secondary-outputs
 
 # Tool invocations
-Buoy_Firmware_V1_2_IMU.elf Buoy_Firmware_V1_2_IMU.map: $(OBJS) $(USER_OBJS) ../stm32l4_flash.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -u _printf_float -o "Buoy_Firmware_V1_2_IMU.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"../stm32l4_flash.ld" --specs=nosys.specs -Wl,-Map="Buoy_Firmware_V1_2_IMU.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Buoy_Firmware_V1_2_IMU.elf Buoy_Firmware_V1_2_IMU.map: $(OBJS) $(USER_OBJS) C:\Users\mpnoy\OneDrive\Documents\Masters\ 2021\SHARC_Buoy_V3\6.\ Firmware\ Development\ STM32L4R5\Firmware\ Conversion\ to\ V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -u _printf_float -o "Buoy_Firmware_V1_2_IMU.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware Conversion to V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="Buoy_Firmware_V1_2_IMU.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

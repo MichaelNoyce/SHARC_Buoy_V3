@@ -80,7 +80,7 @@
 
 #include "stm32l4xx_hal.h"		//HAL header
 
-#include "stm32l476xx.h"		//CMSIS Includes
+#include "stm32l4r5xx.h"		//CMSIS Includes
 
 #include "string.h"				//String Handling Functions
 

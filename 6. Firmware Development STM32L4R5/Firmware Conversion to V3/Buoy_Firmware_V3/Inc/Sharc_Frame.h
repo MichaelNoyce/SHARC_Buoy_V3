@@ -17,7 +17,7 @@
 
 #include <stdarg.h>
 
-#include "stm32l476xx.h"
+#include "stm32l4r5xx.h"
 
 #include "stm32l4xx_hal.h"
 

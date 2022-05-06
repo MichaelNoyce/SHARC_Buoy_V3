@@ -33,6 +33,7 @@
 #include "HAL_INA219.h"
 
 #include "HAL_MPU6050.h"
+
 /** @addtogroup STM32L4xx_HAL_Driver
   * @{
   */
