@@ -29,6 +29,7 @@
 #include "welch.h"
 #include "waveData.h"
 #include "WaveFunctions.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
