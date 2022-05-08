@@ -9,12 +9,8 @@
 
 float32_t rawDataBuf[1024];
 
-float32_t tempBuf[1024];
-
 float32_t decArray[1024];
-
-float32_t magnitudeOutput[1024];
 
 float32_t testOutput_f32[1024];
 
-float32_t testInput_f32[2048];
+float32_t fullArray[5][1024];

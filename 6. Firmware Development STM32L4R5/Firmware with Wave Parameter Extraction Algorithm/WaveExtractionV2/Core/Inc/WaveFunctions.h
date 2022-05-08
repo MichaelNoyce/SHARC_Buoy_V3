@@ -8,26 +8,38 @@
 
 /*User Includes------------------------------------------------*/
 #include "arm_math.h"
+#include "string.h"
 /*End User Includes-------------------------------------------*/
 
 /*Definitions-------------------------------------------------*/
 //Input Data Definitions
 #define RAW_DATA_LENGTH 5120
 #define FFT_LENGTH 1024
-#define DECIMATION_CONSTANT 10
-
-
+#define SEGMENT_NO 5
+#define DECIMATION_CONSTANT 16
+#define F_SAMPLE 100
 //LPF Decimate Defintions
 #define SNR_THRESHOLD_F32    75.0f
 #define BLOCK_SIZE            32
 /* Must be a multiple of 16 */
-#define NUM_TAPS_ARRAY_SIZE              29
-#define NUM_TAPS              29
-#define M 50
-#define DEC_LENGTH 6400/M
+#define NUM_TAPS_ARRAY_SIZE              32
+#define NUM_TAPS              32
 
 /*End Definitions ---------------------------------------------*/
 
+/**
+ *
+ * @param freqSegments
+ * @param PSDOutput
+ */
+void fullPipeline(float32_t freqSegments[SEGMENT_NO][FFT_LENGTH], float32_t PSDOutput);
+
+/**
+ *
+ * @param rawData
+ * @param decArray
+ */
+void singleSegmentPipeline(float32_t* rawData, float32_t* decArray);
 
 /**
  * @brief Calibration Function for the ICM20689
@@ -56,19 +68,33 @@ void LPFDecimate(float32_t* detrendOutput, float32_t* decimatedOutput);
  * @param frequencyOutput
  * @param FFT_Length
  */
-void FourStepDFT(float32_t* timeSeries, float32_t* frequencyOutput);
+void embeddedFFT(float32_t* timeSeries, float32_t* magOut, uint32_t ifftFlag);
 
 /**
  * @brief Double Integrating time series
  * @param detrendOutput
  * @param waveAmplitude
  */
-void HPFDoubleIntegration(float32_t* detrendOutput, float32_t* waveAmplitude);
+void HPFDoubleIntegration(float32_t* fftInput, float32_t* waveAmplitude);
+
 
 /**
- *
- * @param x
- * @param XR
- * @param size
+ * @brief WelchMethod
+ * @param waveAmplitudeArray
+ * @param waveAmplitude
  */
-void DFT(float32_t* x, float32_t* XR, uint16_t size);
+void WelchMethod(float32_t* waveAmplitudeArray, float32_t* PSD);
+
+
+/**
+ * @brief waveParamExtract
+ * @param PSD
+ * @param Hm0
+ * @param Hrms
+ * @param T0
+ * @param Tp
+ * @param M0
+ * @param M1
+ * @param M2
+ */
+void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp,float32_t*  M0,float32_t* M1,float32_t*M2);

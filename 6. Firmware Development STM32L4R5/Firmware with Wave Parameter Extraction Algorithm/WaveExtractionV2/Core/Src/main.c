@@ -97,64 +97,10 @@ int main(void)
   MX_USART2_UART_Init();
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  	printmsg("DSP Pipeline V1 Start!\r\n");
-    uint32_t count;
-    uint32_t j;
+  printmsg("DSP Pipeline V1 Start!\r\n");
 
+  singleSegmentPipeline(rawDataBuf, testOutput_f32);
 
-    for(count = 0; count<DECIMATION_CONSTANT; count++)
-    {
-
-    	//Read()
-    	//read in 1024 values in buffer
-
-       calibrate(rawDataBuf, tempBuf);
-
-    	/*for (j = 0; j < RAW_DATA_LENGTH ; j++)
-    	{
-    		//printmsg("%f \r\n", tempBuf[j]);
-    	}*/
-
-    	detrend(tempBuf, tempBuf);
-
-    	/*for (j = 0; j < RAW_DATA_LENGTH ; j++)
-    	{
-    		//printmsg("%f \r\n", tempBuf[j]);
-    	}*/
-
-    	LPFDecimate(tempBuf, testOutput_f32);
-
-    	/*for (j = 0; j < RAW_DATA_LENGTH ; j++)
-    	{
-    	    //printmsg("%f \r\n", tempBuf[j]);
-    	}*/
-
-
-    	for (j = 0; j < RAW_DATA_LENGTH ; j++)
-    	{
-    		decArray[count*(FFT_LENGTH)/(DECIMATION_CONSTANT) + j] = testOutput_f32[j];
-    	}
-
-
-
-    }
-
-    //Apply Hanning Window
-
-
-
-    //embeddedFFT(dataOutput, testOutput);
-
-    for (j = 0; j < RAW_DATA_LENGTH ; j++)
-    {
-    	printmsg("%f \r\n", testOutput_f32[j]);
-    }
-
-
-    //Welch Method
-
-
-    //Wave Parameter extraction
 
 
   /* USER CODE END 2 */
