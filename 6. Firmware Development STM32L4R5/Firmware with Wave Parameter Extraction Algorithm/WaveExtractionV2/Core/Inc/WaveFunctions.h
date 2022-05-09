@@ -32,14 +32,14 @@
  * @param freqSegments
  * @param PSDOutput
  */
-void fullPipeline(float32_t freqSegments[SEGMENT_NO][FFT_LENGTH], float32_t PSDOutput);
+void fullPipeline(float32_t* PSDOutput);
 
 /**
  *
  * @param rawData
  * @param decArray
  */
-void singleSegmentPipeline(float32_t* rawData, float32_t* decArray);
+void singleSegmentPipeline(float32_t* singleSegment);
 
 /**
  * @brief Calibration Function for the ICM20689
@@ -83,7 +83,7 @@ void HPFDoubleIntegration(float32_t* fftInput, float32_t* waveAmplitude);
  * @param waveAmplitudeArray
  * @param waveAmplitude
  */
-void WelchMethod(float32_t* waveAmplitudeArray, float32_t* PSD);
+void WelchMethod(float32_t* PSD);
 
 
 /**
@@ -97,4 +97,4 @@ void WelchMethod(float32_t* waveAmplitudeArray, float32_t* PSD);
  * @param M1
  * @param M2
  */
-void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp,float32_t*  M0,float32_t* M1,float32_t*M2);
+void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2);

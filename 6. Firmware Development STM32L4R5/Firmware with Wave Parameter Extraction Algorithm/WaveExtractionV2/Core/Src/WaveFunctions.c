@@ -27,49 +27,56 @@ const float32_t firCoeffs32[NUM_TAPS_ARRAY_SIZE] = {
  * @param freqSegments
  * @param PSDOutput
  */
-void fullPipeline(float32_t freqSegments[SEGMENT_NO][FFT_LENGTH], float32_t PSDOutput)
+void fullPipeline(float32_t* PSDOutput)
 {
 
-	//for loop to populate function
-	uint32_t i;
+	float32_t PSD[FFT_LENGTH];
+	float32_t Hm0;
+	float32_t Hrms;
+	float32_t T0;
+	float32_t Tp;
+	float32_t M0;
+	float32_t M1;
+	float32_t M2;
 
-	for(i=0; i<SEGMENT_NO; i++)
-	{
-		//read in raw data here
-
-		singleSegmentPipeline(rawDataBuf, decArray);
-
-		//read segments into contiguous array
-	}
-
-	//Welch Method
-
+	//Welch Method - calls single segment pipeline in function
+	WelchMethod(PSD);
 
 	//Wave Extraction Algorithm
-
+	waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 
 }
 
 /**
- *
+ * @brief singleSegmentPipeline
  * @param rawData
  * @param decArray
  */
-void singleSegmentPipeline(float32_t* rawData, float32_t* decArray)
+void singleSegmentPipeline(float32_t* singleSegment)
 {
 
     uint32_t count;
+    uint32_t i;
     uint32_t j;
 
-    float32_t smallBuf[128];
+    float32_t smallBuf[FFT_LENGTH/DECIMATION_CONSTANT];
     float32_t tempBuf[FFT_LENGTH];
     float32_t tempBuf2[FFT_LENGTH];
     float32_t magnitudeOutput[FFT_LENGTH];
 
 
+
+
+    //get FFT_LENGTH raw data and decimate to FFT_LENGTH/DECIMATION_CONSTANT
+    //append until array equals FFT_LENGTH
+
     for(count = 1; count<DECIMATION_CONSTANT; count++)
     {
-    	calibrate(rawData, tempBuf);
+    	/*----------Read in data here----------------------*/
+    	//Create Read() function
+    	/*----------Read in data here----------------------*/
+
+    	calibrate(rawDataBuf, tempBuf);
 
     	detrend(tempBuf, tempBuf2);
 
@@ -77,20 +84,39 @@ void singleSegmentPipeline(float32_t* rawData, float32_t* decArray)
 
     	//Append detrended, calibrated and decimated array
 
+
         for (j = 0; j < FFT_LENGTH/DECIMATION_CONSTANT ; j++)
         {
-    		   decArray[count*(FFT_LENGTH)/(DECIMATION_CONSTANT) + j] = smallBuf[j];
+        	tempBuf[count*(FFT_LENGTH)/(DECIMATION_CONSTANT) + j] = smallBuf[j];
         }
 
     }
 
-    embeddedFFT(decArray, magnitudeOutput, 0);
+    embeddedFFT(tempBuf, magnitudeOutput, 0);
 
-    HPFDoubleIntegration(magnitudeOutput, tempBuf);
+    for(i = 0; i< FFT_LENGTH; i++)
+               	{
+               		printmsg("%.2f \r\n", magnitudeOutput[i]);
+               	}
 
+    HPFDoubleIntegration(magnitudeOutput, tempBuf2);
+
+    /*
+    //Output Inverse.
     embeddedFFT(tempBuf2, magnitudeOutput, 1);
 
-    //Hanning Window
+    //Apply Hanning Window
+    float32_t tempWindow;
+
+    for(i = 0; i<FFT_LENGTH; i++)
+    {
+    	tempWindow = 0.5 * (1 - cos(2*PI*i/FFT_LENGTH));
+    	tempBuf[i] *= tempWindow;
+    }
+
+    singleSegment = tempBuf;
+
+	*/
 
 }
 
@@ -174,7 +200,7 @@ void LPFDecimate(float32_t* testInput, float32_t* testOutput)
 
     for(i=0; i < numBlocks; i++)
     {
-      arm_fir_decimate_f32(&S, inputF32 + (i * blockSize), outputF32 + (i * blockSize), blockSize);
+      arm_fir_decimate_f32(&S, inputF32 + (i * blockSize), outputF32 + (i * blockSize/DECIMATION_CONSTANT), blockSize);
     }
 
 }
@@ -243,47 +269,64 @@ void HPFDoubleIntegration(float32_t* fftInput, float32_t* waveAmplitude)
 
 //Welch Method
 
-void WelchMethod(float32_t* waveAmplitudeArray, float32_t* PSD)
+void WelchMethod(float32_t* PSD)
 {
+	uint32_t i;
+	uint32_t j;
+	float32_t singleSegment[FFT_LENGTH];
+	float32_t tempSum;
+	float32_t waveAmplitudeArray[5][FFT_LENGTH];
 
-/*
-	// Computes the magnitude of the complex one sided FFT
-		for (i = 0; i < NUMBER_OF_WINDOWS ; i++)
+	//Populate wave amplitude array with windowed FFT functions
+
+	for(i = 0; i<SEGMENT_NO; i++)
+	{
+
+		//populate singleSegment array with processed FFT
+		singleSegmentPipeline(singleSegment);
+
+		for(j = 0; j<FFT_LENGTH; j++)
 		{
-
-			embeddedFFT{]
+			waveAmplitudeArray[i][j] = singleSegment[j];
 		}
+	}
 
+	//Periodogram
 
-		for (i = 0; i < SEGMENT_NO ; i++)
+	for (i = 0; i < SEGMENT_NO ; i++)
+	{
+		for (j = 0; j < FFT_LENGTH ; j++)
 		{
-			for (j = 0; j < FFT_LENGTH ; j++)
-			{
-				waveAmplitudeArray [i][j] = ( waveAmplitudeArray [i][j] *
+			waveAmplitudeArray [i][j] = ( waveAmplitudeArray [i][j] *
 						waveAmplitudeArray [i][j]) / ( FFT_LENGTH * F_SAMPLE ) ;
-			}
 		}
 
-		// Periodograms averaging
-		for (i = 0; i < FFT_LENGTH ; i++)
+	}
+
+	// Averaging
+	for (i = 0; i < FFT_LENGTH ; i++)
+	{
+		tempSum = 0;
+		for (j = 0; j < SEGMENT_NO ; j++)
 		{
-			testOutput_aux = 0;
-			for (j = 0; j < NUMBER_OF_WINDOWS ; j++)
-			{
-				testOutput_aux += windows_mag [j][i];
-			}
-			testOutput [i] = testOutput_aux / NUMBER_OF_WINDOWS ;
-			}
+			tempSum += waveAmplitudeArray [j][i];
+		}
+		PSD [i] = tempSum / SEGMENT_NO ;
+	}
 
+	PSD [0] /= 2;
 
-		testOutput [0] /= 2;
-
-		*/
 }
 
-//Hanning Window
-
 //Wave Parameter extraction
+//Based on SWASH Model
+//
+void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2)
+{
+	//Newton Cotes Quadrature
+
+}
+
 
 
 

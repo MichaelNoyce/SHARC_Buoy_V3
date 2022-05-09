@@ -99,9 +99,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printmsg("DSP Pipeline V1 Start!\r\n");
 
-  singleSegmentPipeline(rawDataBuf, testOutput_f32);
-
-
+  singleSegmentPipeline(testOutput_f32);
 
   /* USER CODE END 2 */
 
