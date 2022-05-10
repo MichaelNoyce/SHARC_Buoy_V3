@@ -66,16 +66,15 @@ void LPFDecimate(float32_t* detrendOutput, float32_t* decimatedOutput);
  * @brief Performs Four Step FFT method on time series greater than 1024 (allows use of CMSIS DSP)
  * @param timeSeries
  * @param frequencyOutput
- * @param FFT_Length
  */
-void embeddedFFT(float32_t* timeSeries, float32_t* magOut, uint32_t ifftFlag);
+void embeddedFFT(float32_t* timeSeries, float32_t* frequencyOutput, uint32_t fftLength, uint32_t ifftFlag);
 
 /**
  * @brief Double Integrating time series
- * @param detrendOutput
+ * @param rfftInput
  * @param waveAmplitude
  */
-void HPFDoubleIntegration(float32_t* fftInput, float32_t* waveAmplitude);
+void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude);
 
 
 /**

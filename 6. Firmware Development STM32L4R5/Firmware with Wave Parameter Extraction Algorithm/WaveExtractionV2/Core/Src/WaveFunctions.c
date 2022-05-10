@@ -62,15 +62,15 @@ void singleSegmentPipeline(float32_t* singleSegment)
     float32_t smallBuf[FFT_LENGTH/DECIMATION_CONSTANT];
     float32_t tempBuf[FFT_LENGTH];
     float32_t tempBuf2[FFT_LENGTH];
-    float32_t magnitudeOutput[FFT_LENGTH];
-
-
-
+    float32_t tempBuf3[FFT_LENGTH];
+    float32_t tempBuf4[FFT_LENGTH];
+    float32_t tempBuf5[FFT_LENGTH/2];
+    float32_t frequencyOutput[FFT_LENGTH/2];
 
     //get FFT_LENGTH raw data and decimate to FFT_LENGTH/DECIMATION_CONSTANT
     //append until array equals FFT_LENGTH
 
-    for(count = 1; count<DECIMATION_CONSTANT; count++)
+    for(count = 0; count<DECIMATION_CONSTANT; count++)
     {
     	/*----------Read in data here----------------------*/
     	//Create Read() function
@@ -84,26 +84,21 @@ void singleSegmentPipeline(float32_t* singleSegment)
 
     	//Append detrended, calibrated and decimated array
 
-
         for (j = 0; j < FFT_LENGTH/DECIMATION_CONSTANT ; j++)
         {
-        	tempBuf[count*(FFT_LENGTH)/(DECIMATION_CONSTANT) + j] = smallBuf[j];
+        	tempBuf3[count*(FFT_LENGTH)/(DECIMATION_CONSTANT) + j] = smallBuf[j];
         }
 
     }
 
-    embeddedFFT(tempBuf, magnitudeOutput, 0);
+    embeddedFFT(tempBuf3, frequencyOutput, FFT_LENGTH, 0);
 
-    for(i = 0; i< FFT_LENGTH; i++)
-               	{
-               		printmsg("%.2f \r\n", magnitudeOutput[i]);
-               	}
+    HPFDoubleIntegration(frequencyOutput, tempBuf4);
 
-    HPFDoubleIntegration(magnitudeOutput, tempBuf2);
-
-    /*
     //Output Inverse.
-    embeddedFFT(tempBuf2, magnitudeOutput, 1);
+    embeddedFFT(tempBuf4, tempBuf5, FFT_LENGTH, 1);
+
+
 
     //Apply Hanning Window
     float32_t tempWindow;
@@ -111,12 +106,12 @@ void singleSegmentPipeline(float32_t* singleSegment)
     for(i = 0; i<FFT_LENGTH; i++)
     {
     	tempWindow = 0.5 * (1 - cos(2*PI*i/FFT_LENGTH));
-    	tempBuf[i] *= tempWindow;
+    	tempBuf5[i] *= tempWindow;
     }
 
-    singleSegment = tempBuf;
+    singleSegment = tempBuf5;
 
-	*/
+
 
 }
 
@@ -210,20 +205,21 @@ void LPFDecimate(float32_t* testInput, float32_t* testOutput)
  * @param inputArray
  * @param frequencyOutput
  */
-void embeddedFFT(float32_t* inputArray,float32_t* magOut, uint32_t ifftFlag)
+void embeddedFFT(float32_t* inputArray,float32_t* frequencyOutput, uint32_t FFTLength, uint32_t ifftFlag)
 {
 
 	arm_rfft_fast_instance_f32 varInstRfftF32;
-	float32_t freqOut[FFT_LENGTH];
 
-	arm_rfft_fast_init_f32(&varInstRfftF32, FFT_LENGTH);
+	arm_rfft_fast_init_f32(&varInstRfftF32, FFTLength);
 
 	 //Process the data through the CFFT/CIFFT module
-	 arm_rfft_fast_f32(&varInstRfftF32, inputArray, freqOut, ifftFlag);
+	 arm_rfft_fast_f32(&varInstRfftF32, inputArray, frequencyOutput, ifftFlag);
 
 	 //Process the data through the Complex Magnitude Module for calculating the magnitude at each bin
-	 arm_cmplx_mag_f32(freqOut, magOut, FFT_LENGTH);
+	 //arm_cmplx_mag_f32(freqOut+2, magOut+1, FFT_LENGTH/2-1);
 
+	 // DC component - consider removing if still conservative
+	 //magOut[0] = freqOut[0];
 }
 
 /**
@@ -231,38 +227,92 @@ void embeddedFFT(float32_t* inputArray,float32_t* magOut, uint32_t ifftFlag)
  * @param fftInput
  * @param waveAmplitude
  */
-void HPFDoubleIntegration(float32_t* fftInput, float32_t* waveAmplitude)
+void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude)
 {
-
 	float32_t freq1 = 0.02;
 	float32_t freq2 = 0.03;
-	float32_t fnyq = 5;
+	float32_t fnyq = 3.15;
 	uint32_t i;
 	float32_t Fs = F_SAMPLE/DECIMATION_CONSTANT;
 	float32_t freq[FFT_LENGTH];
+	float32_t temp_array[FFT_LENGTH/2];
+	float32_t temp_value;
+	float32_t twoSidedFFT[FFT_LENGTH];
 
-	for(i=0; i<FFT_LENGTH; i++)
+	//create two sided array
+	//flip real side of array using symmetry
+	//waveAmplitude is one sided rfft
+	for(i = 0; i<FFT_LENGTH/2; i++)
+	{
+		temp_value = rfftInput[i];
+		temp_array[i] = rfftInput[FFT_LENGTH/2-i-1];
+		temp_array[FFT_LENGTH/2-i-1] = temp_value;
+	}
+
+    for(i=0; i<FFT_LENGTH; i++)
+    {
+    	printmsg("%.2f \r\n", freq[i]);
+    }
+
+
+	//Complex side
+	for(i=0; i<FFT_LENGTH/2; i++)
+	{
+		twoSidedFFT[i] = temp_array[i];
+	}
+
+	//Real side
+	for(i=FFT_LENGTH/2; i<FFT_LENGTH; i++)
+	{
+		twoSidedFFT[i] = rfftInput[i-FFT_LENGTH/2];
+	}
+
+
+	//Create frequency array
+	for(i=0; i<FFT_LENGTH/2; i++)
 	{
 		freq[i] = Fs*(i/FFT_LENGTH);
 	}
 
+	for(i = 0; i<FFT_LENGTH/2; i++)
+	{
+		temp_value = -freq[i];
+		temp_array[i] = freq[FFT_LENGTH/2-i-1];
+		temp_array[FFT_LENGTH/2-i-1] = temp_value;
+	}
+
+	for(i=FFT_LENGTH/2; i<FFT_LENGTH; i++)
+	{
+		freq[i] = freq[i-FFT_LENGTH/2];
+	}
+
+	for(i=0; i<FFT_LENGTH/2; i++)
+	{
+		freq[i] = temp_array[i];
+	}
+
+	//HPF and double integration in frequency domain
+	//Based on Tucker and Pitt
 	for(i=0;i<FFT_LENGTH; i++)
 	{
 		if(freq[i]<freq1)
 		{
-			fftInput[i] = 0;
+			twoSidedFFT[i] = 0;
 		}
 
 		if(freq[i]>freq1 && freq[i]<freq2)
 		{
-			fftInput[i] *= (1/2)*(1-cos(PI*(freq[i]-freq1)/(freq2-freq1))*(-1/(2*PI*(freq[i])*(fftInput[i]))));
+			twoSidedFFT[i] = (1/2)*(1-cos(PI*(freq[i]-freq1)/(freq2-freq1))*(-1/(2*PI*(freq[i])*(twoSidedFFT[i]))));
 		}
 
 		if(freq[i]>freq2 && freq[i]<fnyq)
 		{
-			fftInput[i] = -1/(2*PI*((freq[i])*(freq[i])))*fftInput[i];
+			twoSidedFFT[i] = -1/(2*PI*((freq[i])*(freq[i])))*twoSidedFFT[i];
 		}
+
 	}
+
+	waveAmplitude = twoSidedFFT;
 
 }
 
@@ -273,9 +323,9 @@ void WelchMethod(float32_t* PSD)
 {
 	uint32_t i;
 	uint32_t j;
-	float32_t singleSegment[FFT_LENGTH];
+	float32_t singleSegment[FFT_LENGTH/2];
 	float32_t tempSum;
-	float32_t waveAmplitudeArray[5][FFT_LENGTH];
+	float32_t waveAmplitudeArray[5][FFT_LENGTH/2];
 
 	//Populate wave amplitude array with windowed FFT functions
 
@@ -324,6 +374,8 @@ void WelchMethod(float32_t* PSD)
 void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2)
 {
 	//Newton Cotes Quadrature
+
+
 
 }
 
