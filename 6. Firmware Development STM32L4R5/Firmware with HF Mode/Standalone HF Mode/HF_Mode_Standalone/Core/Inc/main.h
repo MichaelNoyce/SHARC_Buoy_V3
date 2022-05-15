@@ -57,10 +57,11 @@ void printmsg(char *format,...);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define SD_Detect_Pin GPIO_PIN_3
-#define SD_Detect_GPIO_Port GPIOF
-#define LD3_Pin GPIO_PIN_14
-#define LD3_GPIO_Port GPIOB
+#define SD_Detect_Pin_Pin GPIO_PIN_5
+#define SD_Detect_Pin_GPIO_Port GPIOF
+#define INT_IMU_Pin GPIO_PIN_14
+#define INT_IMU_GPIO_Port GPIOD
+#define INT_IMU_EXTI_IRQn EXTI15_10_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

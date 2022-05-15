@@ -299,7 +299,7 @@ typedef struct
 //INT_PIN_CFG
 
 #define INT_PIN_CFG_LEVEL_LOW 0b1<<7 //active logic level for pin
-#define INT_PIN_CFG_LEVEL_HIGH (uint8_t)(~INT_PIN_CFG_LEVEL_LOW)
+#define INT_PIN_CFG_LEVEL_HIGH 0b0<<7
 #define INT_PIN_CFG_PIN_OPEN_DRAIN 0b1<<6
 #define INT_PIN_CFG_PIN_PUSH_PULL  0b0<<6
 #define INT_PIN_CFG_LATCH_INT_EN 0b1<<5 //pin held high untill interrupt is cleared (if set to 0, pin emits a 50 us pulse)
@@ -328,7 +328,7 @@ typedef struct
 #define FIFO_OVERFLOW_INT 0b11111
 
 //INT_STATUS 3
-#define FIFO_WM_INT 0b11111
+#define FIFO_WM_INT 0b00011111
 
 //SIGNAL_PATH_RESET
 #define SIGNAL_PATH_ACC_RESET  0b1<<1
@@ -481,9 +481,11 @@ uint16_t fifo_sample_count;   //Keeps track of the number of samples in the FIFO
 uint8_t IMU_Log_On;			 //used in EXTI IRQ to determine what routine to run
 //============================= 5. Handlers ===============================================
 
-I2C_HandleTypeDef hi2c1;				//handler for I2C Communication
+I2C_HandleTypeDef hi2c1;
 
-DMA_HandleTypeDef hdma_i2c1_rx;			//handler for I2C Peripheral to Memory DMA transfers
+DMA_HandleTypeDef hdma_i2c1_rx;
+
+DMA_HandleTypeDef hdma_i2c1_tx;
 
 
 //============================ 6. Data Buffers ============================================
@@ -545,6 +547,8 @@ imu_status_t ICM20649_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID);
 imu_status_t ICM20649_Get_MST_Status(I2C_HandleTypeDef *hi2c, uint8_t* status_byte);
 imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count);
 imu_status_t ICM20649_SelfTest(I2C_HandleTypeDef *hi2c,float* test_res);
+imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count);
+imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c);
 //======================= 11. Power Mode Config Function ===============================================
 
 imu_status_t ICM20649_Set_Wake(I2C_HandleTypeDef *hi2c);

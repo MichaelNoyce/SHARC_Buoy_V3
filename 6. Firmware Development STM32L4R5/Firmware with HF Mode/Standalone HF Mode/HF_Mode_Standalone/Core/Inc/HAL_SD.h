@@ -26,6 +26,13 @@
 #ifndef HAL_SD_H_
 #define HAL_SD_H_
 
+//============================= 0. Defines ==============================================
+
+#define SD_Detect_Pin GPIO_PIN_3
+#define SD_Detect_GPIO_Port GPIOF
+#define LED_3_Pin GPIO_PIN_14
+#define LED_3_GPIO_Port GPIOB
+
 //============================= 1. Includes ==============================================
 
 #include "stm32l4xx_hal.h"	//HAL library includes

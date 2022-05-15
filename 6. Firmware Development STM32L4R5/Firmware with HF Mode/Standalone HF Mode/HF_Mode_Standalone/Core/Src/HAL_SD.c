@@ -193,6 +193,8 @@ sd_status_t SD_File_Open(FIL *myFile, uint8_t fileNumber)
 		  printmsg("Mount failed");
 	  }
 
+	  return SD_OK;
+
 }
 
 sd_status_t SD_File_Write(FIL *myFile, uint8_t *dataBuffer)

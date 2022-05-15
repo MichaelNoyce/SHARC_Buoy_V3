@@ -1,21 +1,30 @@
-17:19:53 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
+20:46:43 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
 make -j4 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
 ../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:139:11: warning: unused variable 'pwr_mgmt2_reg' [-Wunused-variable]
-  139 |   uint8_t pwr_mgmt2_reg = 0;
+../Core/Src/main.c:339:56: warning: passing argument 3 of 'ICM20649_Get_IMU_RawData_DMA' makes pointer from integer without a cast [-Wint-conversion]
+  339 |  ICM20649_Get_IMU_RawData_DMA(&hi2c1,  &IMU_Buffer[6], 6);
+      |                                                        ^
+      |                                                        |
+      |                                                        int
+In file included from ../Core/Src/main.c:28:
+../Core/Inc/HAL_ICM20649.h:550:92: note: expected 'uint16_t *' {aka 'short unsigned int *'} but argument is of type 'int'
+  550 | imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count);
+      |                                                                                  ~~~~~~~~~~^~~~~
+../Core/Src/main.c:137:11: warning: unused variable 'pwr_mgmt2_reg' [-Wunused-variable]
+  137 |   uint8_t pwr_mgmt2_reg = 0;
       |           ^~~~~~~~~~~~~
-../Core/Src/main.c:76:10: warning: unused variable 'acc' [-Wunused-variable]
-   76 |    float acc;
+../Core/Src/main.c:75:10: warning: unused variable 'acc' [-Wunused-variable]
+   75 |    float acc;
       |          ^~~
-../Core/Src/main.c:75:17: warning: unused variable 'flag' [-Wunused-variable]
-   75 |    imu_status_t flag;
+../Core/Src/main.c:74:17: warning: unused variable 'flag' [-Wunused-variable]
+   74 |    imu_status_t flag;
       |                 ^~~~
-../Core/Src/main.c:74:12: warning: unused variable 'val' [-Wunused-variable]
-   74 |    int16_t val;
+../Core/Src/main.c:73:12: warning: unused variable 'val' [-Wunused-variable]
+   73 |    int16_t val;
       |            ^~~
-../Core/Src/main.c:73:12: warning: unused variable 'buf' [-Wunused-variable]
-   73 |    uint8_t buf[12];
+../Core/Src/main.c:72:12: warning: unused variable 'buf' [-Wunused-variable]
+   72 |    uint8_t buf[12];
       |            ^~~
 arm-none-eabi-gcc -o "ICM20649 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20649 Interface\ICM20649 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20649 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: ICM20649 Interface.elf
@@ -23,15 +32,15 @@ Finished building target: ICM20649 Interface.elf
 arm-none-eabi-size   ICM20649\ Interface.elf 
 arm-none-eabi-objdump -h -S  ICM20649\ Interface.elf  > "ICM20649 Interface.list"
    text	   data	    bss	    dec	    hex	filename
-  39780	    484	   3124	  43388	   a97c	ICM20649 Interface.elf
+  45948	    484	   3220	  49652	   c1f4	ICM20649 Interface.elf
 Finished building: default.size.stdout
  
 Finished building: ICM20649 Interface.list
  
-17:20:00 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
+20:46:50 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
 make -j4 all 
 arm-none-eabi-size   ICM20649\ Interface.elf 
    text	   data	    bss	    dec	    hex	filename
-  39780	    484	   3124	  43388	   a97c	ICM20649 Interface.elf
+  45948	    484	   3220	  49652	   c1f4	ICM20649 Interface.elf
 Finished building: default.size.stdout
  

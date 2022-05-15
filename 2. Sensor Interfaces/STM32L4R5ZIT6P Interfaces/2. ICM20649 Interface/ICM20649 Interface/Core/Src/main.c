@@ -43,7 +43,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- UART_HandleTypeDef hlpuart1;
+
+UART_HandleTypeDef hlpuart1;
 
 /* USER CODE BEGIN PV */
 HAL_StatusTypeDef i2cErrorCode;
@@ -52,11 +53,9 @@ HAL_StatusTypeDef i2cErrorCode;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_LPUART1_UART_Init(void);
-
 /* USER CODE BEGIN PFP */
 void printmsg(char *format,...);
 /* USER CODE END PFP */
-static void MX_LPUART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
@@ -79,7 +78,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+    HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -96,11 +95,10 @@ int main(void)
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  //Clear Interrupt
-  //__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
-
 
 //======================== 1. Testing Initialisation ==============================================================
+
+
 
   if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
   {
@@ -328,9 +326,36 @@ else
 
  //======================== 4. Testing DMA Transfer via i2c ==============================================================
 
+ Reset_FIFO(&hi2c1);
+ HAL_Delay(10000);
+ printmsg("Starting DMA test...");
 
 
+ uint16_t countTest = 0;
+ ICM20649_Get_FIFO_Count(&hi2c1, &countTest);
 
+ printmsg("FIFO count size: %f \r\n", (float)countTest);
+
+ ICM20649_Get_IMU_RawData_DMA(&hi2c1,  &IMU_Buffer[6], 6);
+
+
+// for(int i = 0; i<(countTest-6); i+=6)
+ //{
+	  	rawAccX= (int16_t)IMU_Buffer[0]<<8 | (int16_t)IMU_Buffer[1];
+	    rawAccY = (int16_t)IMU_Buffer[2]<<8 | (int16_t)IMU_Buffer[3];
+	    rawAccZ = (int16_t)IMU_Buffer[4]<<8 | (int16_t)IMU_Buffer[5];
+	    //rawRoll = (int16_t)IMU_Buffer[6]<<8 | (int16_t)IMU_Buffer[7];
+	    //rawPitch = (int16_t)IMU_Buffer[8]<<8 | (int16_t)IMU_Buffer[9];
+	    //rawYaw = (int16_t)IMU_Buffer[10]<<8 | (int16_t)IMU_Buffer[11];
+
+	   printmsg("rawAccX: %f \r\n", (float)rawAccX/8192*9.81);
+	   printmsg("rawAccY: %f \r\n", (float)rawAccY/8192*9.81);
+	   printmsg("rawAccZ: %f \r\n", (float)rawAccZ/8192*9.81);
+	   //printmsg("rawRoll: %f \r\n", (float)rawRoll/65.5);
+	   //printmsg("rawPitch: %f \r\n", (float)rawPitch/65.5);
+	   //printmsg("rawYaw: %f \r\n", (float)rawYaw/65.5);
+
+// }
  //======================== 5. Testing Interrupts ==============================================================
 
 
@@ -435,6 +460,10 @@ else
 }
 
 
+
+
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -492,6 +521,8 @@ void SystemClock_Config(void)
   }
 }
 
+
+
 /**
   * @brief LPUART1 Initialization Function
   * @param None
@@ -539,6 +570,10 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE END LPUART1_Init 2 */
 
 }
+
+
+
+
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {

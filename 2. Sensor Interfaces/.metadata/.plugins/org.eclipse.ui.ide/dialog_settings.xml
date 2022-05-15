@@ -9,6 +9,7 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2022\Firmware Resources\Batch Acquisition Mode\STM32CubeExpansion_AN4515_F4_V1.2.0\Projects\NUCLEO-F411RE\X-NUCLEO-IKSO1A1\SW4STM32\NUCLEO-F411RE_X-NUCLEO-IKS01A1"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\8. Testing\Cold Temperature Testing"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\5. Development\1. Sensor Development\STM32L4\Test_USART_GPS_L4_2"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - HAL Driver code\STM32L4\Buoy_Firmware_V1"/>

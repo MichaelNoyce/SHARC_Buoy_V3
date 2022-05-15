@@ -86,9 +86,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-  /* DMAMUX1_OVR_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMAMUX1_OVR_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMAMUX1_OVR_IRQn);
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
 
 }
 
@@ -114,6 +114,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, 0);
+
+  /*Configure GPIO pin : PB7 */
+  /*Configure GPIO pin : PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 //======================== 5. MSP Function Definitions ==================================
 /* MSP FUNCTIONS:
@@ -127,7 +138,7 @@ static void MX_GPIO_Init(void)
  *
  *  2. Cut the function and paste it in the stm32l4xx_hal_msp.c file
  *
- *  3. In the stm32l4xx_hal_msp.c file, include the header "HAL_BMP280.h"
+ *  3. In the stm32l4xx_hal_msp.c file, include the header "HAL_ICM20649.h"
  */
 
 
@@ -174,7 +185,7 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	ICM20649_Set_Acc_DLPF(&hi2c1,dlpf_acc_coeff, ENABLE);
 	ICM20649_Set_Gyro_DLPF(&hi2c1,dlpf_gyro_coeff, ENABLE);
 	//ICM20649_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
-	//ICM20649_Set_Sample_Rate(&hi2c1);
+	ICM20649_Set_Sample_Rate(&hi2c1);
 
 	//Enable Temperature Sensor
 	ICM20649_Init_TempSensor(&hi2c1, ENABLE);
@@ -182,12 +193,12 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Enable and config FIFO
 	ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
 	ICM20649_Init_FIFO(&hi2c1, ENABLE);
-	ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
+	//ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
 	ICM20649_Config_FIFO(&hi2c1, ENABLE, DISABLE, DISABLE, ENABLE);
 
 	//configure interrupt pin
-	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
-	ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
+	//ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
+	//ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
 	return IMU_OK;
 }
 
@@ -311,17 +322,7 @@ imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrup
 		break;
 	}
 
-	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_1, 1, &iconfigbyte, 1, 100) != HAL_OK)
-	{
-		return IMU_I2C_ERROR;
-	}
-
-	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_2, 1, &iconfigbyte, 1, 100) != HAL_OK)
-	{
-	   return IMU_I2C_ERROR;
-	}
-
-	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, INT_ENABLE_3, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, address, 1, &iconfigbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
@@ -546,7 +547,7 @@ imu_status_t ICM20649_Config_Interrupt_Pin( uint8_t level,uint8_t open,  uint8_t
 		return IMU_I2C_ERROR;
 	}
 	//clear config params
-	byte &= 0x1F;
+	byte &= 0x0;
 	byte |= (open | level | latch);
 
 	if(HAL_I2C_Mem_Write(&hi2c1,IMU_Device_Address,INT_PIN_CFG,1,&byte,1,100)!= HAL_OK)
@@ -787,15 +788,50 @@ imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count)
 
 imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count)
 {
-	 __HAL_DMA_ENABLE_IT(&hdma_i2c1_rx, DMA_IT_TC);
-	if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, imu, *count) != HAL_OK)
-	{
+	uint8_t i = 0;
+
+	//Indicate DMA Transfer
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+
+	 //for(int i = 0; i<(*count-6); i+=6)
+	 //{
+		 if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, &imu, 6) != HAL_OK)
+		 {
+			 return IMU_I2C_ERROR;
+		 }
+
 		return IMU_I2C_ERROR;
-		printmsg("DMA transmission failed");
-	}
+//	}
+
+	//Reset FIFO
+	Reset_FIFO(&hi2c1);
 
 	return IMU_OK;
 
+}
+
+
+imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c)
+{
+
+	uint8_t fifo_rst_byte = 0;
+	fifo_rst_byte |= FIFO_RESET;
+
+		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100) != HAL_OK)
+		{
+			return IMU_I2C_ERROR;
+		}
+		else
+		{
+			//Deassert Reset (need to assert and deassert for full reset
+			fifo_rst_byte &= ~FIFO_RESET;
+			if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)!= HAL_OK)
+			{
+				return IMU_I2C_ERROR;
+			}
+		}
+
+		return IMU_OK;
 }
 
 //======================= 9. Power Mode Config Function Definitions =======================================
@@ -984,7 +1020,6 @@ imu_status_t ICM20649_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 	ICM20649_Set_PLLSrc(&hi2c1, PWR_MGMT_1_CLK_SEL_1); // set clock source to PLL gyro x axis
 	HAL_Delay(400);
 	//ICM20649_Disable_Interrupt(&hi2c1,(INT_ENABLE_DATA_RDY_EN|INT_ENABLE_FIFO_OFLOW_EN | INT_ENABLE_I2C_MST_INT_EN)); //Disable all interrupts
-	//ICM20649_Config_FIFO(&hi2c1,0xFF,DISABLE); 	//reset FIFO
 	ICM20649_Init_FIFO(&hi2c1,DISABLE);
 	ICM20649_Init_FIFO(&hi2c1,IMU_RESET);
 
@@ -1072,33 +1107,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   //Note: Interrupt has been cleared already
  if (GPIO_Pin == GPIO_PIN_14)
  {
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 	uint16_t* count = {0};
 
 	ICM20649_Get_FIFO_Count(&hi2c1, count);
-
-
-
-	printmsg("FIFO watermark Interrupt triggered!");
-
-	printmsg("FIFO count size: %d \r\n", *count);
-
 	ICM20649_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer[*count], count);
 
 	//Reset IMU  FIFO here :)
 	//Reset Interrupt if not done so in function before callback already
-
-
  }
- else
- {
-	 printmsg("Another interrupt triggered!");
- }
+
 }
-
 
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	printmsg("Memory is transfer is complete \r\n");
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 }
 
 

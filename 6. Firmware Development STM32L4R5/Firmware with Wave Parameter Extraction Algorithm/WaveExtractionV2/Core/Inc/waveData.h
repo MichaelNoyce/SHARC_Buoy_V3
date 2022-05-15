@@ -9,6 +9,6 @@
 
 float32_t rawDataBuf[1024];
 
-float32_t PSD[1024];
+float32_t PSD[512];
 
 

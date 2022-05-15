@@ -30,7 +30,7 @@ const float32_t firCoeffs32[NUM_TAPS_ARRAY_SIZE] = {
 void fullPipeline(float32_t* PSDOutput)
 {
 
-	float32_t PSD[FFT_LENGTH];
+	float32_t PSD[FFT_LENGTH/2];
 	float32_t Hm0;
 	float32_t Hrms;
 	float32_t T0;
@@ -42,8 +42,14 @@ void fullPipeline(float32_t* PSDOutput)
 	//Welch Method - calls single segment pipeline in function
 	WelchMethod(PSD);
 
+	for(int i=0; i<FFT_LENGTH/2; i++)
+	  				    {
+	  				    	printmsg("%.2f \r\n", PSD[i]);
+	  				    }
+
 	//Wave Extraction Algorithm
-	waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
+	//PSD Spectra input - wave parameter output
+	//waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 
 }
 
@@ -63,8 +69,8 @@ void singleSegmentPipeline(float32_t* singleSegment)
     float32_t tempBuf[FFT_LENGTH];
     float32_t tempBuf2[FFT_LENGTH];
     float32_t tempBuf3[FFT_LENGTH];
-    float32_t tempBuf4[FFT_LENGTH];
-    float32_t tempBuf5[FFT_LENGTH/2];
+    float32_t tempBuf4[FFT_LENGTH/2];
+    float32_t tempBuf5[FFT_LENGTH];
     float32_t frequencyOutput[FFT_LENGTH/2];
 
     //get FFT_LENGTH raw data and decimate to FFT_LENGTH/DECIMATION_CONSTANT
@@ -91,33 +97,30 @@ void singleSegmentPipeline(float32_t* singleSegment)
 
     }
 
-    embeddedFFT(tempBuf3, frequencyOutput, FFT_LENGTH, 0);
+    embeddedFFT(tempBuf3, frequencyOutput, FFT_LENGTH, FFT);
+
 
     HPFDoubleIntegration(frequencyOutput, tempBuf4);
 
-    //Output Inverse.
-    embeddedFFT(tempBuf4, tempBuf5, FFT_LENGTH, 1);
+
+    //Output Inverse - Wave Amplitude series
+    embeddedFFT(tempBuf4, tempBuf5, FFT_LENGTH, IFFT);
 
 
-
-    //Apply Hanning Window
-    float32_t tempWindow;
+    //Apply Hanning Window to reduce spectral leakage
+   float32_t tempWindow;
 
     for(i = 0; i<FFT_LENGTH; i++)
     {
     	tempWindow = 0.5 * (1 - cos(2*PI*i/FFT_LENGTH));
-    	tempBuf5[i] *= tempWindow;
+    	singleSegment[i] = tempBuf5[i]*tempWindow;
     }
-
-    singleSegment = tempBuf5;
-
-
 
 }
 
 
 /**
- * @brief Calibration function for the ICM20689
+ * @brief Calibration function for the ICM20649
  * @param rawData
  * @param calOutput
  */
@@ -216,10 +219,10 @@ void embeddedFFT(float32_t* inputArray,float32_t* frequencyOutput, uint32_t FFTL
 	 arm_rfft_fast_f32(&varInstRfftF32, inputArray, frequencyOutput, ifftFlag);
 
 	 //Process the data through the Complex Magnitude Module for calculating the magnitude at each bin
-	 //arm_cmplx_mag_f32(freqOut+2, magOut+1, FFT_LENGTH/2-1);
+	 //arm_cmplx_mag_f32(frequencyOutput+2, magnitudeOutput+1, FFTLength/2-1);
 
 	 // DC component - consider removing if still conservative
-	 //magOut[0] = freqOut[0];
+
 }
 
 /**
@@ -231,88 +234,45 @@ void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude)
 {
 	float32_t freq1 = 0.02;
 	float32_t freq2 = 0.03;
-	float32_t fnyq = 3.15;
+	float32_t fnyq = 6.25;
 	uint32_t i;
 	float32_t Fs = F_SAMPLE/DECIMATION_CONSTANT;
-	float32_t freq[FFT_LENGTH];
-	float32_t temp_array[FFT_LENGTH/2];
-	float32_t temp_value;
-	float32_t twoSidedFFT[FFT_LENGTH];
+	float32_t freq[FFT_LENGTH/2];
 
-	//create two sided array
-	//flip real side of array using symmetry
-	//waveAmplitude is one sided rfft
-	for(i = 0; i<FFT_LENGTH/2; i++)
-	{
-		temp_value = rfftInput[i];
-		temp_array[i] = rfftInput[FFT_LENGTH/2-i-1];
-		temp_array[FFT_LENGTH/2-i-1] = temp_value;
-	}
-
-    for(i=0; i<FFT_LENGTH; i++)
-    {
-    	printmsg("%.2f \r\n", freq[i]);
-    }
-
-
-	//Complex side
-	for(i=0; i<FFT_LENGTH/2; i++)
-	{
-		twoSidedFFT[i] = temp_array[i];
-	}
-
-	//Real side
-	for(i=FFT_LENGTH/2; i<FFT_LENGTH; i++)
-	{
-		twoSidedFFT[i] = rfftInput[i-FFT_LENGTH/2];
-	}
 
 
 	//Create frequency array
 	for(i=0; i<FFT_LENGTH/2; i++)
 	{
-		freq[i] = Fs*(i/FFT_LENGTH);
+		freq[i] = Fs*((float32_t)i/(FFT_LENGTH/2));
 	}
 
-	for(i = 0; i<FFT_LENGTH/2; i++)
-	{
-		temp_value = -freq[i];
-		temp_array[i] = freq[FFT_LENGTH/2-i-1];
-		temp_array[FFT_LENGTH/2-i-1] = temp_value;
-	}
-
-	for(i=FFT_LENGTH/2; i<FFT_LENGTH; i++)
-	{
-		freq[i] = freq[i-FFT_LENGTH/2];
-	}
-
-	for(i=0; i<FFT_LENGTH/2; i++)
-	{
-		freq[i] = temp_array[i];
-	}
 
 	//HPF and double integration in frequency domain
 	//Based on Tucker and Pitt
-	for(i=0;i<FFT_LENGTH; i++)
+	for(i=0;i<FFT_LENGTH/2; i++)
 	{
 		if(freq[i]<freq1)
 		{
-			twoSidedFFT[i] = 0;
+			waveAmplitude[i] = 0;
 		}
 
-		if(freq[i]>freq1 && freq[i]<freq2)
+		if(freq[i]>=freq1 && freq[i]<freq2)
 		{
-			twoSidedFFT[i] = (1/2)*(1-cos(PI*(freq[i]-freq1)/(freq2-freq1))*(-1/(2*PI*(freq[i])*(twoSidedFFT[i]))));
+			waveAmplitude[i] = (1/2)*(1-cos(PI*(freq[i]-freq1)/(freq2-freq1))*(-1/(2*PI*(freq[i])*(rfftInput[i]))));
 		}
 
-		if(freq[i]>freq2 && freq[i]<fnyq)
+		if(freq[i]>=freq2 && freq[i]<fnyq)
 		{
-			twoSidedFFT[i] = -1/(2*PI*((freq[i])*(freq[i])))*twoSidedFFT[i];
+			waveAmplitude[i] = -1/(2*PI*((freq[i])*(freq[i])))*rfftInput[i];
+		}
+
+		if(isnan(waveAmplitude[i]))
+		{
+			waveAmplitude[i] = 0;
 		}
 
 	}
-
-	waveAmplitude = twoSidedFFT;
 
 }
 
@@ -323,21 +283,27 @@ void WelchMethod(float32_t* PSD)
 {
 	uint32_t i;
 	uint32_t j;
-	float32_t singleSegment[FFT_LENGTH/2];
+	float32_t singleSegment[FFT_LENGTH];
+	float32_t singleSegmentFFT[FFT_LENGTH/2];
+	float32_t singleSegmentMag[FFT_LENGTH/2];
 	float32_t tempSum;
-	float32_t waveAmplitudeArray[5][FFT_LENGTH/2];
+	float32_t waveAmplitudeArray[SEGMENT_NO][FFT_LENGTH/2];
+	float32_t normalConst = (float32_t)(FFT_LENGTH * F_SAMPLE); //normalizes periodogram estimate
 
 	//Populate wave amplitude array with windowed FFT functions
 
 	for(i = 0; i<SEGMENT_NO; i++)
 	{
-
-		//populate singleSegment array with processed FFT
+		//populate singleSegment array
 		singleSegmentPipeline(singleSegment);
-
-		for(j = 0; j<FFT_LENGTH; j++)
+		//FFT each segment
+		embeddedFFT(singleSegment, singleSegmentFFT, FFT_LENGTH, FFT);
+		arm_cmplx_mag_f32(singleSegmentFFT+2, singleSegmentMag+1, FFT_LENGTH/2-1);
+		//Fill waveAmplitudeArray with segments
+		for(j = 0; j<FFT_LENGTH/2; j++)
 		{
-			waveAmplitudeArray[i][j] = singleSegment[j];
+			waveAmplitudeArray[i][j] = singleSegmentMag[j];
+
 		}
 	}
 
@@ -345,16 +311,15 @@ void WelchMethod(float32_t* PSD)
 
 	for (i = 0; i < SEGMENT_NO ; i++)
 	{
-		for (j = 0; j < FFT_LENGTH ; j++)
+		for (j = 0; j < FFT_LENGTH/2; j++)
 		{
-			waveAmplitudeArray [i][j] = ( waveAmplitudeArray [i][j] *
-						waveAmplitudeArray [i][j]) / ( FFT_LENGTH * F_SAMPLE ) ;
+			waveAmplitudeArray[i][j] = (waveAmplitudeArray[i][j]*waveAmplitudeArray[i][j])/(normalConst);
 		}
 
 	}
 
 	// Averaging
-	for (i = 0; i < FFT_LENGTH ; i++)
+	for (i = 0; i < FFT_LENGTH/2 ; i++)
 	{
 		tempSum = 0;
 		for (j = 0; j < SEGMENT_NO ; j++)
@@ -375,8 +340,46 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t
 {
 	//Newton Cotes Quadrature
 
+	//Length of PSD input
+	float32_t sample_length = FFT_LENGTH/2;
+	//Subint Length
+	float32_t subInt_length;
+	// Number of subintervals
+	float32_t subInt_no = FFT_LENGTH/2 - 1;
+	//Integral
+	float32_t Sum = 0;
 
+	/*
+	//Create frequency array
+	for(i=0; i<FFT_LENGTH/2; i++)
+	{
+		freq[i] = Fs*((float32_t)i/(FFT_LENGTH/2));
+	}
 
+	//Length of subinterval
+	subInt_length=(freq[subInt_no+1]-freq[1])/subInt_no;
+
+	for(i=2; i<FFT_LENGTH/2; i++)
+	{
+		Sum = Sum + PSD[i];
+	}
+
+	M0 = 0.5*subInt_length*(PSD(1)+2*Sum+PSD(subInt_no+1));
+
+	Sum = 0;
+
+	for(i=2; i<FFT_LENGTH/2; i++)
+	{
+		Sum = Sum + (freq[i]*freq[i])*PSD[i];
+	}
+
+	M1 = 0.5*subInt_length*(freq[1]*PSD(1)+2*Sum+(freq[subInt_length+1]*PSD(subInt_no+1)));
+
+	Sum = 0;
+
+	//add M2, T0, Hrms and H0 calculations
+
+	*/
 }
 
 

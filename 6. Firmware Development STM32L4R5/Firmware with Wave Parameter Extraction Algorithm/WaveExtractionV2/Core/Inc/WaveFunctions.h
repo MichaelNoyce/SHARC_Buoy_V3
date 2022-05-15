@@ -18,6 +18,8 @@
 #define SEGMENT_NO 5
 #define DECIMATION_CONSTANT 16
 #define F_SAMPLE 100
+#define IFFT 1
+#define FFT 0
 //LPF Decimate Defintions
 #define SNR_THRESHOLD_F32    75.0f
 #define BLOCK_SIZE            32

@@ -99,7 +99,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printmsg("DSP Pipeline V1 Start!\r\n");
 
-  singleSegmentPipeline(PSD);
+
+  uint32_t i = 0;
+
+  float32_t PSD[FFT_LENGTH/2];
+
+  //singleSegmentPipeline(PSD);
+
+  WelchMethod(PSD);
+
+  HAL_Delay(500);
+
 
   /* USER CODE END 2 */
 
