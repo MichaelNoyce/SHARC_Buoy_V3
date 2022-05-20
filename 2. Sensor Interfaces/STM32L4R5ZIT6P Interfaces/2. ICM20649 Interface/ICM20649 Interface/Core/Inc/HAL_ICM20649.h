@@ -547,7 +547,7 @@ imu_status_t ICM20649_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID);
 imu_status_t ICM20649_Get_MST_Status(I2C_HandleTypeDef *hi2c, uint8_t* status_byte);
 imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count);
 imu_status_t ICM20649_SelfTest(I2C_HandleTypeDef *hi2c,float* test_res);
-imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count);
+imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t count);
 imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c);
 //======================= 11. Power Mode Config Function ===============================================
 

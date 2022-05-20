@@ -188,13 +188,13 @@ typedef struct
 /* UART Defines */
 #define GPS_UART_PORT UART4					//USART GPS Port
 
-#define GPS_TX_Pin GPIO_PIN_10				//USART Tx GPIO Pin
+#define GPS_TX_Pin GPIO_PIN_0		//USART Tx GPIO Pin
 
-#define GPS_TX_GPIO_Port GPIOC				//USART Tx GPIO Port
+#define GPS_TX_GPIO_Port GPIOA				//USART Tx GPIO Port
 
-#define GPS_RX_Pin GPIO_PIN_11				//USART Rx GPIO Pin
+#define GPS_RX_Pin GPIO_PIN_1				//USART Rx GPIO Pin
 
-#define GPS_RX_GPIO_Port GPIOC				//USART Rx GPIO Port
+#define GPS_RX_GPIO_Port GPIOA				//USART Rx GPIO Port
 
 
 #ifdef UBLOX_NEO9							//power-on init baud rate definition

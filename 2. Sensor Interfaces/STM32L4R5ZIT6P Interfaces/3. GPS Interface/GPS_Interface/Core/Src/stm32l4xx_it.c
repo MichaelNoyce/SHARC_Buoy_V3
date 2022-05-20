@@ -56,11 +56,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_memtomem_dma1_channel1;
-extern DMA_HandleTypeDef hdma_uart4_rx;
-extern DMA_HandleTypeDef hdma_uart4_tx;
-extern UART_HandleTypeDef huart4;
-extern TIM_HandleTypeDef htim2;
+extern GPS_Handle_Typedef hgps;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -203,12 +199,61 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32l4xx.s).                    */
 /******************************************************************************/
 
+/**
+  * @brief This function handles DMA1 channel1 global interrupt.
+  */
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_memtomem_dma1_channel1);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_uart4_tx);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel5 global interrupt.
+  */
+void DMA1_Channel5_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_uart4_rx);
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM2 global interrupt.
+  */
 void TIM2_IRQHandler(void)
 {
-  /* USER CODE TIM2_IRQn 0 */
-	 USART_TIM_RTO_Handler(hgps.gps_htim); //custom call back function
-	 HAL_TIM_IRQHandler(hgps.gps_htim);	 //HAL default handler
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+	USART_TIM_RTO_Handler(hgps.gps_htim); //custom call back function
+	HAL_TIM_IRQHandler(hgps.gps_htim);	 //HAL default handler
+  /* USER CODE END TIM2_IRQn 0 */
 
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**
@@ -216,42 +261,13 @@ void TIM2_IRQHandler(void)
   */
 void UART4_IRQHandler(void)
 {
-  /* USER CODE UART4_IRQn 0 */
+  /* USER CODE BEGIN UART4_IRQn 0 */
 	USART_GPS_IRQHandler(&hgps); //custom user Call Back function
+  /* USER CODE END UART4_IRQn 0 */
 
-}
+  /* USER CODE BEGIN UART4_IRQn 1 */
 
-/**
-  * @brief This function handles DMA2 channel3 global interrupt.
-  */
-void DMA2_Channel3_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA2_Channel3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_uart4_tx);
-
-}
-
-/**
-  * @brief This function handles DMA2 channel5 global interrupt.
-  */
-void DMA2_Channel5_IRQHandler(void)
-{
-  /* USER CODE DMA2_Channel5_IRQn 0 */
-  DMA_GNSS_Periph_IRQHandler(&hgps);
-
-}
-
-
-/**
-  * @brief This function handles DMA1 channel1 global interrupt.
-  */
-void DMA1_Channel1_IRQHandler(void)
-{
-  /* USER CODE DMA1_Channel1_IRQn 0 */
-
-  HAL_DMA_IRQHandler(&hdma_memtomem_dma1_channel1);
-  DMA_GNSS_MEM_IRQHandler(&hgps);
-
+  /* USER CODE END UART4_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

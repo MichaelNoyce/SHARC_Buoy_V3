@@ -193,12 +193,12 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Enable and config FIFO
 	ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
 	ICM20649_Init_FIFO(&hi2c1, ENABLE);
-	//ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
+	ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
 	ICM20649_Config_FIFO(&hi2c1, ENABLE, DISABLE, DISABLE, ENABLE);
 
 	//configure interrupt pin
-	//ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
-	//ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
+	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
+	ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
 	return IMU_OK;
 }
 
@@ -786,7 +786,7 @@ imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count)
 
 }
 
-imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t* count)
+imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t count)
 {
 	uint8_t i = 0;
 
