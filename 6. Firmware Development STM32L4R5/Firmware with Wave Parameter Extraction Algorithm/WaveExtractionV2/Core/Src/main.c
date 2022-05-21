@@ -102,14 +102,22 @@ int main(void)
 
   uint32_t i = 0;
 
-  float32_t PSD[FFT_LENGTH/2];
+  float32_t PSD[FFT_LENGTH];
+
+  fullPipeline(PSD);
 
   //singleSegmentPipeline(PSD);
 
-  WelchMethod(PSD);
+  //WelchMethod(PSD);
 
-  HAL_Delay(500);
 
+  printmsg("DSP Pipeline Finished!\r\n");
+
+  /*for(int i=0; i<512; i++)
+  	  				    {
+  	  				    	printmsg("%.8f \r\n", PSD[i]);
+  	  				    }
+*/
 
   /* USER CODE END 2 */
 
@@ -288,20 +296,20 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PC13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
 }
 

@@ -167,7 +167,7 @@ sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 {
 	  printmsg("SDMMC Interface Starting! \r\n");
 	  FATFS SDFatFs; /* File system object for User logical drive */
-	  char diskPath[4]; /* User logical drive path */
+	  char diskPath[10]; /* User logical drive path */
 	  sd_status_t errorCode;
 	  FRESULT res;
 	  uint32_t byteswritten = 0;
@@ -178,7 +178,8 @@ sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
 	  {
 		  printmsg("Mounted successfully!");
-		  if(f_open(myFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		  sprintf(diskPath, "Log%d.txt", (int)fileNumber);
+		   if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 		    {
 			  printmsg("Opened file!");
 		    }
@@ -226,4 +227,5 @@ sd_status_t SD_File_Close(FIL *myFile)
 
 	return SD_OK;
 }
+
 

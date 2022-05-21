@@ -795,7 +795,7 @@ imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu,
 
 	 //for(int i = 0; i<(*count-6); i+=6)
 	 //{
-		 if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, &imu, 6) != HAL_OK)
+		 if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, imu, 6) != HAL_OK)
 		 {
 			 return IMU_I2C_ERROR;
 		 }

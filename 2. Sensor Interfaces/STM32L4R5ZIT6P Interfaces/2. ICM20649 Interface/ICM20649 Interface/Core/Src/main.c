@@ -296,7 +296,7 @@ int main(void)
 
  uint8_t imu_fifo[6] = {0};
 
- if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_R_W, I2C_MEMADD_SIZE_8BIT, imu_fifo, 14,100)!= HAL_OK)
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, FIFO_R_W, I2C_MEMADD_SIZE_8BIT, imu_fifo, 6,100)!= HAL_OK)
 {
 	return IMU_I2C_ERROR;
 }
@@ -336,7 +336,7 @@ else
 
  printmsg("FIFO count size: %f \r\n", (float)countTest);
 
- ICM20649_Get_IMU_RawData_DMA(&hi2c1, IMU_Buffer, 6);
+ ICM20649_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer, 6);
 
 
 // for(int i = 0; i<(countTest-6); i+=6)
@@ -373,7 +373,7 @@ printmsg("Interrupt test started!");
 
  //Print out int_config register
 
- if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_PIN_CFG, 1, &int_pin_config, 1, 100) != HAL_OK)
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_PIN_CFG, I2C_MEMADD_SIZE_8BIT, &int_pin_config, 1, 100) != HAL_OK)
   {
 	 printmsg("i2c read error");
        return IMU_I2C_ERROR;
@@ -386,7 +386,7 @@ printmsg("Interrupt test started!");
 
  //Print out interrupt enable registers
 
- if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE, 1, &int_enable, 1, 100) != HAL_OK)
+ if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_ENABLE, I2C_MEMADD_SIZE_8BIT, &int_enable, 1, 100) != HAL_OK)
   {
        return IMU_I2C_ERROR;
        printmsg("i2c read error");

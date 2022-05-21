@@ -1,60 +1,24 @@
-16:19:19 **** Incremental Build of configuration Debug for project ICM20649 Interface ****
+16:29:09 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
 make -j4 all 
-arm-none-eabi-gcc "../Core/Src/HAL_ICM20649.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_ICM20649.d" -MT"Core/Src/HAL_ICM20649.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_ICM20649.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/HAL_ICM20649.c: In function 'MX_I2C1_Init':
-../Core/Src/HAL_ICM20649.c:59:5: warning: implicit declaration of function 'Error_Handler' [-Wimplicit-function-declaration]
-   59 |     Error_Handler();
-      |     ^~~~~~~~~~~~~
-../Core/Src/HAL_ICM20649.c: In function 'ICM20649_Get_IMU_RawData_DMA':
-../Core/Src/HAL_ICM20649.c:798:67: warning: passing argument 5 of 'HAL_I2C_Mem_Read_DMA' from incompatible pointer type [-Wincompatible-pointer-types]
-  798 |    if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, &imu, 6) != HAL_OK)
-      |                                                                   ^~~~
-      |                                                                   |
-      |                                                                   uint8_t ** {aka unsigned char **}
-In file included from ../Core/Inc/stm32l4xx_hal_conf.h:342,
-                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
-                 from ../Core/Inc/HAL_ICM20649.h:37,
-                 from ../Core/Src/HAL_ICM20649.c:10:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c.h:670:70: note: expected 'uint8_t *' {aka 'unsigned char *'} but argument is of type 'uint8_t **' {aka 'unsigned char **'}
-  670 |                                        uint16_t MemAddSize, uint8_t *pData, uint16_t Size);
-      |                                                             ~~~~~~~~~^~~~~
-../Core/Src/HAL_ICM20649.c:791:10: warning: unused variable 'i' [-Wunused-variable]
-  791 |  uint8_t i = 0;
-      |          ^
-../Core/Src/HAL_ICM20649.c: In function 'HAL_GPIO_EXTI_Callback':
-../Core/Src/HAL_ICM20649.c:1115:60: warning: passing argument 3 of 'ICM20649_Get_IMU_RawData_DMA' makes integer from pointer without a cast [-Wint-conversion]
- 1115 |  ICM20649_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer[*count], count);
-      |                                                            ^~~~~
-      |                                                            |
-      |                                                            uint16_t * {aka short unsigned int *}
-../Core/Src/HAL_ICM20649.c:789:91: note: expected 'uint16_t' {aka 'short unsigned int'} but argument is of type 'uint16_t *' {aka 'short unsigned int *'}
-  789 | imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t count)
-      |                                                                                  ~~~~~~~~~^~~~~
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:137:11: warning: unused variable 'pwr_mgmt2_reg' [-Wunused-variable]
-  137 |   uint8_t pwr_mgmt2_reg = 0;
-      |           ^~~~~~~~~~~~~
-../Core/Src/main.c:75:10: warning: unused variable 'acc' [-Wunused-variable]
-   75 |    float acc;
-      |          ^~~
-../Core/Src/main.c:74:17: warning: unused variable 'flag' [-Wunused-variable]
-   74 |    imu_status_t flag;
-      |                 ^~~~
-../Core/Src/main.c:73:12: warning: unused variable 'val' [-Wunused-variable]
-   73 |    int16_t val;
+arm-none-eabi-gcc "../Core/Src/HAL_SD.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../FATFS/Target -I../FATFS/App -I../Middlewares/Third_Party/FatFs/src -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_SD.d" -MT"Core/Src/HAL_SD.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_SD.o"
+../Core/Src/HAL_SD.c: In function 'SD_File_Open':
+../Core/Src/HAL_SD.c:168:4: warning: implicit declaration of function 'printmsg'; did you mean 'printf'? [-Wimplicit-function-declaration]
+  168 |    printmsg("SDMMC Interface Starting! \r\n");
+      |    ^~~~~~~~
+      |    printf
+../Core/Src/HAL_SD.c:173:13: warning: unused variable 'byteswritten' [-Wunused-variable]
+  173 |    uint32_t byteswritten = 0;
+      |             ^~~~~~~~~~~~
+../Core/Src/HAL_SD.c:172:12: warning: unused variable 'res' [-Wunused-variable]
+  172 |    FRESULT res;
       |            ^~~
-../Core/Src/main.c:72:12: warning: unused variable 'buf' [-Wunused-variable]
-   72 |    uint8_t buf[12];
-      |            ^~~
-arm-none-eabi-gcc -o "ICM20649 Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\2. ICM20649 Interface\ICM20649 Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="ICM20649 Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: ICM20649 Interface.elf
- 
-arm-none-eabi-size   ICM20649\ Interface.elf 
-arm-none-eabi-objdump -h -S  ICM20649\ Interface.elf  > "ICM20649 Interface.list"
-   text	   data	    bss	    dec	    hex	filename
-  46356	    484	   3220	  50060	   c38c	ICM20649 Interface.elf
-Finished building: default.size.stdout
- 
-Finished building: ICM20649 Interface.list
- 
+../Core/Src/HAL_SD.c:196:1: warning: control reaches end of non-void function [-Wreturn-type]
+  196 | }
+      | ^
+arm-none-eabi-gcc -o "SDMMC_Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\1. SDMMC Interface\SDMMC_Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="SDMMC_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:65: multiple definition of `hcrc'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:65: first defined here
+c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:67: multiple definition of `hlpuart1'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:67: first defined here
+c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:69: multiple definition of `hsd1'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:69: first defined here
+collect2.exe: error: ld returned 1 exit status
+make: *** [makefile:68: SDMMC_Interface.elf] Error 1
+"make -j4 all" terminated with exit code 2. Build might be incomplete.

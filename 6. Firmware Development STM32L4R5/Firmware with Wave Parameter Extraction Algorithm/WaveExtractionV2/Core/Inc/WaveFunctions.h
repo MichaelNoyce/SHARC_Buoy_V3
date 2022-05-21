@@ -98,4 +98,4 @@ void WelchMethod(float32_t* PSD);
  * @param M1
  * @param M2
  */
-void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2);
+void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2);

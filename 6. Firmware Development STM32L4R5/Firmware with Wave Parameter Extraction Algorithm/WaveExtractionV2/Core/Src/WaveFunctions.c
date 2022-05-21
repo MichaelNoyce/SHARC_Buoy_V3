@@ -29,9 +29,8 @@ const float32_t firCoeffs32[NUM_TAPS_ARRAY_SIZE] = {
  */
 void fullPipeline(float32_t* PSDOutput)
 {
-
-	float32_t PSD[FFT_LENGTH/2];
 	float32_t Hm0;
+	float32_t Tm01;
 	float32_t Hrms;
 	float32_t T0;
 	float32_t Tp;
@@ -40,17 +39,27 @@ void fullPipeline(float32_t* PSDOutput)
 	float32_t M2;
 
 	//Welch Method - calls single segment pipeline in function
-	WelchMethod(PSD);
-
-	for(int i=0; i<FFT_LENGTH/2; i++)
+	WelchMethod(PSDOutput);
+	/*for(int i=0; i<512; i++)
 	  				    {
 	  				    	printmsg("%.2f \r\n", PSD[i]);
-	  				    }
+	  				    	PSDOutput[i] = PSD[i];
+	  				    	printmsg("PSD sample %d \r\n", i);
+	  				    } */
+
 
 	//Wave Extraction Algorithm
 	//PSD Spectra input - wave parameter output
 	//waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
+	waveParamExtract(PSDOutput, &Hm0, &Tm01, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 
+	printmsg("Hm0 %.8f \r\n", Hm0);
+	printmsg("Hrms %.8f \r\n", Hrms);
+	printmsg("M0 %.8f \r\n", M0);
+	printmsg("M1 %.8f \r\n", M1);
+	printmsg("M2 %.8f \r\n", M2);
+	printmsg("Tm01 %.8f \r\n", Tm01);
+	printmsg("T0 %.8f \r\n", T0);
 }
 
 /**
@@ -335,36 +344,51 @@ void WelchMethod(float32_t* PSD)
 
 //Wave Parameter extraction
 //Based on SWASH Model
-//
-void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2)
+void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2)
 {
-	//Newton Cotes Quadrature
 
+	//Iterators
+	uint32_t i, j;
 	//Length of PSD input
 	float32_t sample_length = FFT_LENGTH/2;
 	//Subint Length
 	float32_t subInt_length;
 	// Number of subintervals
-	float32_t subInt_no = FFT_LENGTH/2 - 1;
+	uint32_t subInt_no = sample_length - 1;
 	//Integral
 	float32_t Sum = 0;
+	//Frequency array
+	float32_t freq[FFT_LENGTH/2];
+	//Max Amplitude freq
+	float32_t fm;
+	//Freq index of max amplitude
+	uint32_t fi;
+	//temp moment values
+	float32_t m0, m1, m2;
 
-	/*
 	//Create frequency array
 	for(i=0; i<FFT_LENGTH/2; i++)
 	{
-		freq[i] = Fs*((float32_t)i/(FFT_LENGTH/2));
+		freq[i] = F_SAMPLE*((float32_t)i/(FFT_LENGTH/2));
 	}
+
+
 
 	//Length of subinterval
 	subInt_length=(freq[subInt_no+1]-freq[1])/subInt_no;
+
+	//Newton Cotes Quadrature to calculate spectral moments
 
 	for(i=2; i<FFT_LENGTH/2; i++)
 	{
 		Sum = Sum + PSD[i];
 	}
 
-	M0 = 0.5*subInt_length*(PSD(1)+2*Sum+PSD(subInt_no+1));
+	*M0 = 0.5*subInt_length*(PSD[1]+2*Sum+PSD[subInt_no+1]);
+
+	m0 = *M0;
+
+	printmsg("M0 calculated!");
 
 	Sum = 0;
 
@@ -373,11 +397,47 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Hrms, float32_t
 		Sum = Sum + (freq[i]*freq[i])*PSD[i];
 	}
 
-	M1 = 0.5*subInt_length*(freq[1]*PSD(1)+2*Sum+(freq[subInt_length+1]*PSD(subInt_no+1)));
+	printmsg("f^2 sum %.8f", Sum);
+
+	m1 = 0.5*subInt_length*(freq[1]*PSD[1]+2*Sum+(freq[subInt_no+1]*PSD[subInt_no+1]));
+
+	*M1 = m1;
+
+	printmsg("M1 calculated!: m1 %.8f", m1);
 
 	Sum = 0;
 
+	for(i=2; i<FFT_LENGTH/2; i++)
+		{
+			Sum = Sum + (freq[i]*freq[i])*PSD[i];
+		}
+
+	 m2 =  0.5*subInt_length*(freq[1]*freq[1]*PSD[1]+2*Sum+(freq[subInt_no+1]*freq[subInt_no+1]*PSD[subInt_no+1]));
+
+	 *M2 = m2;
+
+	printmsg("M2 calculated!");
+
 	//add M2, T0, Hrms and H0 calculations
+
+	*Hm0 = 4*sqrt(fabsf(m0)); //correct
+	*Tm01 = 1/(fabsf(m0/m1)*(float32_t)FFT_LENGTH); //Check normalisation + inverse
+	*Hrms = sqrt(2)/2*(*Hm0); // Correct
+	*T0 = sqrt(fabsf(m0)/fabsf(m2))*(float32_t)F_SAMPLE; //off by F_SAMPLE = 100 why?
+
+	printmsg("Parameters calculated!");
+
+	/* for (i = 1; i < FFT_LENGTH/2; ++i) {
+	    if (PSD[0] < PSD[i]) {
+	    	fi = i;
+	    }
+	  }
+
+	fm = freq[fi];
+
+	*Tp = 1/fm;
+
+	printmsg("Tp calculated!");
 
 	*/
 }
