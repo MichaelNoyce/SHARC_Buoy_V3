@@ -20,6 +20,8 @@
 static void MX_GPIO_Init(void);
 static void MX_SDMMC1_SD_Init(void);
 static void MX_CRC_Init(void);
+static void MX_RTC_Init(void);
+void MX_FATFS_Init();
 
 //======================== 4. Static Functions Definition ===========================================
 
@@ -119,7 +121,69 @@ static void MX_CRC_Init(void)
 }
 
 
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
 
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef sDate = {0};
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x10;
+  sTime.Minutes = 0x21;
+  sTime.Seconds = 0x0;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
+  sDate.Month = RTC_MONTH_MAY;
+  sDate.Date = 0x5;
+  sDate.Year = 0x16;
+
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
 
 
 
@@ -145,9 +209,11 @@ static void MX_CRC_Init(void)
 
 sd_status_t SD_Init(void)
 {
+	MX_FATFS_Init();
 	MX_GPIO_Init();
 	MX_SDMMC1_SD_Init();
 	MX_CRC_Init();
+	MX_RTC_Init(); // remove if program has own RTC
 
 	return SD_OK;
 }
@@ -178,20 +244,24 @@ sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
 	  {
 		  printmsg("Mounted successfully!");
-		  sprintf(diskPath, "Log%d.txt", (int)fileNumber);
+		  sprintf(diskPath, "Log%ld.txt", fileNumber);
 		   if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 		    {
 			  printmsg("Opened file!");
 		    }
 		  else
 		  {
+			return SD_OPEN_ERROR;
 			printmsg("Open failed!");
 		  }
 	  }
 	  else
 	  {
 		  printmsg("Mount failed");
+		  return SD_MOUNT_ERROR;
 	  }
+
+	  return SD_OK;
 
 }
 
@@ -226,6 +296,37 @@ sd_status_t SD_File_Close(FIL *myFile)
 	}
 
 	return SD_OK;
+}
+
+/**
+ * @brief Manually timestmap file if get_fattime() in fatfs.c is not used
+ *
+ * @param myFile
+ * @return
+ */
+sd_status_t SD_File_TimeStamp(FIL *myFile)
+{
+	RTC_DateTypeDef gDate;
+	RTC_TimeTypeDef gTime;
+	/* Get the RTC current Time */
+	HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	/* Get the RTC current Date */
+	HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+
+	FILINFO fno;
+
+	fno.fdate = (WORD)(((gDate.Year - 1980) * 512U) | gDate.Month * 32U | gDate.Date);
+	fno.ftime = (WORD)(gTime.Hours * 2048U | gTime.Minutes * 32U | gTime.Seconds / 2U);
+
+
+	if(f_utime(myFile, &fno) != FR_OK)
+		{
+			printmsg("Timestamp Failed!");
+			return SD_TIME_ERROR;
+		}
+
+		return SD_OK;
+
 }
 
 

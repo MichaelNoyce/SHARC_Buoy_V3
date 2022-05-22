@@ -1,24 +1,44 @@
-16:29:09 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+16:34:25 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
 make -j4 all 
 arm-none-eabi-gcc "../Core/Src/HAL_SD.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../FATFS/Target -I../FATFS/App -I../Middlewares/Third_Party/FatFs/src -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_SD.d" -MT"Core/Src/HAL_SD.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_SD.o"
 ../Core/Src/HAL_SD.c: In function 'SD_File_Open':
-../Core/Src/HAL_SD.c:168:4: warning: implicit declaration of function 'printmsg'; did you mean 'printf'? [-Wimplicit-function-declaration]
-  168 |    printmsg("SDMMC Interface Starting! \r\n");
+../Core/Src/HAL_SD.c:234:4: warning: implicit declaration of function 'printmsg'; did you mean 'printf'? [-Wimplicit-function-declaration]
+  234 |    printmsg("SDMMC Interface Starting! \r\n");
       |    ^~~~~~~~
       |    printf
-../Core/Src/HAL_SD.c:173:13: warning: unused variable 'byteswritten' [-Wunused-variable]
-  173 |    uint32_t byteswritten = 0;
+../Core/Src/HAL_SD.c:239:13: warning: unused variable 'byteswritten' [-Wunused-variable]
+  239 |    uint32_t byteswritten = 0;
       |             ^~~~~~~~~~~~
-../Core/Src/HAL_SD.c:172:12: warning: unused variable 'res' [-Wunused-variable]
-  172 |    FRESULT res;
+../Core/Src/HAL_SD.c:238:12: warning: unused variable 'res' [-Wunused-variable]
+  238 |    FRESULT res;
       |            ^~~
-../Core/Src/HAL_SD.c:196:1: warning: control reaches end of non-void function [-Wreturn-type]
-  196 | }
-      | ^
+../Core/Src/HAL_SD.c: In function 'SD_File_TimeStamp':
+../Core/Src/HAL_SD.c:322:13: warning: passing argument 1 of 'f_utime' from incompatible pointer type [-Wincompatible-pointer-types]
+  322 |  if(f_utime(myFile, &fno) != FR_OK)
+      |             ^~~~~~
+      |             |
+      |             FIL * {aka struct <anonymous> *}
+In file included from ../FATFS/App/fatfs.h:26,
+                 from ../Core/Inc/HAL_SD.h:35,
+                 from ../Core/Src/HAL_SD.c:11:
+../Middlewares/Third_Party/FatFs/src/ff.h:259:31: note: expected 'const TCHAR *' {aka 'const char *'} but argument is of type 'FIL *' {aka 'struct <anonymous> *'}
+  259 | FRESULT f_utime (const TCHAR* path, const FILINFO* fno);   /* Change timestamp of a file/dir */
+      |                  ~~~~~~~~~~~~~^~~~
 arm-none-eabi-gcc -o "SDMMC_Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\1. SDMMC Interface\SDMMC_Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="SDMMC_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:65: multiple definition of `hcrc'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:65: first defined here
-c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:67: multiple definition of `hlpuart1'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:67: first defined here
-c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127\tools\arm-none-eabi\bin\ld.exe: ./Core/Src/main.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:69: multiple definition of `hsd1'; ./Core/Src/HAL_SD.o:C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/1. SDMMC Interface/SDMMC_Interface/Debug/../Core/Inc/HAL_SD.h:69: first defined here
-collect2.exe: error: ld returned 1 exit status
-make: *** [makefile:68: SDMMC_Interface.elf] Error 1
-"make -j4 all" terminated with exit code 2. Build might be incomplete.
+Finished building target: SDMMC_Interface.elf
+ 
+arm-none-eabi-size   SDMMC_Interface.elf 
+arm-none-eabi-objdump -h -S  SDMMC_Interface.elf  > "SDMMC_Interface.list"
+   text	   data	    bss	    dec	    hex	filename
+  44656	    120	   4664	  49440	   c120	SDMMC_Interface.elf
+Finished building: default.size.stdout
+ 
+Finished building: SDMMC_Interface.list
+ 
+16:34:45 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+make -j4 all 
+arm-none-eabi-size   SDMMC_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  44656	    120	   4664	  49440	   c120	SDMMC_Interface.elf
+Finished building: default.size.stdout
+ 

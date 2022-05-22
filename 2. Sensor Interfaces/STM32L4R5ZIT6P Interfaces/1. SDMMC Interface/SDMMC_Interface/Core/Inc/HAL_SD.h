@@ -20,7 +20,7 @@
  *  3. Read files
  *  4. Create Files
  *
- *
+ * NB: get_fattime must be updated in the fatfs.c file to use f_utime and timestamp functions
  */
 
 #ifndef HAL_SD_H_
@@ -37,11 +37,10 @@
 //========================== 2. Structs & Enums ===========================================
 
 /*
- * IMU_Status_t
+ * sd_status_t
  *
  * @brief:	Used to represent numeric statuses returned as a result of
- * 		    running Sensor-register level functions e.g. using i2c to write
- * 		    a value for Power mode. Successful return
+ * 		    running SDMMC interface
  */
 typedef enum
 {
@@ -54,6 +53,7 @@ typedef enum
 	SD_CRC_ERROR,
 	SD_DMA_ERROR,
 	SD_OK,
+	SD_TIME_ERROR,
 }sd_status_t;
 
 //========================== 4. Global Variables ==========================================
@@ -67,6 +67,9 @@ CRC_HandleTypeDef hcrc;
 UART_HandleTypeDef hlpuart1;
 
 SD_HandleTypeDef hsd1;
+
+RTC_HandleTypeDef hrtc; // this is only included for the standalone module - remove if using code with own RTC
+
 
 //======================== 6. SD Configuration Functions =========================================
 
@@ -107,6 +110,13 @@ sd_status_t SD_File_Write(FIL *myFile, uint8_t *dataBuffer);
  */
 sd_status_t SD_File_Close(FIL *myFile);
 
+/**
+ * @brief Time-stamps myFile with current time from RTC
+ *
+ * @param myFile
+ * @return
+ */
+sd_status_t SD_File_TimeStamp(FIL *myFile);
 
 //======================== 6. SD Read/Write Functions ============================================
 
