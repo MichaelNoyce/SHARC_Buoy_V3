@@ -142,6 +142,15 @@ static HAL_StatusTypeDef MX_USART3_UART_Init(void)
 static HAL_StatusTypeDef MX_DMA_Init(void)
 {
 
+	 if(DMA2_Channel2->CCR != 0)
+	  {
+	   //clear channel to reset state
+	   hdma_usart3_rx.Instance = DMA2_Channel2;
+	   hdma_usart3_rx.DmaBaseAddress->ISR = DMA2->ISR;
+	   hdma_usart3_rx.ChannelIndex = 2;
+	   HAL_DMA_DeInit(&hdma_usart3_rx);
+	  }
+
   /* DMA controller clock enable */
   __HAL_RCC_DMAMUX1_CLK_ENABLE();
   __HAL_RCC_DMA1_CLK_ENABLE();
@@ -186,7 +195,7 @@ static HAL_StatusTypeDef MX_GPIO_Init(void)
 
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  /*Configure GPIO pin Output Level */
+  __HAL_RCC_GPIOF_CLK_ENABLE();
 
 
   /*Configure GPIO pins : IR_OnOff_Pin */

@@ -96,6 +96,21 @@ int main(void)
   SD_File_Open(&File, 1);
   SD_File_Write(&File, dataBuffer);
   SD_File_Close(&File);
+
+
+  RTC_DateTypeDef gDate;
+  RTC_TimeTypeDef gTime;
+  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+  HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+
+
+//Check Timestamp
+
+  /* Display time Format: hh:mm:ss */
+  printmsg("\r\n Time %d:%d:%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds);
+  /* Display date Format: dd-mm-yy */
+   printmsg("Date %d-%d-%d \r\n", gDate.Date, gDate.Month, 2000 + gDate.Year);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

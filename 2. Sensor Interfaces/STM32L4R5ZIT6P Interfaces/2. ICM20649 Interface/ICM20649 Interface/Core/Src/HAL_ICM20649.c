@@ -39,7 +39,7 @@ static HAL_StatusTypeDef MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00100002;
+  hi2c1.Init.Timing = 0x00000004;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -56,7 +56,7 @@ static HAL_StatusTypeDef MX_I2C1_Init(void)
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
-    Error_Handler();
+    //Error_Handler();
   }
 
   /** Configure Digital filter
@@ -69,26 +69,6 @@ static HAL_StatusTypeDef MX_I2C1_Init(void)
   //printmsg("i2c init successful! \r\n");
   /* USER CODE END I2C1_Init 2 */
   return HAL_OK;
-
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMAMUX1_CLK_ENABLE();
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-  /* DMA1_Channel2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
 
 }
 
@@ -114,18 +94,46 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, 0);
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
-  /*Configure GPIO pin : PB7 */
-  /*Configure GPIO pin : PB7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PB14 PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_7;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
+
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMAMUX1_CLK_ENABLE();
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+
+}
+
 //======================== 5. MSP Function Definitions ==================================
 /* MSP FUNCTIONS:
  *
@@ -152,21 +160,27 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	ICM20649_Register_Bank_Select(&hi2c1, 0);
 
 	//Initialise Peripherals
-	if(MX_I2C1_Init() != HAL_OK) return IMU_PERIPHERAL_INIT_ERROR;
 	MX_DMA_Init();
+	if(MX_I2C1_Init() != HAL_OK) return IMU_PERIPHERAL_INIT_ERROR;
 	MX_GPIO_Init();
+
 	//reset buffers and flags
 	imu_sample_count = 0;
 	I2C_TX_CPLT = 0;
 	IMU_Log_On = 0;
 	IMU_Log_On = 1;
-	memset(IMU_Buffer,0,IMU_BUFFER_SIZE);
+
+	//memset(IMU_Buffer,0,IMU_BUFFER_SIZE);
+
 	//get ID
-	uint8_t whoami = 0;
+	uint8_t whoami;
 	if(ICM20649_Get_ID(&hi2c1,&whoami) != IMU_OK)
 	{
+
 		return IMU_I2C_DEVICE_OFFLINE;
 	}
+
+
 
 	if(whoami != WHO_AM_I_VALUE)
 	{
@@ -182,8 +196,8 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Configure sensor settings
 	ICM20649_Set_Acc_FSR(&hi2c1,a_fsr);
 	ICM20649_Set_Gyro_FSR(&hi2c1,g_fsr);
-	ICM20649_Set_Acc_DLPF(&hi2c1,dlpf_acc_coeff, ENABLE);
-	ICM20649_Set_Gyro_DLPF(&hi2c1,dlpf_gyro_coeff, ENABLE);
+	ICM20649_Set_Acc_DLPF(&hi2c1,0, ENABLE);
+	ICM20649_Set_Gyro_DLPF(&hi2c1,0, ENABLE);
 	//ICM20649_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
 	ICM20649_Set_Sample_Rate(&hi2c1);
 
@@ -194,18 +208,22 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
 	ICM20649_Init_FIFO(&hi2c1, ENABLE);
 	ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
-	ICM20649_Config_FIFO(&hi2c1, ENABLE, DISABLE, DISABLE, ENABLE);
+	ICM20649_Config_FIFO(&hi2c1, ENABLE, ENABLE, DISABLE, ENABLE);
 
 	//configure interrupt pin
-	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_EN);
-	ICM20649_Enable_Interrupt(&hi2c1, FIFO_WM_INT, 3);
+	ICM20649_Disable_Interrupts(&hi2c1);
+	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
+	ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_EN, 1);
+
+	Reset_FIFO(&hi2c1);
+
 	return IMU_OK;
 }
 
 imu_status_t ICM20649_Deinit_IMU(void)
 {
-	 ICM20649_Disable_Interrupt(&hi2c1,DATA_READY);
-	 ICM20649_Get_Interrupt_Status(&hi2c1,DATA_READY,(uint8_t*)0xFF);
+	 ICM20649_Disable_Interrupts(&hi2c1);
+	 //ICM20649_Get_Interrupt_Status(&hi2c1,DATA_READY,(uint8_t*)0xFF);
 	//reset Device and place in sleep mode
 	ICM20649_Set_PLLSrc(&hi2c1, PWR_MGMT_1_CLK_SEL_0);
 	ICM20649_reset(&hi2c1);
@@ -307,6 +325,7 @@ imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrup
 {
 	ICM20649_Register_Bank_Select(&hi2c1, 0);
 
+
 	uint8_t iconfigbyte = 0;
 	uint8_t address;
 
@@ -337,7 +356,14 @@ imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrup
 	return IMU_OK;
 }
 
-imu_status_t ICM20649_Disable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts)
+/**
+ * @brief Clear all interrupt registers
+ *
+ * @param hi2c
+ * @param interrupts
+ * @return
+ */
+imu_status_t ICM20649_Disable_Interrupts(I2C_HandleTypeDef *hi2c)
 {
 	uint8_t iconfigbyte = 0;
 	if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_ENABLE,1,&iconfigbyte,1,100) != HAL_OK)
@@ -345,12 +371,30 @@ imu_status_t ICM20649_Disable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interru
 		return IMU_I2C_ERROR;
 	}
 	//set enable bit
-	iconfigbyte &= ~interrupts;
+	iconfigbyte = 0;
 	//write to register
+
+	//Clear INT_ENABLE -INT_ENABLE_3
 	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,INT_ENABLE,1,&iconfigbyte,1,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
+
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,INT_ENABLE_1,1,&iconfigbyte,1,100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,INT_ENABLE_2,1,&iconfigbyte,1,100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,INT_ENABLE_3,1,&iconfigbyte,1,100) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
+
 	return IMU_OK;
 }
 
@@ -406,6 +450,7 @@ imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 	{
 		return IMU_I2C_ERROR;
 	}
+
 
 	configbyte = 0;
 	smplrtdiv = 0;
@@ -633,7 +678,7 @@ imu_status_t ICM20649_FIFO_CMD(I2C_HandleTypeDef *hi2c,uint8_t cmd)
 imu_status_t ICM20649_Register_Bank_Select(I2C_HandleTypeDef *hi2c,uint8_t reg)
 {
 	uint8_t byte = 0;
-	byte = reg;
+	byte = reg<<4;
 
 	if(HAL_I2C_Mem_Write(hi2c, IMU_Device_Address, REG_BANK_SEL, 1, &byte, 1, 100)!= HAL_OK)
 	{
@@ -679,7 +724,10 @@ imu_status_t ICM20649_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf
 
  imu_status_t ICM20649_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID)
  {
-	  uint8_t whoami = 0;
+
+	 ICM20649_Register_Bank_Select(&hi2c1, 0);
+
+	 uint8_t whoami;
 	  //check if device is I2C ready
 	  if(HAL_I2C_IsDeviceReady(&hi2c1,IMU_Device_Address,10,100)== HAL_OK)
 	  {
@@ -736,20 +784,20 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 				{
 					return IMU_I2C_ERROR;
 				}
-			*res = (istatus&FIFO_OVERFLOW_INT);
+			*res = istatus;
 			break;
 		case DATA_READY:
 			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_2,1,&istatus,1,100) != HAL_OK)
 			{
 				return IMU_I2C_ERROR;
 			}
-			*res = (istatus&RAW_DATA_0_RDY_INT);
+			*res = istatus;
 		case FIFO_WATERMARK:
 			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_3,1,&istatus,1,100) != HAL_OK)
 			{
 				return IMU_I2C_ERROR;
 			}
-			*res = (istatus&FIFO_WM_INT);
+			*res = istatus;
 		default:
 			break;
 
@@ -760,12 +808,24 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 
 imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
 {
-	ICM20649_Register_Bank_Select(hi2c, 0);
-	//printmsg("Getting IMU Raw data \r\n");
-	if( HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, ACCEL_XOUT_H, 1, imu, 12, 100) != HAL_OK)
-	{
-		return IMU_I2C_ERROR;
-	}
+
+	//Indicate DMA Transfer
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	I2C_TX_CPLT = 0;
+
+
+	 for(int i = 0; i<N_SAMPLES; i++)
+	 {
+		 if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[i*12], 12, 100) != HAL_OK)
+		 {
+			 return IMU_I2C_ERROR;
+		 }
+
+	 }
+
+	//Reset FIFO
+	Reset_FIFO(&hi2c1);
+
 	return IMU_OK;
 }
 
@@ -786,25 +846,13 @@ imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count)
 
 }
 
-imu_status_t ICM20649_Get_IMU_RawData_DMA(I2C_HandleTypeDef *hi2c, uint8_t* imu, uint16_t count)
+imu_status_t ICM20649_Get_IMU_RawData_FIFO(I2C_HandleTypeDef *hi2c, uint8_t* imuBuf, uint8_t count)
 {
-	uint8_t i = 0;
 
-	//Indicate DMA Transfer
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-
-	 //for(int i = 0; i<(*count-6); i+=6)
-	 //{
-		 if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, imu, 6) != HAL_OK)
-		 {
-			 return IMU_I2C_ERROR;
-		 }
-
-		return IMU_I2C_ERROR;
-//	}
-
-	//Reset FIFO
-	Reset_FIFO(&hi2c1);
+	if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, FIFO_Buffer, 4080)!= HAL_OK)
+	{
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+	}
 
 	return IMU_OK;
 
@@ -815,24 +863,25 @@ imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c)
 {
 
 	uint8_t fifo_rst_byte = 0;
-	fifo_rst_byte |= FIFO_RESET;
+	fifo_rst_byte = 0x0F;
 
 		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100) != HAL_OK)
 		{
 			return IMU_I2C_ERROR;
 		}
-		else
+
+		//Deassert Reset (need to assert and deassert for full reset
+		fifo_rst_byte = 0x0;
+		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)!= HAL_OK)
 		{
-			//Deassert Reset (need to assert and deassert for full reset
-			fifo_rst_byte &= ~FIFO_RESET;
-			if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)!= HAL_OK)
-			{
-				return IMU_I2C_ERROR;
-			}
+			return IMU_I2C_ERROR;
 		}
 
 		return IMU_OK;
+
 }
+
+
 
 //======================= 9. Power Mode Config Function Definitions =======================================
 
@@ -911,7 +960,7 @@ imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c)
 
 	//set bit in register
 	uint8_t pwrmgmtbyte = (uint8_t)PWR_MGMT_1_DEVICE_RESET;
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,100) != HAL_OK)
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,2) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
@@ -920,7 +969,7 @@ imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c)
 	while((pwrmgmtbyte &PWR_MGMT_1_DEVICE_RESET)!=0)
 	{
 		//poll data register untill bit is cleared
-		if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,100)!= HAL_OK)
+		if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address,PWR_MGMT_1,1,&pwrmgmtbyte,1,2)!= HAL_OK)
 		{
 			//failiure to read register
 				retries++;
@@ -1019,7 +1068,6 @@ imu_status_t ICM20649_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 	ICM20649_Set_Wake(&hi2c1); //wake up device
 	ICM20649_Set_PLLSrc(&hi2c1, PWR_MGMT_1_CLK_SEL_1); // set clock source to PLL gyro x axis
 	HAL_Delay(400);
-	//ICM20649_Disable_Interrupt(&hi2c1,(INT_ENABLE_DATA_RDY_EN|INT_ENABLE_FIFO_OFLOW_EN | INT_ENABLE_I2C_MST_INT_EN)); //Disable all interrupts
 	ICM20649_Init_FIFO(&hi2c1,DISABLE);
 	ICM20649_Init_FIFO(&hi2c1,IMU_RESET);
 
@@ -1084,48 +1132,37 @@ imu_status_t ICM20649_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 
 //======================= 11. IRQ Handler Functions =======================================
 
-//Initialisation Functions
-void ICM20649_DMA_PeriphIRQHandler(void)
+void ICM20649_IntPin_IRQ(uint32_t* sample_count)
 {
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	Reset_FIFO(&hi2c1);
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
+
+}
+
+
+void ICM20649_FIFO_Interrupt_IRQ(void)
+{
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+
+	ICM20649_Get_IMU_RawData_FIFO(&hi2c1, FIFO_Buffer, 0);
+
+	fifo_sample_count = 1;
+
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
+
+}
+
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
+{
+  /* Turn LED1 on: Transfer in transmission process is correct */
 	I2C_TX_CPLT = 1;
+	Reset_FIFO(&hi2c1);
+	//printmsg("I2C Transfer complete!");
 }
-
-void ICM20649_IntPin_IRQ(void)
-{
-  /* Prevent unused argument(s) compilation warning */
-  if(imu_sample_count < N_Samples)
-  {
-  	  uint8_t data_ready;
-  	  //ICM20649_Get_IMU_RawData_DMA(&hi2c1,&IMU_Buffer[imu_sample_count*12], count);
-  	  ICM20649_Get_Interrupt_Status(&hi2c1,DATA_READY,&data_ready);
-  	  imu_sample_count++;
-  }
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-  //Note: Interrupt has been cleared already
- if (GPIO_Pin == GPIO_PIN_14)
- {
-
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	uint16_t* count = {0};
-
-	ICM20649_Get_FIFO_Count(&hi2c1, count);
-	ICM20649_Get_IMU_RawData_DMA(&hi2c1, &IMU_Buffer[*count], count);
-
-	//Reset IMU  FIFO here :)
-	//Reset Interrupt if not done so in function before callback already
- }
-
-}
-
-void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-}
-
-
 
 
  /*

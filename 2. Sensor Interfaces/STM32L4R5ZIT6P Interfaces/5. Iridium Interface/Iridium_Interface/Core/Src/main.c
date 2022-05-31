@@ -90,6 +90,8 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+  MX_GPIO_Init();
+  MX_LPUART1_UART_Init();
 
   /* USER CODE BEGIN SysInit */
 
@@ -98,8 +100,6 @@ int main(void)
   /* Initialize all configured peripherals */
 
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-  HAL_Delay(500);
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
   printmsg("Iridium test started!");
 //==================TEST Initialization ==========================//
@@ -148,6 +148,8 @@ int main(void)
 	  __NOP();
   }
   IR_DeInit_Module();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -271,24 +273,6 @@ static void MX_GPIO_Init(void)
   HAL_PWREx_EnableVddIO2();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14|GPIO_PIN_7, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : PF2 PF3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PC1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB14 PB7 */
   GPIO_InitStruct.Pin = GPIO_PIN_14|GPIO_PIN_7;
@@ -296,13 +280,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 }
 

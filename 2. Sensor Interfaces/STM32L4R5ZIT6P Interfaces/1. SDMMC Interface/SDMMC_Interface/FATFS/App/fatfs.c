@@ -54,8 +54,8 @@ DWORD get_fattime(void)
 	/* Get the RTC current Date */
 	 HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
 
-	 return (DWORD)(gDate.Year - 80) << 25 |
-	            (DWORD)(gDate.Month + 1) << 21 |
+	 return (DWORD)(gDate.Year + 20) << 25 | //Time since 1980
+	            (DWORD)(gDate.Month) << 21 |
 	            (DWORD)(gDate.Date) << 16 |
 	            (DWORD)gTime.Hours << 11 |
 	            (DWORD)gTime.Minutes << 5 |

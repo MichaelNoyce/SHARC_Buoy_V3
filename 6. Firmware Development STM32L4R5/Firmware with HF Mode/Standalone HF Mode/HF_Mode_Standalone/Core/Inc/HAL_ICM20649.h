@@ -1,5 +1,5 @@
 /*
- * HAL_ICM20689.h
+ * HAL_ICM20649.h
  *
  *  Created on: Mar 3, 2021
  *      Author: Michael Noyce
@@ -9,7 +9,7 @@
  *  This Library is designed to be used with the STM32 HAL Driver files version 1.15.1
  *  Version 1.14.x is also supported
  *
- *  This library is designed to interface with the ICM20689 Inertial Measurement Unit (IMU). This
+ *  This library is designed to interface with the ICM20649 Inertial Measurement Unit (IMU). This
  *  device is a 6 degree of Freedom MEMs-based IMU that communicates via I2C. The device measures
  *  3-axis acceleration, 3-axis rotation and contains an on-board temperature sensor. In addition,
  *  The chip contains a digital motion processor that fuses accelerometer and gyroscope readings to
@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef HAL_ICM20689_H_
-#define HAL_ICM20689_H_
+#ifndef HAL_ICM20649_H_
+#define HAL_ICM20649_H_
 
 //============================= 1. Includes ==============================================
 
@@ -44,7 +44,7 @@
 /*
  * ICM_20689_Register_t
  *
- * Complete 8-bit Register Map of the ICM20689 chip.
+ * Complete 8-bit Register Map of the ICM20649 chip.
  */
 typedef enum
 {
@@ -67,6 +67,7 @@ typedef enum
 	INT_ENABLE_2 = 0X12,
 	INT_ENABLE_3 = 0X13,
 	I2C_MST_STATUS = 0X17,
+	INT_STATUS = 0X19,
 	INT_STATUS_1 = 0X1A,
 	INT_STATUS_2 = 0X1B,
 	INT_STATUS_3 = 0X1C,
@@ -245,7 +246,7 @@ typedef struct
 //PWR_MGMT_1
 /*
 	An internal 8MHz oscillator, gyroscope based clock, or external sources can be selected as the
-	ICM20689 clock source. When the internal 8 MHz oscillator or an external source is chosen as the
+	ICM20649 clock source. When the internal 8 MHz oscillator or an external source is chosen as the
 	clock source, the IMU20689 can operate in low power modes with the gyroscopes disabled.
 	Upon power up, the IMU20689 clock source defaults to the internal oscillator. However, it is highly
 	recommended that the device be configured to use one of the gyroscopes (or an external clock
@@ -274,8 +275,8 @@ typedef struct
 #define PWR_MGMT_1_CLK_SEL_7 	PWR_MGMT_1_CLK_SEL_MSK
 
 /*
-	By setting SLEEP to 1, the ICM20689 can be put into low power sleep mode. When CYCLE is set to
-	1 while SLEEP is disabled, the ICM20689 will be put into Cycle Mode. In Cycle Mode, the device
+	By setting SLEEP to 1, the ICM20649 can be put into low power sleep mode. When CYCLE is set to
+	1 while SLEEP is disabled, the ICM20649 will be put into Cycle Mode. In Cycle Mode, the device
 	cycles between sleep mode and waking up to take a single sample of data from accelerometer at a
 	rate determined by LP_WAKE_CTRL (register 108). To configure the wake frequency, use
 	LP_WAKE_CTRL within the Power Management 2 register (Register 108).
@@ -298,10 +299,11 @@ typedef struct
 //INT_PIN_CFG
 
 #define INT_PIN_CFG_LEVEL_LOW 0b1<<7 //active logic level for pin
-#define INT_PIN_CFG_LEVEL_HIGH (uint8_t)(~INT_PIN_CFG_LEVEL_LOW)
+#define INT_PIN_CFG_LEVEL_HIGH 0b0<<7
 #define INT_PIN_CFG_PIN_OPEN_DRAIN 0b1<<6
 #define INT_PIN_CFG_PIN_PUSH_PULL  0b0<<6
 #define INT_PIN_CFG_LATCH_INT_EN 0b1<<5 //pin held high untill interrupt is cleared (if set to 0, pin emits a 50 us pulse)
+#define INT_PIN_CFG_LATCH_INT_DIS 0b0<<5
 #define INT_PIN_CFG_INT_RD_CLEAR 0b1<<4
 #define INT_PIN_CFG_FSYNC_INT_LEVEL_LOW 0b1<<3
 #define INT_PIN_CFG_FSYNC_INT_LEVEL_HIGH ~INT_PIN_FSYNC_INT_LEVEL_LOW
@@ -318,7 +320,7 @@ typedef struct
 #define RAW_DATA_0_RDY_EN 0b1<<0
 
 //INT_ENABLE_2
-#define INT_ENABLE_FIFO_OFLOW_EN 0b1<<4
+#define INT_ENABLE_FIFO_OFLOW_EN 0b11111
 
 //INT_STATUS_1
 #define RAW_DATA_0_RDY_INT 0b1
@@ -352,7 +354,7 @@ typedef struct
 #define TEMP_FIFO_EN	0b1<<0
 
 //FIFO_RST
-#define FIFO_RESET 0b1111
+#define FIFO_RESET 0b1<<4
 
 
 //--------------------------------------------------------------------------------------
@@ -416,7 +418,7 @@ typedef struct
 #define ACC_FCHOICE_EN 1 //DLPF Enabled
 //Sample Rate Value
 
-#define SAMPLE_RATE 100//Hz
+#define SAMPLE_RATE 1//Hz
 #define ACC_OUTPUT_RATE_DLPF_EN 1125 //Hz
 #define ACC_OUTPUT_RATE_DLPF_DIS 4500 //Hz
 
@@ -429,7 +431,7 @@ typedef struct
  * ACK Acknowledge: SDA line is low while the SCL line is high at the
  * 9th clock cycle
  * NACK Not-Acknowledge: SDA line stays high at the 9th clock cycle
- * RA ICM20689 internal register address
+ * RA ICM20649 internal register address
  * DATA Transmit or received data
  * P Stop condition: SDA going from low to high while SCL is high
  */
@@ -455,8 +457,10 @@ typedef struct
 #define ACC_30G_WORD_LENGTH 1024
 
 //Data Defines
-#define N_Samples 100
-#define IMU_BUFFER_SIZE N_Samples*12
+#define N_SAMPLES 340
+#define IMU_BUFFER_SIZE N_SAMPLES*12
+#define DMA_TX_BUFFER_SIZE 10 //Number of N_SAMPLES in DMA Buffer
+
 
 
 //I2C Peripheral Defines
@@ -473,86 +477,95 @@ typedef struct
 
 //========================== 4. Global Variables ==========================================
 
-uint16_t imu_sample_count;   //Keeps track of the number of samples from the IMU
+uint32_t imu_sample_count;   //Keeps track of the number of samples from the IMU
+
+uint32_t fifo_sample_count;   //Keeps track of the number of samples in the FIFO Buffer
 
 uint8_t IMU_Log_On;			 //used in EXTI IRQ to determine what routine to run
+
+uint32_t loopTime;
 //============================= 5. Handlers ===============================================
 
-I2C_HandleTypeDef hi2c1;				//handler for I2C Communication
+I2C_HandleTypeDef hi2c1;
 
-DMA_HandleTypeDef hdma_i2c1_rx;			//handler for I2C Peripheral to Memory DMA transfers
+DMA_HandleTypeDef hdma_i2c1_rx;
+
+DMA_HandleTypeDef hdma_i2c1_tx;
 
 
 //============================ 6. Data Buffers ============================================
 
-uint8_t IMU_Buffer[IMU_BUFFER_SIZE];	//Buffer to store data from the IMU
+uint8_t IMU_Buffer[N_SAMPLES*12];	//Buffer to store data from the IMU
 
-
+uint8_t FIFO_Buffer[N_SAMPLES*12];	//Buffer to store data from the IMU
 
 //======================== 8. Sensor Configuration Functions =========================================
 
-imu_status_t ICM20689_Set_Gyro_FSR(I2C_HandleTypeDef *hi2c, uint8_t FSR);
-imu_status_t ICM20689_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR);
-imu_status_t ICM20689_Set_FSync(I2C_HandleTypeDef *hi2c, uint8_t Fsync);
-imu_status_t ICM20689_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
-imu_status_t ICM20689_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
-imu_status_t ICM20689_Set_Sample_Rate(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20689_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL);
-imu_status_t  ICM20689_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  uint8_t gyroEnable, uint8_t tempEnable, uint8_t cmd );
-imu_status_t ICM20689_Config_Interrupt_Pin(Interrupt_source_t interrupt, uint8_t level, uint8_t latch);
-imu_status_t ICM20689_FIFO_CMD(I2C_HandleTypeDef *hi2c,uint8_t cmd);
-imu_status_t ICM20689_Register_Bank_Select(I2C_HandleTypeDef *i2c, uint8_t regNo);
-imu_status_t ICM20689_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf, uint8_t gyro_dis_lpf);
+imu_status_t ICM20649_Set_Gyro_FSR(I2C_HandleTypeDef *hi2c, uint8_t FSR);
+imu_status_t ICM20649_Set_Acc_FSR(I2C_HandleTypeDef *hi2c,uint8_t FSR);
+imu_status_t ICM20649_Set_FSync(I2C_HandleTypeDef *hi2c, uint8_t Fsync);
+imu_status_t ICM20649_Set_Acc_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
+imu_status_t ICM20649_Set_Gyro_DLPF(I2C_HandleTypeDef *hi2c, uint8_t DLPF, uint8_t cmd);
+imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c);
+imu_status_t ICM20649_Set_PLLSrc(I2C_HandleTypeDef *hi2c, uint8_t PLL);
+imu_status_t  ICM20649_Config_FIFO(I2C_HandleTypeDef *hi2c, uint8_t accEnable,  uint8_t gyroEnable, uint8_t tempEnable, uint8_t cmd );
+imu_status_t ICM20649_Config_Interrupt_Pin(Interrupt_source_t interrupt, uint8_t level, uint8_t latch);
+imu_status_t ICM20649_FIFO_CMD(I2C_HandleTypeDef *hi2c,uint8_t cmd);
+imu_status_t ICM20649_Register_Bank_Select(I2C_HandleTypeDef *i2c, uint8_t regNo);
+imu_status_t ICM20649_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf, uint8_t gyro_dis_lpf);
 
 //======================= 9. Initializaiton Function Prototypes ========================================
 
-/*Function Name imy_status_t ICM20689_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff)
+/*Function Name imy_status_t ICM20649_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff)
  *
  * @brief: Initialise I2C and DMA Microcontroller Peripherals. Wake Up sensor and configure
  *
  */
 
-imu_status_t ICM20689_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff, uint8_t dlpf_acc_coeff);
-imu_status_t ICM20689_Deinit_IMU(void);
-imu_status_t ICM20689_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber);
-imu_status_t ICM20689_Disable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts);
+imu_status_t ICM20649_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff, uint8_t dlpf_acc_coeff);
+imu_status_t ICM20649_Deinit_IMU(void);
+imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber);
+imu_status_t ICM20649_Disable_Interrupts(I2C_HandleTypeDef *hi2c);
 
-/* Function Name imu_status_t ICM20689_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
+/* Function Name imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
  *
  * @brief: Enables the IMU FIFO buffer and configures it to recieve
  * 		   Data from peripherals determined by the fifo_Mask
  * @param: hi2c - pointer to I2C handle typedef
  * 		   enable - can either be (ENABLE - enables FIFO Buffer), DISABLE - disables BUFFER, RESET (3)- resets buffer
  */
-imu_status_t ICM20689_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable);
+imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable);
 
-/* Function Name imu_status_t ICM20689_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd);
+/* Function Name imu_status_t ICM20649_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd);
  *
  * @brief: Function to enable/disable the temperature sensor
  *
  * @param: hi2c - pointer to I2C handle
  * 		   cmd 	- set to ENABLE to enable the reading, DISABLE to disable
  */
-imu_status_t ICM20689_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd);
+imu_status_t ICM20649_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd);
 
 //======================= 10. Sensor Read Functions ====================================================
 
-imu_status_t ICM20689_Get_SelfTestResponse_Values(I2C_HandleTypeDef *hi2c,IMU_SelfTest_t *IMU);
-imu_status_t ICM20689_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID);
-imu_status_t ICM20689_Get_MST_Status(I2C_HandleTypeDef *hi2c, uint8_t* status_byte);
-imu_status_t ICM20689_Get_FIFO_Count(I2C_HandleTypeDef *hi2c,uint16_t* count);
-imu_status_t ICM20689_SelfTest(I2C_HandleTypeDef *hi2c,float* test_res);
+imu_status_t ICM20649_Get_SelfTestResponse_Values(I2C_HandleTypeDef *hi2c,IMU_SelfTest_t *IMU);
+imu_status_t ICM20649_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID);
+imu_status_t ICM20649_Get_MST_Status(I2C_HandleTypeDef *hi2c, uint8_t* status_byte);
+imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count);
+imu_status_t ICM20649_SelfTest(I2C_HandleTypeDef *hi2c,float* test_res);
+imu_status_t ICM20649_Get_IMU_RawData_FIFO(I2C_HandleTypeDef *hi2c, uint8_t* imuBuf, uint8_t count);
+imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c);
 //======================= 11. Power Mode Config Function ===============================================
 
-imu_status_t ICM20689_Set_Wake(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20689_Set_Cycle_Power_Mode(I2C_HandleTypeDef *hi2c,uint8_t Cycles);
-imu_status_t ICM20689_Set_Low_Power_Mode_Acc(I2C_HandleTypeDef *hi2c,uint8_t Cycles);
-imu_status_t ICM20689_Set_Sleep_Power_Mode(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20689_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_source_t interrupt_src,uint8_t* res);
-imu_status_t ICM20689_Signal_conditioned_Reset(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20689_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu);
-imu_status_t ICM20689_reset(I2C_HandleTypeDef *hi2c);
+imu_status_t ICM20649_Set_Wake(I2C_HandleTypeDef *hi2c);
+imu_status_t ICM20649_Set_Cycle_Power_Mode(I2C_HandleTypeDef *hi2c,uint8_t Cycles);
+imu_status_t ICM20649_Set_Low_Power_Mode_Acc(I2C_HandleTypeDef *hi2c,uint8_t Cycles);
+imu_status_t ICM20649_Set_Sleep_Power_Mode(I2C_HandleTypeDef *hi2c);
+imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_source_t interrupt_src,uint8_t* res);
+imu_status_t ICM20649_Signal_conditioned_Reset(I2C_HandleTypeDef *hi2c);
+imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu);
+imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c);
 
-void ICM20689_DMA_PeriphIRQHandler(void);
-void ICM20689_IntPin_IRQ(void);
-#endif /* HAL_ICM20689_H_ */
+void ICM20649_DMA_PeriphIRQHandler(void);
+void ICM20649_FIFO_Interrupt_IRQ(void);
+void ICM20649_IntPin_IRQ(uint32_t* sample_count);
+#endif /* HAL_ICM20649_H_ */

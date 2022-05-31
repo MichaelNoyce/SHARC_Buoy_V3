@@ -155,26 +155,26 @@ typedef struct
 //======================== 3. Macro Definitions =========================================
 
 //GPIO Pins
-#define IR_OnOff_Pin GPIO_PIN_7				//ONOFF Control pin
-#define IR_Ring_Pin GPIO_PIN_13				//Ring Indicator Pin
+#define IR_OnOff_Pin GPIO_PIN_1				//ONOFF Control pin
+#define IR_Ring_Pin GPIO_PIN_3				//Ring Indicator Pin
 #define IR_NetAv_Pin GPIO_PIN_11				//Network Available Pin
 
 //GPIO Ports
 #define IR_OnOff_GPIO_Port GPIOC				//ONOFF GPIO PORT
-#define IR_Ring_GPIO_Port GPIOC				//RING INDICATOR GPIO PORT
-#define IR_NetAv_GPIO_Port GPIOA				//NETWORK AVAILABILITY GPIO PORT
+#define IR_Ring_GPIO_Port GPIOF				//RING INDICATOR GPIO PORT
+#define IR_NetAv_GPIO_Port GPIOF				//NETWORK AVAILABILITY GPIO PORT
 
 
 #define IR_OnOff_PWR_GPIO_Port PWR_GPIO_C		//ONOFF PWR Port
 
 //IRQn Definitions
-#define IR_Ring_EXTI_IRQn EXTI15_10_IRQn		//RING INDICATOR IRQn Line
-#define IR_NetAv_EXTI_IRQn  EXTI9_5_IRQn		//NETWORK AVAILABILTY IRQN LINE
+#define IR_Ring_EXTI_IRQn EXTI2_IRQn		//RING INDICATOR IRQn Line
+#define IR_NetAv_EXTI_IRQn  EXTI3_IRQn		//NETWORK AVAILABILTY IRQN LINE
 
 //USART Definitions
 #define IR_USART_PORT USART3					//IRIDIUM USART PERIPHERAL
-#define IR_TX_Pin GPIO_PIN_5					//IRIDIUM USART TX PIN
-#define IR_RX_Pin GPIO_PIN_4					//IRIDIUM USART RX PIN
+#define IR_TX_Pin GPIO_PIN_4					//IRIDIUM USART TX PIN
+#define IR_RX_Pin GPIO_PIN_5					//IRIDIUM USART RX PIN
 #define IR_TX_GPIO_Port GPIOC					//IRIDIUM USART TX GPIO PORT
 #define IR_RX_GPIO_Port GPIOC					//IRIDIUM USART RX GPIO PORT
 
