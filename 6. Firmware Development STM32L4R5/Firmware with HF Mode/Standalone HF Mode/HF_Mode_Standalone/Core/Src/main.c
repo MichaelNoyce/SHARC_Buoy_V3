@@ -126,17 +126,22 @@ int main(void)
   float Ax, Ay, Az, Gx, Gy, Gz;
 
   waveDirNo = 1;
+  waveLogNo = 1;
+
 
   while (1)
   {
-	  memcpy(IMU_Buffer, FIFO_Buffer, IMU_BUFFER_SIZE);
 
-	  if(fifo_sample_complete == 1 && fifo_sample_count<WAVELOGBUFNO)
-	  	   {
+
+	  if(fifo_sample_complete == 1 && fifo_sample_count<=WAVELOGBUFNO)
+	  {
+
+		  memcpy(IMU_Buffer, FIFO_Buffer, IMU_BUFFER_SIZE);
 
 		  printmsg("FIFO SAMPLE COMPLETE");
 		  SD_Wave_Store(&File, &Dir, &fno, waveDirNo, waveLogNo);
-
+		  RTC_TimeTypeDef gTime;
+		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
 
 	  		 for (int i = 0; i < IMU_BUFFER_SIZE; i+=SAMPLE_SIZE)
 
@@ -150,20 +155,12 @@ int main(void)
 	  	       	           gyroTemp[1] = ( (int16_t) (IMU_Buffer[i+8] << 8) | IMU_Buffer[i+9]);
 	  	       	           gyroTemp[2] = ( (int16_t) (IMU_Buffer[i+10] << 8) | IMU_Buffer[i+11]);
 
-	  	       	           	  Ax = (float)accelTemp[0]/8192*9.81;
-	  	       	           	  Ay = (float)accelTemp[1]/8192*9.81;
-	  	       	           	  Az = (float)accelTemp[2]/8192*9.81;
-	  	       	           	  Gx = (float)gyroTemp[0]/65.5;
-	  	       	           	  Gy = (float)gyroTemp[1]/65.5;
-	  	       	           	  Gz = (float)gyroTemp[2]/65.5;
-
 	  	       	           	  //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
 	  	       	           	  //printmsg("%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
-	  	       	           	  sprintf(tempFIFOBuf, "%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
+	  	       	           	  sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
 	  	       	           	  SD_File_Write(&File, tempFIFOBuf);
-
-
 	  	       	   }
+
 
 	  		SD_File_Close(&File); //NB Remember to close file
 
@@ -171,16 +168,18 @@ int main(void)
 
 	  		fifo_sample_complete = 0;
 
-	  		 if(fifo_sample_count== WAVELOGBUFNO)
+	  		 if(fifo_sample_count== WAVELOGBUFNO+1)
 	  		 {
-	  			 waveLogNo++;
+	  			waveLogNo++;
+	  			fifo_sample_count = 0;
 	  		 }
 
-	  		 if(waveLogNo == WAVELOGNO)
+	  		 if(waveLogNo == WAVELOGNO+1)
 	  		 {
-	  			 waveDirNo++;
-	  			 break;
+	  			waveDirNo++;
+	  			waveLogNo = 0 ;
 	  		 }
+
 
 	  	   }
 

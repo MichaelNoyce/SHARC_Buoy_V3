@@ -459,7 +459,7 @@ typedef struct
 #define N_SAMPLES 100
 #define SAMPLE_SIZE 12 //12 bytes per sample ax ay az gx gy gz
 #define IMU_BUFFER_SIZE N_SAMPLES*SAMPLE_SIZE
-#define WAVELOGBUFNO 5 //Number of local buffers written to each wavelog file
+#define WAVELOGBUFNO 2 //Number of local buffers written to each wavelog file
 #define WAVELOGNO 5 //Number of wave logs
 
 //I2C Peripheral Defines

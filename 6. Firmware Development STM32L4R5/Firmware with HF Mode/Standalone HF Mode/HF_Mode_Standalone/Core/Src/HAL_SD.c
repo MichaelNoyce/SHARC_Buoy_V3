@@ -356,17 +356,16 @@ sd_status_t SD_Wave_Store(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t waveDi
 
 	 printmsg("SDMMC Interface Starting! \r\n");
      char diskPath[100]; /* User logical drive path */
-     char dirPath[20];
+     char dirPath[100];
 
 	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
 	  {
 		  printmsg("Mounted successfully!");
 
-		  sprintf(dirPath, "WaveDir");
+		  sprintf(dirPath, "/WaveDir%ld", waveDirNo);
 
 		  if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
 		  {
-
 			  if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
 			  {
 			  	printmsg("Directory not created");
@@ -375,7 +374,7 @@ sd_status_t SD_Wave_Store(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t waveDi
 
 			  sprintf(diskPath, "WaveDir%ld/WaveLog%ld.txt",waveDirNo, waveLogNo);
 
-			  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+			  if(f_open(myFile, (const TCHAR*)diskPath, FA_OPEN_APPEND | FA_WRITE) == FR_OK)
 			  {
 				  printmsg("Opened file!");
 			  }
