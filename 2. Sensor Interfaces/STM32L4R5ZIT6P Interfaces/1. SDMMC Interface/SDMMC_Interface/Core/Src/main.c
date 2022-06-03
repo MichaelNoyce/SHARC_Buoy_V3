@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include "HAL_SD.h"
+
+//#include "waveData.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -91,11 +93,26 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  FIL File; /* File object */
-  uint8_t dataBuffer[] = "Hello World!";
+  /*uint8_t dataBuffer[] = "Hello World!";
   SD_File_Open(&File, 1);
   SD_File_Write(&File, dataBuffer);
-  SD_File_Close(&File);
+  SD_File_Close(&File);*/
+
+
+  uint8_t errorCode = SD_Init();
+  printmsg("Error Code, %d \r\n", errorCode);
+
+  uint8_t waveBufferSegment[] = "Some Wave Data!";
+  uint32_t waveLogNo = 1;
+  uint8_t FIFOCount = 0;
+
+  for(int i= 0; i<10; i++)
+  {
+	  SD_Wave_Store(&File, &Dir, &fno, waveLogNo, waveBufferSegment, &FIFOCount);
+	  waveLogNo++;
+	  HAL_Delay(100);
+  }
+
 
 
   RTC_DateTypeDef gDate;

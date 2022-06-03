@@ -20,6 +20,8 @@
 static void MX_GPIO_Init(void);
 static void MX_SDMMC1_SD_Init(void);
 static void MX_CRC_Init(void);
+static void MX_RTC_Init(void);
+void MX_FATFS_Init();
 
 //======================== 4. Static Functions Definition ===========================================
 
@@ -41,8 +43,6 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : SD_Detect_Pin */
   GPIO_InitStruct.Pin = SD_Detect_Pin;
@@ -50,12 +50,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SD_Detect_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD3_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_14;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -119,7 +113,69 @@ static void MX_CRC_Init(void)
 }
 
 
+/**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
 
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  RTC_TimeTypeDef sTime = {0};
+  RTC_DateTypeDef sDate = {0};
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /* USER CODE BEGIN Check_RTC_BKUP */
+
+  /* USER CODE END Check_RTC_BKUP */
+
+  /** Initialize RTC and set the Time and Date
+  */
+  sTime.Hours = 0x20;
+  sTime.Minutes = 0X20;
+  sTime.Seconds = 0x00;
+  sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+  sTime.StoreOperation = RTC_STOREOPERATION_RESET;
+  if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
+  sDate.Month = RTC_MONTH_MAY;
+  sDate.Date = 0x22;
+  sDate.Year = 0x22;
+
+  if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
 
 
 
@@ -145,9 +201,11 @@ static void MX_CRC_Init(void)
 
 sd_status_t SD_Init(void)
 {
+	MX_FATFS_Init();
 	MX_GPIO_Init();
 	MX_SDMMC1_SD_Init();
-	MX_CRC_Init();
+	//MX_CRC_Init();
+	MX_RTC_Init(); // remove if program has own RTC
 
 	return SD_OK;
 }
@@ -163,10 +221,9 @@ sd_status_t SD_Mount(FATFS SDFatFs, char diskPath[])
 	return SD_OK;
 }
 
-sd_status_t SD_File_Open(FIL *myFile, uint8_t fileNumber)
+sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 {
 	  printmsg("SDMMC Interface Starting! \r\n");
-	  FATFS SDFatFs; /* File system object for User logical drive */
 	  char diskPath[10]; /* User logical drive path */
 	  sd_status_t errorCode;
 	  FRESULT res;
@@ -178,19 +235,21 @@ sd_status_t SD_File_Open(FIL *myFile, uint8_t fileNumber)
 	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
 	  {
 		  printmsg("Mounted successfully!");
-		  sprintf(diskPath, "Log%d.txt", fileNumber);
-		  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+		  sprintf(diskPath, "Log%ld.txt", fileNumber);
+		   if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 		    {
 			  printmsg("Opened file!");
 		    }
 		  else
 		  {
+			return SD_OPEN_ERROR;
 			printmsg("Open failed!");
 		  }
 	  }
 	  else
 	  {
 		  printmsg("Mount failed");
+		  return SD_MOUNT_ERROR;
 	  }
 
 	  return SD_OK;
@@ -202,7 +261,7 @@ sd_status_t SD_File_Write(FIL *myFile, uint8_t *dataBuffer)
 
 	uint32_t byteswritten = 0 ;  /* File write counts */
 
-	if(f_write(myFile, (const void*)dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten)!= FR_OK)
+	if(f_write(myFile, dataBuffer, strlen((char *)dataBuffer), (void *)&byteswritten)!= FR_OK)
 	{
 		printmsg("Write failed!");
 		return SD_WRITE_ERROR;
@@ -229,4 +288,113 @@ sd_status_t SD_File_Close(FIL *myFile)
 
 	return SD_OK;
 }
+
+/**
+ * @brief Closes Current Directory
+ *
+ * @param myDir
+ * @return
+ */
+sd_status_t SD_Dir_Close(DIR *myDir)
+{
+	if(f_closedir(myDir) != FR_OK)
+	{
+		printmsg("CloseDir Failed!");
+		return SD_CLOSE_ERROR;
+	}
+
+	return SD_OK;
+}
+
+/**
+ * @brief Manually timestmap file if get_fattime() in fatfs.c is not used
+ *
+ * @param myFile
+ * @return
+ */
+sd_status_t SD_File_TimeStamp(FIL *myFile)
+{
+	RTC_DateTypeDef gDate;
+	RTC_TimeTypeDef gTime;
+	/* Get the RTC current Time */
+	HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	/* Get the RTC current Date */
+	HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+
+	FILINFO fno;
+
+	fno.fdate = (WORD)(((gDate.Year - 1980) * 512U) | gDate.Month * 32U | gDate.Date);
+	fno.ftime = (WORD)(gTime.Hours * 2048U | gTime.Minutes * 32U | gTime.Seconds / 2U);
+
+
+	if(f_utime(myFile, &fno) != FR_OK)
+		{
+			printmsg("Timestamp Failed!");
+			return SD_TIME_ERROR;
+		}
+
+		return SD_OK;
+
+}
+
+
+
+
+
+/**
+ * @brief Function to open a wave log file for writing local data buffers to.
+ *
+ * Description: The function opens a wavLog file in a waveDir directory to be written to
+ *
+ *
+ * @param myFile
+ * @param waveBufferSegment
+ * @return
+ */
+sd_status_t SD_Wave_Store(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t waveDirNo, uint32_t waveLogNo)
+{
+
+	 printmsg("SDMMC Interface Starting! \r\n");
+     char diskPath[100]; /* User logical drive path */
+     char dirPath[20];
+
+	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+	  {
+		  printmsg("Mounted successfully!");
+
+		  sprintf(dirPath, "WaveDir");
+
+		  if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+		  {
+
+			  if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+			  {
+			  	printmsg("Directory not created");
+			  }
+		  }
+
+			  sprintf(diskPath, "WaveDir%ld/WaveLog%ld.txt",waveDirNo, waveLogNo);
+
+			  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+			  {
+				  printmsg("Opened file!");
+			  }
+			  else
+			  {
+				  printmsg("Open failed!");
+				  return SD_OPEN_ERROR;
+			  }
+	  }
+	  else
+	  {
+		   printmsg("Mount failed");
+		   return SD_MOUNT_ERROR;
+	  }
+
+
+	  return SD_OK;
+
+
+}
+
 

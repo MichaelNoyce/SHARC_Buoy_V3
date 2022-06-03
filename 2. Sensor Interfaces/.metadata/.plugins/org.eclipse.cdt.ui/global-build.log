@@ -1,70 +1,68 @@
-22:57:45 **** Incremental Build of configuration Debug for project HF_Mode_Standalone ****
+16:44:32 **** Incremental Build of configuration Debug for project HF_Mode_Standalone ****
 make -j4 all 
-arm-none-eabi-gcc "../Core/Src/HAL_ICM20649.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_ICM20649.d" -MT"Core/Src/HAL_ICM20649.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_ICM20649.o"
 arm-none-eabi-gcc "../Core/Src/HAL_SD.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/HAL_SD.d" -MT"Core/Src/HAL_SD.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/HAL_SD.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc "../Core/Src/stm32l4xx_it.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4xx_it.d" -MT"Core/Src/stm32l4xx_it.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32l4xx_it.o"
-In file included from ../Core/Src/HAL_ICM20649.c:10:
-../Core/Inc/HAL_ICM20649.h:448: warning: "SAMPLE_RATE" redefined
-  448 | #define SAMPLE_RATE 100//Hz
-      | 
-../Core/Inc/HAL_ICM20649.h:421: note: this is the location of the previous definition
-  421 | #define SAMPLE_RATE 1//Hz
-      | 
 ../Core/Src/HAL_SD.c: In function 'SD_File_Open':
-../Core/Src/HAL_SD.c:173:13: warning: unused variable 'byteswritten' [-Wunused-variable]
-  173 |    uint32_t byteswritten = 0;
+../Core/Src/HAL_SD.c:230:13: warning: unused variable 'byteswritten' [-Wunused-variable]
+  230 |    uint32_t byteswritten = 0;
       |             ^~~~~~~~~~~~
-../Core/Src/HAL_SD.c:172:12: warning: unused variable 'res' [-Wunused-variable]
-  172 |    FRESULT res;
+../Core/Src/HAL_SD.c:229:12: warning: unused variable 'res' [-Wunused-variable]
+  229 |    FRESULT res;
       |            ^~~
-In file included from ../Core/Src/main.c:29:
-../Core/Inc/HAL_ICM20649.h:448: warning: "SAMPLE_RATE" redefined
-  448 | #define SAMPLE_RATE 100//Hz
-      | 
-../Core/Inc/HAL_ICM20649.h:421: note: this is the location of the previous definition
-  421 | #define SAMPLE_RATE 1//Hz
-      | 
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:96:33: warning: unused variable 'T' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |                                 ^
-../Core/Src/main.c:96:29: warning: unused variable 'Gz' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |                             ^~
-../Core/Src/main.c:96:25: warning: unused variable 'Gy' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |                         ^~
-../Core/Src/main.c:96:21: warning: unused variable 'Gx' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |                     ^~
-../Core/Src/main.c:96:17: warning: unused variable 'Az' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |                 ^~
-../Core/Src/main.c:96:13: warning: unused variable 'Ay' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |             ^~
-../Core/Src/main.c:96:9: warning: unused variable 'Ax' [-Wunused-variable]
-   96 |   float Ax, Ay, Az, Gx, Gy, Gz, T;
-      |         ^~
-../Core/Src/main.c:95:16: warning: unused variable 'flag' [-Wunused-variable]
-   95 |   imu_status_t flag;
-      |                ^~~~
+../Core/Src/HAL_SD.c: In function 'SD_File_TimeStamp':
+../Core/Src/HAL_SD.c:330:13: warning: passing argument 1 of 'f_utime' from incompatible pointer type [-Wincompatible-pointer-types]
+  330 |  if(f_utime(myFile, &fno) != FR_OK)
+      |             ^~~~~~
+      |             |
+      |             FIL * {aka struct <anonymous> *}
+In file included from ../FATFS/App/fatfs.h:26,
+                 from ../Core/Inc/HAL_SD.h:35,
+                 from ../Core/Src/HAL_SD.c:11:
+../Middlewares/Third_Party/FatFs/src/ff.h:259:31: note: expected 'const TCHAR *' {aka 'const char *'} but argument is of type 'FIL *' {aka 'struct <anonymous> *'}
+  259 | FRESULT f_utime (const TCHAR* path, const FILINFO* fno);   /* Change timestamp of a file/dir */
+      |                  ~~~~~~~~~~~~~^~~~
+At top level:
+../Core/Src/HAL_SD.c:89:13: warning: 'MX_CRC_Init' defined but not used [-Wunused-function]
+   89 | static void MX_CRC_Init(void)
+      |             ^~~~~~~~~~~
 arm-none-eabi-gcc -o "HF_Mode_Standalone.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with HF Mode\Standalone HF Mode\HF_Mode_Standalone\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="HF_Mode_Standalone.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: HF_Mode_Standalone.elf
  
 arm-none-eabi-size   HF_Mode_Standalone.elf 
 arm-none-eabi-objdump -h -S  HF_Mode_Standalone.elf  > "HF_Mode_Standalone.list"
    text	   data	    bss	    dec	    hex	filename
-  50576	    488	  10928	  61992	   f228	HF_Mode_Standalone.elf
+  77384	    488	  13176	  91048	  163a8	HF_Mode_Standalone.elf
 Finished building: default.size.stdout
  
 Finished building: HF_Mode_Standalone.list
  
-22:58:04 **** Incremental Build of configuration Debug for project HF_Mode_Standalone ****
+16:44:40 **** Incremental Build of configuration Debug for project HF_Mode_Standalone ****
 make -j4 all 
 arm-none-eabi-size   HF_Mode_Standalone.elf 
    text	   data	    bss	    dec	    hex	filename
-  50576	    488	  10928	  61992	   f228	HF_Mode_Standalone.elf
+  77384	    488	  13176	  91048	  163a8	HF_Mode_Standalone.elf
 Finished building: default.size.stdout
+ 
+16:47:02 **** Incremental Build of configuration Debug for project HF_Mode_Standalone ****
+make -j4 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../FATFS/Target -I../FATFS/App -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Middlewares/Third_Party/FatFs/src -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:162:35: warning: pointer targets in passing argument 1 of 'sprintf' differ in signedness [-Wpointer-sign]
+  162 |                           sprintf(tempFIFOBuf, "%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
+      |                                   ^~~~~~~~~~~
+      |                                   |
+      |                                   uint8_t * {aka unsigned char *}
+In file included from ../Core/Src/main.c:26:
+c:\st\stm32cubeide_1.8.0\stm32cubeide\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.9-2020-q2-update.win32_2.0.0.202105311346\tools\arm-none-eabi\include\stdio.h:244:14: note: expected 'char * restrict' but argument is of type 'uint8_t *' {aka 'unsigned char *'}
+  244 | int sprintf (char *__restrict, const char *__restrict, ...)
+      |              ^
+arm-none-eabi-gcc -o "HF_Mode_Standalone.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with HF Mode\Standalone HF Mode\HF_Mode_Standalone\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="HF_Mode_Standalone.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: HF_Mode_Standalone.elf
+ 
+arm-none-eabi-size   HF_Mode_Standalone.elf 
+arm-none-eabi-objdump -h -S  HF_Mode_Standalone.elf  > "HF_Mode_Standalone.list"
+   text	   data	    bss	    dec	    hex	filename
+  77384	    488	  13176	  91048	  163a8	HF_Mode_Standalone.elf
+Finished building: default.size.stdout
+ 
+Finished building: HF_Mode_Standalone.list
  

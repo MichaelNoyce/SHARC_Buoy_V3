@@ -77,7 +77,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
- HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -287,7 +287,7 @@ int main(void)
 
 	 if(fifo_sample_count == 1)
 	   {
-		 for (int i = 0; i < 4080; i+=12)
+		 for (int i = 0; i < 60; i+=12)
 
 	       	   {
 
@@ -311,12 +311,12 @@ int main(void)
 	       	   }
 
 		 fifo_sample_count = 0;
+		 break;
 
 	   }
 
 
     /* USER CODE END WHILE */
-
 
     /* USER CODE BEGIN 3 */
 
@@ -324,6 +324,8 @@ int main(void)
 }
 
 }
+
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -368,6 +370,12 @@ void SystemClock_Config(void)
   }
 }
 
+
+/**
+  * @brief LPUART1 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_LPUART1_UART_Init(void)
 {
 
@@ -440,7 +448,6 @@ void Error_Handler(void)
   {
   }
   /* USER CODE END Error_Handler_Debug */
-
 }
 
 #ifdef  USE_FULL_ASSERT

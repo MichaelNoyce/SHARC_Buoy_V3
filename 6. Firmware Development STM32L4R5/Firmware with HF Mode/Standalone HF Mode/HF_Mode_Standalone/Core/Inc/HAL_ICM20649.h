@@ -329,7 +329,7 @@ typedef struct
 #define FIFO_OVERFLOW_INT 0b11111
 
 //INT_STATUS 3
-#define FIFO_WM_INT 0b11111
+#define FIFO_WM_INT 0b1
 
 //SIGNAL_PATH_RESET
 #define SIGNAL_PATH_ACC_RESET  0b1<<1
@@ -418,7 +418,6 @@ typedef struct
 #define ACC_FCHOICE_EN 1 //DLPF Enabled
 //Sample Rate Value
 
-#define SAMPLE_RATE 1//Hz
 #define ACC_OUTPUT_RATE_DLPF_EN 1125 //Hz
 #define ACC_OUTPUT_RATE_DLPF_DIS 4500 //Hz
 
@@ -457,11 +456,11 @@ typedef struct
 #define ACC_30G_WORD_LENGTH 1024
 
 //Data Defines
-#define N_SAMPLES 340
-#define IMU_BUFFER_SIZE N_SAMPLES*12
-#define DMA_TX_BUFFER_SIZE 10 //Number of N_SAMPLES in DMA Buffer
-
-
+#define N_SAMPLES 100
+#define SAMPLE_SIZE 12 //12 bytes per sample ax ay az gx gy gz
+#define IMU_BUFFER_SIZE N_SAMPLES*SAMPLE_SIZE
+#define WAVELOGBUFNO 5 //Number of local buffers written to each wavelog file
+#define WAVELOGNO 5 //Number of wave logs
 
 //I2C Peripheral Defines
 
@@ -481,6 +480,12 @@ uint32_t imu_sample_count;   //Keeps track of the number of samples from the IMU
 
 uint32_t fifo_sample_count;   //Keeps track of the number of samples in the FIFO Buffer
 
+uint32_t fifo_sample_complete;   //Current FIFO sample is complete
+
+uint32_t waveLogNo;
+
+uint32_t waveDirNo;
+
 uint8_t IMU_Log_On;			 //used in EXTI IRQ to determine what routine to run
 
 uint32_t loopTime;
@@ -495,9 +500,9 @@ DMA_HandleTypeDef hdma_i2c1_tx;
 
 //============================ 6. Data Buffers ============================================
 
-uint8_t IMU_Buffer[N_SAMPLES*12];	//Buffer to store data from the IMU
+uint8_t IMU_Buffer[N_SAMPLES*SAMPLE_SIZE];	//Buffer to store data from the IMU
 
-uint8_t FIFO_Buffer[N_SAMPLES*12];	//Buffer to store data from the IMU
+uint8_t FIFO_Buffer[N_SAMPLES*SAMPLE_SIZE];	//Buffer to store data from the IMU
 
 //======================== 8. Sensor Configuration Functions =========================================
 
@@ -524,7 +529,7 @@ imu_status_t ICM20649_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf
 
 imu_status_t ICM20649_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff, uint8_t dlpf_acc_coeff);
 imu_status_t ICM20649_Deinit_IMU(void);
-imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber);
+imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intAddress);
 imu_status_t ICM20649_Disable_Interrupts(I2C_HandleTypeDef *hi2c);
 
 /* Function Name imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
@@ -567,5 +572,5 @@ imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c);
 
 void ICM20649_DMA_PeriphIRQHandler(void);
 void ICM20649_FIFO_Interrupt_IRQ(void);
-void ICM20649_IntPin_IRQ(uint32_t* sample_count);
+void ICM20649_IntPin_IRQ();
 #endif /* HAL_ICM20649_H_ */

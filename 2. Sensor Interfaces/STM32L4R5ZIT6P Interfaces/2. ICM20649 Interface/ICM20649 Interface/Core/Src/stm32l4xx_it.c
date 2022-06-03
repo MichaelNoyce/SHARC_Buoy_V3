@@ -264,10 +264,11 @@ void I2C1_ER_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	//ICM20649_FIFO_Interrupt_IRQ();
-	ICM20649_FIFO_Interrupt_IRQ();
+	ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	//ICM20649_IntPin_IRQ();
   /* USER CODE END EXTI15_10_IRQn 0 */
-  //HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
   /* USER CODE END EXTI15_10_IRQn 1 */

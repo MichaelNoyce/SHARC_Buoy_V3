@@ -37,6 +37,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define FILE_FIFO_BUF_NO 72 // 72 x 3.4 second buffer = 244.8 seconds = 04:04:08
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -90,10 +92,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_LPUART1_UART_Init();
+
   /* USER CODE BEGIN 2 */
 
-  imu_status_t flag;
-  float Ax, Ay, Az, Gx, Gy, Gz, T;
 
   if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
   {
@@ -104,14 +105,85 @@ int main(void)
 	  printmsg("Init successful! \r\n");
   }
 
+
+   if(SD_Init()!= SD_OK)
+   {
+	   printmsg("SD not initialised correctly!");
+   }
+   else
+   {
+	   printmsg("SD Initialised correctly!");
+   }
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int32_t accelTemp[3];
+  int32_t gyroTemp[3];
+  uint8_t tempFIFOBuf[500];
+  float Ax, Ay, Az, Gx, Gy, Gz;
 
+  waveDirNo = 1;
 
   while (1)
   {
+	  memcpy(IMU_Buffer, FIFO_Buffer, IMU_BUFFER_SIZE);
+
+	  if(fifo_sample_complete == 1 && fifo_sample_count<WAVELOGBUFNO)
+	  	   {
+
+		  printmsg("FIFO SAMPLE COMPLETE");
+		  SD_Wave_Store(&File, &Dir, &fno, waveDirNo, waveLogNo);
+
+
+	  		 for (int i = 0; i < IMU_BUFFER_SIZE; i+=SAMPLE_SIZE)
+
+	  	       	   {
+
+
+	  	       	           accelTemp[0] = ( (int16_t) (IMU_Buffer[i+0] << 8) | IMU_Buffer[i+1]);
+	  	       	           accelTemp[1] = ( (int16_t) (IMU_Buffer[i+2] << 8) | IMU_Buffer[i+3]);
+	  	       	           accelTemp[2] = ( (int16_t) (IMU_Buffer[i+4] << 8) | IMU_Buffer[i+5]);
+	  	       	           gyroTemp[0] = ( (int16_t) (IMU_Buffer[i+6] << 8) | IMU_Buffer[i+7]);
+	  	       	           gyroTemp[1] = ( (int16_t) (IMU_Buffer[i+8] << 8) | IMU_Buffer[i+9]);
+	  	       	           gyroTemp[2] = ( (int16_t) (IMU_Buffer[i+10] << 8) | IMU_Buffer[i+11]);
+
+	  	       	           	  Ax = (float)accelTemp[0]/8192*9.81;
+	  	       	           	  Ay = (float)accelTemp[1]/8192*9.81;
+	  	       	           	  Az = (float)accelTemp[2]/8192*9.81;
+	  	       	           	  Gx = (float)gyroTemp[0]/65.5;
+	  	       	           	  Gy = (float)gyroTemp[1]/65.5;
+	  	       	           	  Gz = (float)gyroTemp[2]/65.5;
+
+	  	       	           	  //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
+	  	       	           	  //printmsg("%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
+	  	       	           	  sprintf(tempFIFOBuf, "%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
+	  	       	           	  SD_File_Write(&File, tempFIFOBuf);
+
+
+	  	       	   }
+
+	  		SD_File_Close(&File); //NB Remember to close file
+
+	  		fifo_sample_count++;
+
+	  		fifo_sample_complete = 0;
+
+	  		 if(fifo_sample_count== WAVELOGBUFNO)
+	  		 {
+	  			 waveLogNo++;
+	  		 }
+
+	  		 if(waveLogNo == WAVELOGNO)
+	  		 {
+	  			 waveDirNo++;
+	  			 break;
+	  		 }
+
+	  	   }
+
 
 
     /* USER CODE END WHILE */
@@ -172,7 +244,6 @@ void SystemClock_Config(void)
 }
 
 
-
 /**
   * @brief LPUART1 Initialization Function
   * @param None
@@ -220,7 +291,6 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE END LPUART1_Init 2 */
 
 }
-
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {

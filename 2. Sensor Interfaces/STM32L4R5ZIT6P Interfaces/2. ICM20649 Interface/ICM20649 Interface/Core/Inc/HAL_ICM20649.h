@@ -329,7 +329,7 @@ typedef struct
 #define FIFO_OVERFLOW_INT 0b11111
 
 //INT_STATUS 3
-#define FIFO_WM_INT 0b11111
+#define FIFO_WM_INT 0b1
 
 //SIGNAL_PATH_RESET
 #define SIGNAL_PATH_ACC_RESET  0b1<<1
@@ -522,7 +522,7 @@ imu_status_t ICM20649_Disable_LPF(I2C_HandleTypeDef *hi2c, uint8_t accel_dis_lpf
 
 imu_status_t ICM20649_Init_IMU(uint8_t g_fsr,uint8_t a_fsr, uint8_t dlpf_coeff, uint8_t dlpf_acc_coeff);
 imu_status_t ICM20649_Deinit_IMU(void);
-imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber);
+imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intAddress);
 imu_status_t ICM20649_Disable_Interrupts(I2C_HandleTypeDef *hi2c);
 
 /* Function Name imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable)
@@ -565,5 +565,5 @@ imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c);
 
 void ICM20649_DMA_PeriphIRQHandler(void);
 void ICM20649_FIFO_Interrupt_IRQ(void);
-void ICM20649_IntPin_IRQ(uint32_t* sample_count);
+void ICM20649_IntPin_IRQ();
 #endif /* HAL_ICM20649_H_ */

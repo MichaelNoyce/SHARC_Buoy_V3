@@ -232,7 +232,6 @@ sd_status_t SD_Mount(FATFS SDFatFs, char diskPath[])
 sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNumber)
 {
 	  printmsg("SDMMC Interface Starting! \r\n");
-	  FATFS SDFatFs; /* File system object for User logical drive */
 	  char diskPath[10]; /* User logical drive path */
 	  sd_status_t errorCode;
 	  FRESULT res;
@@ -299,6 +298,23 @@ sd_status_t SD_File_Close(FIL *myFile)
 }
 
 /**
+ * @brief Closes Current Directory
+ *
+ * @param myDir
+ * @return
+ */
+sd_status_t SD_Dir_Close(DIR *myDir)
+{
+	if(f_closedir(myDir) != FR_OK)
+	{
+		printmsg("CloseDir Failed!");
+		return SD_CLOSE_ERROR;
+	}
+
+	return SD_OK;
+}
+
+/**
  * @brief Manually timestmap file if get_fattime() in fatfs.c is not used
  *
  * @param myFile
@@ -326,6 +342,71 @@ sd_status_t SD_File_TimeStamp(FIL *myFile)
 		}
 
 		return SD_OK;
+
+}
+
+
+
+
+
+/**
+ * @brief Function to write local IMU data buffers to SD card
+ *
+ * Description: The function takes a individual IMU sample segment from local memory and appends it to a numbered wave log file
+ * in the WaveDir Directory.
+ *
+ *
+ * @param myFile
+ * @param waveBufferSegment
+ * @return
+ */
+sd_status_t SD_Wave_Store(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t waveLogNo, uint8_t *waveBufferSegment, uint8_t* FIFOCount)
+{
+
+	 printmsg("SDMMC Interface Starting! \r\n");
+     char diskPath[100]; /* User logical drive path */
+     char dirPath[20];
+
+	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+	  {
+		  printmsg("Mounted successfully!");
+
+		  sprintf(dirPath, "WaveDir");
+
+		  if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+		  {
+
+			  if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+			  {
+			  	printmsg("Directory not created");
+			  }
+		  }
+
+			  sprintf(diskPath, "WaveDir/WaveLog%ld.txt", waveLogNo);
+
+			  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+			  {
+				  printmsg("Opened file!");
+			  }
+			  else
+			  {
+				  return SD_OPEN_ERROR;
+				  printmsg("Open failed!");
+			  }
+	  }
+	  else
+	  {
+		   printmsg("Mount failed");
+		   return SD_MOUNT_ERROR;
+	  }
+
+	  SD_File_Write(myFile, waveBufferSegment);
+
+	  SD_File_Close(myFile);
+
+
+	  return SD_OK;
+
 
 }
 

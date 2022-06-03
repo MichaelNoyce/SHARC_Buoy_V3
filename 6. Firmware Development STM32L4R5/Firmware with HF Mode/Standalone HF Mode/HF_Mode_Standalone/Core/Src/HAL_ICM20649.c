@@ -8,7 +8,6 @@
 //======================== 1. Includes ==============================================================
 
 #include <HAL_ICM20649.h>
-#include "HAL_SD.h"
 
 //======================== 2. Private Variables =====================================================
 
@@ -40,7 +39,7 @@ static HAL_StatusTypeDef MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00000004;
+  hi2c1.Init.Timing = 	0x00100002;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -167,9 +166,10 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 
 	//reset buffers and flags
 	imu_sample_count = 0;
-	I2C_TX_CPLT = 0;
-	IMU_Log_On = 0;
-	IMU_Log_On = 1;
+	fifo_sample_count = 0;
+	fifo_sample_complete = 0;
+	waveLogNo = 0;
+
 
 	//memset(IMU_Buffer,0,IMU_BUFFER_SIZE);
 
@@ -214,7 +214,7 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//configure interrupt pin
 	ICM20649_Disable_Interrupts(&hi2c1);
 	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
-	ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_EN, 1);
+	ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_INT, INT_ENABLE_1);
 
 	Reset_FIFO(&hi2c1);
 
@@ -322,27 +322,14 @@ imu_status_t ICM20649_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd)
  	return IMU_OK;
  }
 
-imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intNumber)
+imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrupts, uint8_t intAddress)
 {
 	ICM20649_Register_Bank_Select(&hi2c1, 0);
 
 
 	uint8_t iconfigbyte = 0;
-	uint8_t address;
 
-	switch(intNumber)
-	{
-	case 1:
-		address = INT_ENABLE_1;
-	case 2:
-		address = INT_ENABLE_2;
-	case 3:
-		address = INT_ENABLE_3;
-	default:
-		break;
-	}
-
-	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, address, 1, &iconfigbyte, 1, 100) != HAL_OK)
+	if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, intAddress, 1, &iconfigbyte, 1, 100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
@@ -350,7 +337,7 @@ imu_status_t ICM20649_Enable_Interrupt(I2C_HandleTypeDef *hi2c, uint8_t interrup
 	//set enable bit
 	iconfigbyte |= interrupts;
 	//write to register
-	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, address,1,&iconfigbyte,1,100) != HAL_OK)
+	if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address, intAddress,1,&iconfigbyte,1,100) != HAL_OK)
 	{
 		return IMU_I2C_ERROR;
 	}
@@ -788,7 +775,7 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 			*res = istatus;
 			break;
 		case DATA_READY:
-			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_2,1,&istatus,1,100) != HAL_OK)
+			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,DATA_RDY_STATUS,1,&istatus,1,100) != HAL_OK)
 			{
 				return IMU_I2C_ERROR;
 			}
@@ -812,17 +799,23 @@ imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
 
 	//Indicate DMA Transfer
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	I2C_TX_CPLT = 0;
 
+	if(imu_sample_count<N_SAMPLES)
+	{
 
-	 for(int i = 0; i<N_SAMPLES; i++)
-	 {
-		 if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[i*12], 12, 100) != HAL_OK)
-		 {
-			 return IMU_I2C_ERROR;
-		 }
+		if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[imu_sample_count*SAMPLE_SIZE], SAMPLE_SIZE, 10) != HAL_OK)
+		{
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+		}
 
-	 }
+		imu_sample_count++;
+
+	}
+	else
+	{
+		fifo_sample_complete = 1;
+		imu_sample_count = 0;
+	}
 
 	//Reset FIFO
 	Reset_FIFO(&hi2c1);
@@ -850,10 +843,20 @@ imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count)
 imu_status_t ICM20649_Get_IMU_RawData_FIFO(I2C_HandleTypeDef *hi2c, uint8_t* imuBuf, uint8_t count)
 {
 
+
+
+	/*if (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY)
+	{
+			HAL_Delay(1);
+	}*/
+
+	//ICM20649_Register_Bank_Select(&hi2c1, 0);
+
 	if(HAL_I2C_Mem_Read_DMA(hi2c, IMU_Device_Address, FIFO_R_W, 1, FIFO_Buffer, 4080)!= HAL_OK)
 	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
 	}
+
 
 	return IMU_OK;
 
@@ -863,17 +866,19 @@ imu_status_t ICM20649_Get_IMU_RawData_FIFO(I2C_HandleTypeDef *hi2c, uint8_t* imu
 imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c)
 {
 
+	ICM20649_Register_Bank_Select(&hi2c1, 0);
+
 	uint8_t fifo_rst_byte = 0;
 	fifo_rst_byte = 0x0F;
 
-		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100) != HAL_OK)
+		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,5) != HAL_OK)
 		{
 			return IMU_I2C_ERROR;
 		}
 
 		//Deassert Reset (need to assert and deassert for full reset
 		fifo_rst_byte = 0x0;
-		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,100)!= HAL_OK)
+		if(HAL_I2C_Mem_Write(hi2c,IMU_Device_Address,FIFO_RST,1,&fifo_rst_byte,1,5)!= HAL_OK)
 		{
 			return IMU_I2C_ERROR;
 		}
@@ -1133,12 +1138,11 @@ imu_status_t ICM20649_Calibrate_Acc(I2C_HandleTypeDef *hi2c,float* accel_bias)
 
 //======================= 11. IRQ Handler Functions =======================================
 
-void ICM20649_IntPin_IRQ(uint32_t* sample_count)
+void ICM20649_IntPin_IRQ()
 {
 
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
 	ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
-	Reset_FIFO(&hi2c1);
 	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
 
 }
@@ -1151,8 +1155,6 @@ void ICM20649_FIFO_Interrupt_IRQ(void)
 
 	ICM20649_Get_IMU_RawData_FIFO(&hi2c1, FIFO_Buffer, 0);
 
-	fifo_sample_count = 1;
-
 	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
 
 }
@@ -1160,11 +1162,9 @@ void ICM20649_FIFO_Interrupt_IRQ(void)
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 {
   /* Turn LED1 on: Transfer in transmission process is correct */
-	I2C_TX_CPLT = 1;
 	Reset_FIFO(&hi2c1);
-	SD_File_Open(&File, 1);
-	SD_File_Write(&File, FIFO_Buffer);
-	SD_File_Close(&File);
+	fifo_sample_count = 1;
+	//memcpy(IMU_Buffer, FIFO_Buffer, 4080);
 	//printmsg("I2C Transfer complete!");
 }
 
