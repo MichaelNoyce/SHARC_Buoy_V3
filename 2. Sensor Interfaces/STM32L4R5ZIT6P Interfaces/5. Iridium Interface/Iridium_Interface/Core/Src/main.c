@@ -61,6 +61,7 @@ static void Test_On_Off(void);
 static void Test_On_Off(void)
 {
 
+		printmsg("ON/OFF Entered! \r\n");
 		//turn off
 		IR_OnOff_GPIO_Port->ODR &= ~GPIO_ODR_OD1;
 
@@ -101,14 +102,25 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+  HAL_Delay(200);
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
   printmsg("Iridium test started!");
 //==================TEST Initialization ==========================//
 
-	  if(IR_Init_Module() == IR_OK)
+  	  IR_Status_t status = IR_Init_Module();
+
+	  if(status == IR_OK)
 	  {
 		  Test_On_Off();
 		 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
 	  }
+	  else
+	  {
+		  printmsg("Error, the status of the system is: %d", status);
+	  }
+
 
 	  IR_DeInit_Module();
 //==================TEST Transmission==========================//

@@ -102,17 +102,63 @@ int main(void)
   uint8_t errorCode = SD_Init();
   printmsg("Error Code, %d \r\n", errorCode);
 
-  uint8_t waveBufferSegment[] = "Some Wave Data!";
-  uint32_t waveLogNo = 1;
-  uint8_t FIFOCount = 0;
+  uint8_t waveBufferSegment[] = "-0.024, 0.038, 9.992, 3.603, 71.756, -8.321, -18.448 \n";
+  uint8_t gpsBufferSegment[] = "Some GPS data! \r\n";
+
+  waveLogNo = 0;
+  waveDirNo = 0;
+  gpsLogNo = 0;
+  gpsDirNo = 0;
+
+  //Write Test for directory open functions
 
   for(int i= 0; i<10; i++)
   {
-	  SD_Wave_Store(&File, &Dir, &fno, waveLogNo, waveBufferSegment, &FIFOCount);
+
+	  //Increment logs
 	  waveLogNo++;
-	  HAL_Delay(100);
+	  waveDirNo++;
+	  gpsLogNo++;
+	  gpsDirNo++;
+
+	  //Open wave Log
+	  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
+	  //Write to wave log
+	  SD_File_Write(&File, waveBufferSegment);
+	  //Close Wave Log
+	  SD_File_Close(&File);
+
+	  //Open GPS Log
+	  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo,gpsLogNo);
+	  //Write to GPS Log
+	  SD_File_Write(&File, gpsBufferSegment);
+	  //Close GPS Log
+	  SD_File_Close(&File);
+
   }
 
+  SD_Unmount(SDFatFs);
+
+  //Read Test
+
+  int32_t zAcc[1024];
+
+
+  waveLogNo = 1;
+  waveDirNo = 1;
+  uint32_t fpointer = 0;
+
+
+  SD_Wave_Read(&File, zAcc, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+
+  SD_File_Close(&File);
+
+
+  for(int j = 0; j<1024; j++)
+  {
+	 // printmsg("Z_Acc Value \r\n");
+	 // printmsg("Z_acc %d \r\n", zAcc[j]);
+  }
 
 
   RTC_DateTypeDef gDate;
@@ -126,7 +172,7 @@ int main(void)
   /* Display time Format: hh:mm:ss */
   printmsg("\r\n Time %d:%d:%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds);
   /* Display date Format: dd-mm-yy */
-   printmsg("Date %d-%d-%d \r\n", gDate.Date, gDate.Month, 2000 + gDate.Year);
+  printmsg("Date %d-%d-%d \r\n", gDate.Date, gDate.Month, 2000 + gDate.Year);
 
   /* USER CODE END 2 */
 
@@ -276,7 +322,7 @@ static void MX_LPUART1_UART_Init(void)
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {
-    char str[30];
+    char str[80];
 
     /*Extract the the argument list using VA apis */
     va_list args;

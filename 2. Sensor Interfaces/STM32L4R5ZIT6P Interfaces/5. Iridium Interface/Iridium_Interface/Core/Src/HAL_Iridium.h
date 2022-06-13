@@ -157,7 +157,7 @@ typedef struct
 //GPIO Pins
 #define IR_OnOff_Pin GPIO_PIN_1				//ONOFF Control pin
 #define IR_Ring_Pin GPIO_PIN_3				//Ring Indicator Pin
-#define IR_NetAv_Pin GPIO_PIN_11				//Network Available Pin
+#define IR_NetAv_Pin GPIO_PIN_2				//Network Available Pin
 
 //GPIO Ports
 #define IR_OnOff_GPIO_Port GPIOC				//ONOFF GPIO PORT

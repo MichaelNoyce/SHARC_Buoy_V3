@@ -56,12 +56,45 @@ typedef enum
 	SD_TIME_ERROR,
 }sd_status_t;
 
+
+
+typedef enum
+{
+	TIMESTAMP_DATA,
+	X_ACC,
+	Y_ACC,
+	Z_ACC,
+	X_GYRO,
+	Y_GYRO,
+	Z_GYRO,
+	TEMP,
+}IMU_Data_SD_t;
+
+
+typedef enum
+{
+	ETIME,		// UTC Epoch representation of time
+	COORD,	//GPS coordinates
+	DIAG,		//Diagnostic information
+	ENV_TEMP,		//environmental temperature
+	ATM_PRESS,		//atmospheric pressure
+	SHUNT_V,		//shunt voltage (mv)
+	BUS_V,			//bus voltage   (mV)
+	CURRENT,		//battery current (mA)
+	POWER,			//power consumption (mW)
+}GPS_Data_SD_t;
+
 //========================== 4. Global Variables ==========================================
 
 FATFS SDFatFs; /* File system object for User logical drive */
 FIL File; /* File object */
 DIR Dir; /*Directory Object*/
 FILINFO fno;
+uint32_t waveLogNo;
+uint32_t waveDirNo;
+uint32_t gpsLogNo;
+uint32_t gpsDirNo;
+
 
 //============================= 5. Defines ===============================================
 
@@ -103,6 +136,15 @@ sd_status_t SD_Mount(FATFS SDFatFs, char myPath[]);
  *
  */
 
+/**
+ * @brief
+ *
+ * @param SDFatFs
+ * @param diskPath
+ * @return
+ */
+sd_status_t SD_Unmount(FATFS SDFatFs);
+
 //======================== 6. SD Read/Write Functions ============================================
 
 sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNo);
@@ -141,60 +183,56 @@ sd_status_t SD_File_TimeStamp(FIL *myFile);
 
 
 /**
- * @brief Function to write local IMU data buffers to SD card
+ * @brief Opens file in wave file directory
  *
  * Description: The function takes a individual IMU sample segment from local memory and appends it to a numbered wave log file.
  * After a determined number of buffers have been added, close file and start new file.
  *
  * @param myFile
  * @param waveLogNo
- * @param waveBufferSegment
- * @param FIFOCount
+ * @param waveLogNo
  * @return
  */
-sd_status_t SD_Wave_Store(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t wavDirNo, uint32_t waveLogNo);
-
+sd_status_t SD_Wave_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t wavDirNo, uint32_t waveLogNo);
 
 
 /**
- * @brief Function to read the most recent waveBuffer file within the last sampling period. Increments to nth most recent
- * file with each invocation.
- *
- * If the file is empty, next most recent full file is used and number of wave buffers for use in wave
- * parameter extraction is decremented.
- *
- * Excludes files outside of previous 30 minute sampling period
+ * @brief
  *
  * @param myFile
- * @param waveFileNo
- * @param timePeriod
+ * @param LineNo
+ * @param dataBuf
  * @return
  */
-sd_status_t SD_Wave_Read(FIL *myFile, uint32_t waveFileNo, uint32_t timePeriod);
+sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, uint32_t WaveLogNo,  IMU_Data_SD_t inertialDataType, uint32_t *fpointer);
 
 
 
 
 /**
- * @brief Stores local GPS data buffer on SD card
+ * @brief Opens file in GPS file directory
  *
  * @param myFile
- * @param GPSFileNo
- * @param timePeriod
+ * @param myDir
+ * @param fno
+ * @param
  * @return
  */
-sd_status_t SD_GPS_Store(FIL *myFile, uint32_t GPSFileNo, uint32_t timePeriod);
+sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo, uint8_t GPSLogNo);
 
 
 /**
- * @brief Reads last GPS data buffer stored on SD card
+ * @brief
  *
  * @param myFile
- * @param GPSFileNo
- * @param timePeriod
+ * @param GPSArray
+ * @param GPSDirNo
+ * @param GPSLogNo
+ * @param GPSDataType
+ * @param fpointer
  * @return
  */
-sd_status_t SD_GPS_Read(FIL *myFile, uint32_t GPSFileNo, uint32_t timePeriod);
+sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, GPS_Data_SD_t GPSDataType, uint32_t *fpointer);
 
 
 

@@ -18,7 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "HAL_BMP280.h"
+#include "math.h"
+#include <stdarg.h>
+#include "stdio.h"
+#include "string.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -31,6 +35,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+typedef enum
+{
+	PASS,
+	FAIL
+}UT_Result_t;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -41,8 +51,6 @@
 /* Private variables ---------------------------------------------------------*/
  UART_HandleTypeDef hlpuart1;
 
-SPI_HandleTypeDef hspi1;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -51,14 +59,38 @@ SPI_HandleTypeDef hspi1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_LPUART1_UART_Init(void);
-static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
+void printmsg(char *format,...);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+UT_Result_t AT001_Connection_Test(char * fail_cond)
+{
+	   BMP_Init_Typedef BMP_InitStruct;
+	   BMP280_Init_Preset_Mode(Weather_Monitoring,&BMP_InitStruct);
+	   BMPStatus_t flag = BMP280_Init(&BMP_InitStruct);
+		switch (flag)
+		{
+			case BMP_OK:
+				memcpy(fail_cond,(char*)"None", strlen("None"));
+				return PASS;
+			case BMP_SPI_READ_ERROR:
+				memcpy(fail_cond,(char*)"SPI Read Error", strlen("SPI Read Error"));
+				return FAIL;
+			case BMP_SPI_WRITE_ERROR:
+				memcpy(fail_cond,(char*)"SPI Write Error", strlen("SPI Write Error"));
+				return FAIL;
+			case BMP_DEVICE_CHECK_ERROR:
+				memcpy(fail_cond,(char*)"Incorrect ID", strlen("Incorrect ID"));
+				return FAIL;
+			default:
+				memcpy(fail_cond,(char*)"Undefined Behaviour", strlen("Undefined Behaviour"));
+				return FAIL;
+		}
+		memcpy(fail_cond,(char*)"Undefined Behaviour", strlen("Undefined Behaviour"));
+		return FAIL;
+}
 /* USER CODE END 0 */
 
 /**
@@ -70,6 +102,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -90,19 +123,41 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_LPUART1_UART_Init();
-  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+  char fail_cond[100] = {0};
+  UT_Result_t result = AT001_Connection_Test(fail_cond);
+  char res_buff[500] = {0};
+  sprintf(res_buff, "%s", fail_cond);
+  if(result == PASS)
+  {
+	  printmsg(" AT001 Test Status: Pass \t INFO: %s \r\n",res_buff);
+  }else
+  {
+	  printmsg(" AT001 Test Status: Fail \t INFO: %s \r\n",res_buff);
+  }
   /* USER CODE END 2 */
 
+  while (1)
+{
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+ 	/* uint32_t temp,press,P;
+ 	int32_t T ,t_fine;
+
+	  //wait for device to finish converting
+	  BMP280_Get_Status(&bmp);
+	  BMP280_Force_Measure(&temp,&press);
+	  T = BMP280_Compensate_Temp(temp,&t_fine,bmp.Factory_Trim);
+	  P = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;
+
+	  //create a string
+	  printmsg("Temp = %ld C\tPressure = %lu KPa\r\n",T,P); */
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	  }
   /* USER CODE END 3 */
 }
 
@@ -198,45 +253,6 @@ static void MX_LPUART1_UART_Init(void)
 
 }
 
-/**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
-{
-
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_HARD_INPUT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 7;
-  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
-}
 
 /**
   * @brief GPIO Initialization Function
@@ -266,7 +282,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void printmsg(char *format,...) {
+    char str[80];
 
+    /*Extract the the argument list using VA apis */
+    va_list args;
+    va_start(args, format);
+    vsprintf(str, format,args);
+    HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+    va_end(args);
+}
 /* USER CODE END 4 */
 
 /**

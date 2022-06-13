@@ -29,26 +29,52 @@
 
 /*End Definitions ---------------------------------------------*/
 
-/**
- *
- * @param freqSegments
- * @param PSDOutput
+
+
+/* Structs ---------------------------------------------------*?
+
+/*
+ * @brief: Wave data structure
  */
-void fullPipeline(float32_t* PSDOutput);
+typedef struct
+{
+
+	float32_t Hm0; //Significant waveheight
+	float32_t Hrms; //Root mean square waveheight
+	float32_t T0; //Mean zero corssing period
+	float32_t TM01; //Mean spectral wave period
+	float32_t Tp; // Peak wave period
+	float32_t M0; //0th Spectral moment
+	float32_t M1; //1st spectral moment
+	float32_t M2; //2nd spectral moment
+	uint32_t PSD[20]; //PSD Period in spectral bins
+
+}Wave_Data_t;
+
+
+
+
+/* Wave Parameter Extraction functions ------------------------------------------------------------*/
+/**
+ * @brief
+ *
+ * @param waveData
+ */
+void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo);
 
 /**
  *
  * @param rawData
  * @param decArray
  */
-void singleSegmentPipeline(float32_t* singleSegment);
+void singleSegmentPipeline(float32_t* singleSegment,  uint32_t waveDirNo, uint32_t waveLogNo);
 
 /**
  * @brief Calibration Function for the ICM20689
  * @param rawData
  * @param calOutput
  */
-void calibrate(float32_t* rawData, float32_t* calOutput);
+void calibrate(int32_t* rawData, float32_t* calOutput);
 
 /**
  * @brief Detrending function
@@ -84,7 +110,7 @@ void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude);
  * @param waveAmplitudeArray
  * @param waveAmplitude
  */
-void WelchMethod(float32_t* PSD);
+void WelchMethod(float32_t* PSD, uint32_t waveDirNo);
 
 
 /**

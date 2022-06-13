@@ -123,68 +123,95 @@ int main(void)
   int32_t accelTemp[3];
   int32_t gyroTemp[3];
   uint8_t tempFIFOBuf[500];
-  float Ax, Ay, Az, Gx, Gy, Gz;
+  uint8_t imu[12] = {0};
+  int32_t Ax, Ay, Az, Gx, Gy, Gz;
 
   waveDirNo = 1;
   waveLogNo = 1;
+  fifo_sample_complete = 0;
+  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
 
+  //Enable interrupt
 
   while (1)
   {
 
+	  if(fifo_sample_count== WAVELOGBUFNO)
+		 {
+			SD_File_Close(&File); //NB Remember to close file
+			waveLogNo++;
+			fifo_sample_count = 0;
+			SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
+		 }
 
-	  if(fifo_sample_complete == 1 && fifo_sample_count<=WAVELOGBUFNO)
+		uint8_t data_status;
+
+		data_status = HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, DATA_RDY_STATUS, I2C_MEMADD_SIZE_8BIT, &data_status, 1, 100);
+
+		printmsg("Data status %d \r\n", data_status);
+
+		if(data_status&0b1)
+		{
+
+			if(imu_sample_count<=N_SAMPLES)
+			{
+				HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[imu_sample_count*SAMPLE_SIZE], 12, 100);
+				imu_sample_count++;
+				data_status = 0;
+				printmsg("Values %d \r\n", imu_sample_count);
+			}
+			else
+			{
+				fifo_sample_complete = 1;
+				imu_sample_count = 0;
+			}
+
+		}
+
+
+
+	  if(fifo_sample_complete == 1)
 	  {
 
 		  memcpy(IMU_Buffer, FIFO_Buffer, IMU_BUFFER_SIZE);
+		  printmsg("FIFO SAMPLE COMPLETE \r\n");
 
-		  printmsg("FIFO SAMPLE COMPLETE");
-		  SD_Wave_Store(&File, &Dir, &fno, waveDirNo, waveLogNo);
 		  RTC_TimeTypeDef gTime;
 		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
 
 	  		 for (int i = 0; i < IMU_BUFFER_SIZE; i+=SAMPLE_SIZE)
+			   {
+				   accelTemp[0] = ( (int16_t) (imu[i+0] << 8) | imu[i+1]);
+				   accelTemp[1] = ( (int16_t) (imu[i+2] << 8) | imu[i+3]);
+				   accelTemp[2] = ( (int16_t) (imu[i+4] << 8) | imu[i+5]);
+				   gyroTemp[0] = ( (int16_t) (imu[i+6] << 8) | imu[i+7]);
+				   gyroTemp[1] = ( (int16_t) (imu[i+8] << 8) | imu[i+9]);
+				   gyroTemp[2] = ( (int16_t) (imu[i+10] << 8) | imu[i+11]);
 
-	  	       	   {
+				   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
+				   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
+				   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
+				   SD_File_Write(&File, tempFIFOBuf);
 
-
-	  	       	           accelTemp[0] = ( (int16_t) (IMU_Buffer[i+0] << 8) | IMU_Buffer[i+1]);
-	  	       	           accelTemp[1] = ( (int16_t) (IMU_Buffer[i+2] << 8) | IMU_Buffer[i+3]);
-	  	       	           accelTemp[2] = ( (int16_t) (IMU_Buffer[i+4] << 8) | IMU_Buffer[i+5]);
-	  	       	           gyroTemp[0] = ( (int16_t) (IMU_Buffer[i+6] << 8) | IMU_Buffer[i+7]);
-	  	       	           gyroTemp[1] = ( (int16_t) (IMU_Buffer[i+8] << 8) | IMU_Buffer[i+9]);
-	  	       	           gyroTemp[2] = ( (int16_t) (IMU_Buffer[i+10] << 8) | IMU_Buffer[i+11]);
-
-	  	       	           	  //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
-	  	       	           	  //printmsg("%.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz);
-	  	       	           	  sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
-	  	       	           	  SD_File_Write(&File, tempFIFOBuf);
-	  	       	   }
-
-
-	  		SD_File_Close(&File); //NB Remember to close file
+	  	       	}
 
 	  		fifo_sample_count++;
 
+	  		printmsg("fifo_sample_count: %d", fifo_sample_count);
+
 	  		fifo_sample_complete = 0;
-
-	  		 if(fifo_sample_count== WAVELOGBUFNO+1)
-	  		 {
-	  			waveLogNo++;
-	  			fifo_sample_count = 0;
-	  		 }
-
-	  		 if(waveLogNo == WAVELOGNO+1)
-	  		 {
-	  			waveDirNo++;
-	  			waveLogNo = 0 ;
-	  		 }
-
 
 	  	   }
 
+	  if(waveLogNo == WAVELOGNO)
+	  {
+		  SD_File_Close(&File); //NB Remember to close file
+	  	  waveDirNo++;
+	  	  waveLogNo = 0 ;
+	  	  break;
+	  }
 
-
+	  //Disable Interrupt
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

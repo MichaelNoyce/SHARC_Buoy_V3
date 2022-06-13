@@ -252,7 +252,7 @@ else
   while (1)
   {
 
-	  if(((HAL_GetTick()-logStartTime)>=600000))
+	  if(((HAL_GetTick()-logStartTime)>=1800000))
 	  {
 		   logStartTime = HAL_GetTick();
 		   SD_File_Close(&File);
@@ -283,7 +283,7 @@ else
 	  Gz = (float)rawYaw/65.5;
 	  T = (float)temperature/333.81+21;
 
-	  sprintf(dataBuffer, "%.3f  %.3f  %.3f  %.3f  %.3f  %.3f  %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz, T);
+	  sprintf(dataBuffer, "%.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f \r\n", Ax, Ay, Az, Gx, Gy, Gz, T);
 
 	  SD_File_Write(&File, dataBuffer);
 

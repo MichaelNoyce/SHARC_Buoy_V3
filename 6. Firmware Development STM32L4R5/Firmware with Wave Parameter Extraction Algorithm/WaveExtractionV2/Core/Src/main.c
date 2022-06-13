@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -27,6 +28,8 @@
 #include <stdarg.h>
 #include "waveFunctions.h"
 #include "waveData.h"
+#include "fatfs.h"
+#include "HAL_SD.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +50,10 @@
  UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart2;
 
+RTC_HandleTypeDef hrtc;
+
+SD_HandleTypeDef hsd1;
+
 /* USER CODE BEGIN PV */
 
 
@@ -54,8 +61,6 @@ UART_HandleTypeDef huart2;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
 static void MX_LPUART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void printmsg(char *format,...);
@@ -79,7 +84,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -93,42 +98,47 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_USART2_UART_Init();
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
   printmsg("DSP Pipeline V1 Start!\r\n");
 
+  uint8_t errorCode = SD_Init();
+  printmsg("Error Code, %d \r\n", errorCode);
 
   uint32_t i = 0;
 
   float32_t PSD[FFT_LENGTH];
 
-  fullPipeline(PSD);
+  Wave_Data_t waveData;
+  uint32_t waveDirNo  = 1;
 
-  //singleSegmentPipeline(PSD);
 
-  //WelchMethod(PSD);
+
+  fullPipeline(waveData, waveDirNo);
+
+  //singleSegmentPipeline(PSD, 1, 1);
+
+  //WelchMethod(PSD, 1);
 
 
   printmsg("DSP Pipeline Finished!\r\n");
 
-  /*for(int i=0; i<512; i++)
-  	  				    {
-  	  				    	printmsg("%.8f \r\n", PSD[i]);
-  	  				    }
-*/
+  //for(int i=0; i<1024; i++)
+  //{
+  	 //printmsg("%.8f \r\n", PSD[i]);
+   //}
+
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+        while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+  }0
   /* USER CODE END 3 */
 }
 
@@ -151,7 +161,8 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
@@ -230,92 +241,11 @@ static void MX_LPUART1_UART_Init(void)
 
 }
 
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
 
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart2, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  HAL_PWREx_EnableVddIO2();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
-
-}
 
 /* USER CODE BEGIN 4 */
 void printmsg(char *format,...) {
-    char str[30];
+    char str[80];
 
     /*Extract the the argument list using VA apis */
     va_list args;

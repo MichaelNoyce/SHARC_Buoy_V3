@@ -18,7 +18,7 @@ HAL_StatusTypeDef Init_Debug(void)
 #ifdef DEBUG_HSE_OUTPUT_ENABLE
 	//configure pin
 	/*Configure GPIO pin : PA8 */
-	 GPIO_InitTypeDef GPIO_InitStruct;
+	 GPIO_InitTypeDef GPIO_InitStruct = {0};
 	 GPIO_InitStruct.Pin = GPIO_PIN_8;
 	 GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	 GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -31,8 +31,8 @@ HAL_StatusTypeDef Init_Debug(void)
 	//initialise USART 2 for USB comms
 #ifdef DEBUG_USART_ENABLE
 	  hlpuart1.Instance = LPUART1;
-	  hlpuart1.Init.BaudRate = 209700;
-	  hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
+	  hlpuart1.Init.BaudRate = 115200;
+	  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
 	  hlpuart1.Init.StopBits = UART_STOPBITS_1;
 	  hlpuart1.Init.Parity = UART_PARITY_NONE;
 	  hlpuart1.Init.Mode = UART_MODE_TX_RX;
@@ -45,18 +45,47 @@ HAL_StatusTypeDef Init_Debug(void)
 	  {
 	    return HAL_ERROR;
 	  }
-	  setbuf(stdout, NULL);
+	  if (HAL_UARTEx_SetTxFifoThreshold(&hlpuart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+	  {
+		  return HAL_ERROR;
+	  }
+	  if (HAL_UARTEx_SetRxFifoThreshold(&hlpuart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+	  {
+		  return HAL_ERROR;
+	  }
+	  if (HAL_UARTEx_DisableFifoMode(&hlpuart1) != HAL_OK)
+	  {
+		  return HAL_ERROR;
+	  }
 #endif
 
-#ifdef DEBUG_LED1_ENABLE
+#ifdef DEBUG_LED2_ENABLE
+
+	  /* GPIO Ports Clock Enable */
+	  __HAL_RCC_GPIOB_CLK_ENABLE();
+	  __HAL_RCC_GPIOG_CLK_ENABLE();
+	  HAL_PWREx_EnableVddIO2();
+
 	  /*Configure GPIO pin Output Level */
 	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-	  /*Configure GPIO pin : PD2 */
-	  GPIO_InitStruct.Pin = GPIO_PIN_2;
-	  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+
+	  /*Configure GPIO pin : PB14 */
+	  GPIO_InitStruct.Pin = LD2_Pin;
+	  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	  GPIO_InitStruct.Pull = GPIO_NOPULL;
-	  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-	  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+	  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+#endif
+
+#ifdef DEBUG_LED3_ENABLE
+	  /*Configure GPIO pin Output Level */
+	    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
+
+	    GPIO_InitStruct.Pin = LD3_Pin;
+	    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	    GPIO_InitStruct.Pull = GPIO_NOPULL;
+	    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 #endif
 
 #ifdef DEBUG_LP_ENABLE
@@ -66,6 +95,18 @@ HAL_StatusTypeDef Init_Debug(void)
 #endif
 
 	  return HAL_OK;
+}
+
+//Debug Print
+void printmsg(char *format,...) {
+    char str[80];
+
+    /*Extract the the argument list using VA apis */
+    va_list args;
+    va_start(args, format);
+    vsprintf(str, format,args);
+    HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+    va_end(args);
 }
 
 /**
@@ -81,7 +122,7 @@ HAL_StatusTypeDef SystemClock_Config(void)
   */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
-	  return HAL_ERROR;
+    Error_Handler();
   }
 
   /** Configure LSE Drive Capability
@@ -106,7 +147,7 @@ HAL_StatusTypeDef SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-	  return HAL_ERROR;
+    Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
@@ -265,11 +306,6 @@ void set_WUP_Pin(uint32_t Pin, PinMode_typedef mode)
 	__HAL_RCC_PWR_CLK_DISABLE();
 }
 
-PUTCHAR_PROTOTYPE
-{
-	HAL_UART_Transmit(&hlpuart1,(uint8_t*) &ch,1,0xFFFF);
-	return ch;
-}
 
 void GPIO_Set_Pin_LP(void)
 {

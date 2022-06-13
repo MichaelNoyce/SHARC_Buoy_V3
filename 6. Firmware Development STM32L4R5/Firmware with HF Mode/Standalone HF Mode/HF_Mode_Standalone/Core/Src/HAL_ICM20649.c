@@ -166,10 +166,9 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 
 	//reset buffers and flags
 	imu_sample_count = 0;
-	fifo_sample_count = 0;
-	fifo_sample_complete = 0;
-	waveLogNo = 0;
-
+	I2C_TX_CPLT = 0;
+	IMU_Log_On = 0;
+	IMU_Log_On = 1;
 
 	//memset(IMU_Buffer,0,IMU_BUFFER_SIZE);
 
@@ -213,8 +212,8 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 
 	//configure interrupt pin
 	ICM20649_Disable_Interrupts(&hi2c1);
-	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
-	ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_INT, INT_ENABLE_1);
+	//ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
+	//ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_INT, INT_ENABLE_1);
 
 	Reset_FIFO(&hi2c1);
 
@@ -775,7 +774,7 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 			*res = istatus;
 			break;
 		case DATA_READY:
-			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,DATA_RDY_STATUS,1,&istatus,1,100) != HAL_OK)
+			if(HAL_I2C_Mem_Read(hi2c,IMU_Device_Address,INT_STATUS_2,1,&istatus,1,100) != HAL_OK)
 			{
 				return IMU_I2C_ERROR;
 			}
@@ -796,30 +795,12 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 
 imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
 {
-
-	//Indicate DMA Transfer
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-
-	if(imu_sample_count<N_SAMPLES)
+	ICM20649_Register_Bank_Select(&hi2c1, 0);
+	//printmsg("Getting IMU Raw data \r\n");
+	if( HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, ACCEL_XOUT_H, 1, imu, 12, 100) != HAL_OK)
 	{
-
-		if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[imu_sample_count*SAMPLE_SIZE], SAMPLE_SIZE, 10) != HAL_OK)
-		{
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-		}
-
-		imu_sample_count++;
-
+		return IMU_I2C_ERROR;
 	}
-	else
-	{
-		fifo_sample_complete = 1;
-		imu_sample_count = 0;
-	}
-
-	//Reset FIFO
-	Reset_FIFO(&hi2c1);
-
 	return IMU_OK;
 }
 
@@ -1142,7 +1123,8 @@ void ICM20649_IntPin_IRQ()
 {
 
 	//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	//ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	fifo_sample_complete = 1;
 	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
 
 }

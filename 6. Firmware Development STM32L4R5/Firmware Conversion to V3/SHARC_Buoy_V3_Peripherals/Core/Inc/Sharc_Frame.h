@@ -15,6 +15,8 @@
 
 #include <stdlib.h>
 
+#include <stdarg.h>
+
 #include "stm32l4r5xx.h"
 
 #include "stm32l4xx_hal.h"
@@ -102,13 +104,6 @@ typedef struct
 //============
 /* Private Macro Functions ------------------------------------------------------------*/
 
-//The following lines of code allow for printf statements to output to serial via USART2. Remove code if not neccessary
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
-
 // Custom flag set detction for Event Power on Reset (PWR_BORST, PWR_SWRST, PWR_NRST Set )
 #define __HAL_RCC_GET_PORRST_FLAG() ((READ_REG(RCC->CSR)&(RCC_FLAG_PORRST))>>26)&&0b111
 
@@ -179,9 +174,13 @@ typedef struct
  */
 #define DEBUG_USART_ENABLE
 /*
- * @brief: enables initialisation of LED1: on the NUCLEO-L4 development board
+ * @brief: enables initialisation of LED2: on the NUCLEO-144 development board
  */
-#define DEBUG_LED1_ENABLE 1
+#define DEBUG_LED2_ENABLE
+/*
+ * @brief: enables initialisation of LED3: on the NUCLEO-144 development board
+ */
+#define DEBUG_LED3_ENABLE
 /*
  * @brief: enables Debug for low power mode allowing the debugger to still work when mcu is in stop, sleep or stdby mode
  */
@@ -193,11 +192,17 @@ typedef struct
 
 #define RTC_WUCK_Period 1799 //s
 
-//define GPIO Port for LED
+//define GPIO Port for LED2
 #define LD2_GPIO_Port GPIOB
 
-//define GPIO Pin for LED
+//define GPIO Pin for LED2
 #define LD2_Pin GPIO_PIN_7
+
+//define GPIO Port for LED3
+#define LD3_GPIO_Port GPIOB
+
+//define GPIO Pin for LED
+#define LD3_Pin GPIO_PIN_14
 
 //define Number of onboard FLASH Chips
 #define FLASH_CHIPS 4
@@ -231,6 +236,14 @@ uint8_t Sample_On,sample_count,IMU_On;
  * @return: HAL_StatusTypeDef - return status of the function based on HAL_StatusTypeDef
  */
 HAL_StatusTypeDef Init_Debug(void);
+
+
+/**
+ * @brief Print function used for SHARC Buoy
+ *
+ * @param format
+ */
+void printmsg(char *format,...);
 
 /*
  * Function name HAL_StatusTypeDef SystemClock_Config(void);

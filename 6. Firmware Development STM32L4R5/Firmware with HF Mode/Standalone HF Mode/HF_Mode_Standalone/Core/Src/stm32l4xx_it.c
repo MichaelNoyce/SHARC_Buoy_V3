@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "HAL_SD.h"
+#include "HAL_ICM20649.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
