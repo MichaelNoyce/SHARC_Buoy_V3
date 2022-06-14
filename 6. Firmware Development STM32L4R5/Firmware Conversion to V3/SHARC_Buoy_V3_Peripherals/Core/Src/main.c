@@ -159,7 +159,7 @@ int main(void)
 		uint8_t flag = __HAL_RCC_GET_PORRST_FLAG();
 		if(flag  == SET)
 		{
-		  printf("Software Reset Detected. Initializing main program...\r\n");
+		  printmsg("Software Reset Detected. Initializing main program...\r\n");
 		  POR_Handler();
 		}
 //=================================== 2. END ====================================//
@@ -195,14 +195,14 @@ int main(void)
 			  if(Current_State == STATE_SLEEP)				//return to sleep if Interrupt event handled before wake up
 			  {
 
-				  printf("System Going Back To Sleep\r\n"); 	//check how long device was asleep for
+				  printmsg("System Going Back To Sleep\r\n"); 	//check how long device was asleep for
 				  set_WUP_Pin(IMU_EVENT_WAKE_PIN, MODE_WUP);	//reenable wake up pins
 				  Go_To_Sleep(STDBY,T_SLEEP);						//return to sleep
 			  }
 			  	 else
 			  {
 
-			  	  printf("Going Back to Main Loop:\r\n");		//if come from wake mode
+			  	  printmsg("Going Back to Main Loop:\r\n");		//if come from wake mode
 				  __SET_CURRENT_STATE(STATE_ASYNCINT);
 			  }
 		  }
@@ -396,13 +396,13 @@ void Error_Handler(void)
 //=============================== 9. Routines =======================================//
 static void Routine_ASYNC_IMU_EVENT(void)
 {
-	 printf("IMU Event Detected: Sampling...");
+	 printmsg("IMU Event Detected: Sampling...");
 	 for (int i = 0; i < 50; ++i)
 	 {
 	 	HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
 	 	HAL_Delay(100);
 	 }
-	 printf("Done\r\n");
+	 printmsg("Done\r\n");
 }
 
 
@@ -413,8 +413,8 @@ static void Routine_STATE_RESET(void)
 	 MX_RTC_Init();
 	 //Enable Interrupt pins as EXTI Outputs
 	 set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI);
-	 printf("Device Online!\r\n");
-	 printf("Current State: RESET \t Next State: SAMPLE\r\n");
+	 printmsg("Device Online!\r\n");
+	 printmsg("Current State: RESET \t Next State: SAMPLE\r\n");
 	 HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
 
 
@@ -422,8 +422,8 @@ static void Routine_STATE_RESET(void)
 
 static void Routine_STATE_SLEEP(void)
 {
-	  printf("Current State: SLEEP \t Next State: SAMPLE\r\n");
-	  printf("Good Night! \r\n");
+	  printmsg("Current State: SLEEP \t Next State: SAMPLE\r\n");
+	  printmsg("Good Night! \r\n");
 	  set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_WUP);
 	  Go_To_Sleep(STDBY,T_SLEEP);
 }
@@ -435,10 +435,10 @@ static void Routine_STATE_SAMPLE(void)
 	  sample_count = __GET_SAMPLE_COUNT();
 	  if(sample_count < 3)
 	  {
-		  printf("Current State: SAMPLE \t Next State: SLEEP\r\n");
+		  printmsg("Current State: SAMPLE \t Next State: SLEEP\r\n");
 	  } else
 	  {
-		  printf("Current State: SAMPLE \t Next State: TRANS\r\n");
+		  printmsg("Current State: SAMPLE \t Next State: TRANS\r\n");
 		  IMU_On = 1;
 	  }
 
@@ -449,7 +449,7 @@ static void Routine_STATE_SAMPLE(void)
 		  //initialise gps peripherals and begin comms on sensor instance
 		  if(init_GPS(&hgps)== GPS_Init_OK)
 		  {
-			 printf("GPS Online! Acquiring Signal...\r\n");
+			 printmsg("GPS Online! Acquiring Signal...\r\n");
 			 GPS_On = 1;
 			 break;
 		  }
@@ -469,25 +469,25 @@ static void Routine_STATE_SAMPLE(void)
 				  int y = HAL_GetTick()- x;
 				  if(y >  30000) //30s to acquire signal
 				  {
-					  printf("Failed to Acquire Signal\r\n");
+					  printmsg("Failed to Acquire Signal\r\n");
 					  break;
 				  }
 
 			  }
 			  GPS_Log_Stop();
-			  printf("Logging Data...\r\n");
+			  printmsg("Logging Data...\r\n");
 			  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
 			  Gdata.coordinates = GPS_coord;
 			  Gdata.Etime = eTime;
 			  Gdata.diag = diag;
-			  printf("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-			  printf("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-			  printf("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
+			  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
+			  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
+			  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
 
 		  deinit_GPS(&hgps);
 	  }else
 	  {
-		  printf("Error GPS Not Found!\r\n");
+		  printmsg("Error GPS Not Found!\r\n");
 	  }
 	  // Environmental Sensor Init Routine
 	  BMP_Init_Typedef BMP_InitStruct = {0};
@@ -498,7 +498,7 @@ static void Routine_STATE_SAMPLE(void)
 	  BMP_InitStruct.BMP_Power_Mode = BMP280_CTRLMEAS_MODE_FORCED;
 	  if(BMP280_Init(&BMP_InitStruct) == BMP_OK)
 	  {
-		  printf("Environmental Sensor Online!\r\n");
+		  printmsg("Environmental Sensor Online!\r\n");
 		  //create variables
 		  uint32_t temp,press;
 		  int32_t t_fine;
@@ -509,14 +509,14 @@ static void Routine_STATE_SAMPLE(void)
 			Gdata.atm_Press = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;	//compensate pressure
 
 		  }
-		  printf("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
+		  printmsg("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
 	  }
 
 	  //INA219 Sample Routine
 	  if(INA219_Init_Sensor() == INA_OK)
 	  {
 		  int16_t p_temp = 0;
-		  printf("INA219 Ready! \r\n");
+		  printmsg("INA219 Ready! \r\n");
 		  //Trigger a conversion
 		  INA219_Trigger_Conversion(2);
 		  //read registers
@@ -525,7 +525,7 @@ static void Routine_STATE_SAMPLE(void)
 		  INA219_Get_Current(&Gdata.current);
 		  INA219_Get_Power(&p_temp);
 		  Gdata.power = (ina.INA219_P_LSB*(float)p_temp)*1000;
-		  printf("V_Shunt %d mV V_Bus %d mV Current %d mA Power %d mW\r\n",Gdata.shunt_v,Gdata.bus_v, Gdata.current,Gdata.power);
+		  printmsg("V_Shunt %d mV V_Bus %d mV Current %d mA Power %d mW\r\n",Gdata.shunt_v,Gdata.bus_v, Gdata.current,Gdata.power);
 	  }
 
 	  /* High Frequency IMU sampling */
@@ -534,7 +534,8 @@ static void Routine_STATE_SAMPLE(void)
 	  int32_t gyroTemp[3];
 	  uint8_t tempFIFOBuf[500];
 	  uint8_t imu[12] = {0};
-	  int32_t Ax, Ay, Az, Gx, Gy, Gz;
+	  RTC_TimeTypeDef gTime;
+	  uint8_t data_status;
 
 	  waveDirNo = 1;
 	  waveLogNo = 1;
@@ -545,87 +546,62 @@ static void Routine_STATE_SAMPLE(void)
 	  {
 		  if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
 		  	  {
-			  if(fifo_sample_count== WAVELOGBUFNO)
-			  		 {
-			  			SD_File_Close(&File); //NB Remember to close file
-			  			waveLogNo++;
-			  			fifo_sample_count = 0;
-			  			SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
-			  		 }
+			  while (1)
+			  {
 
-			  		uint8_t data_status;
+				  if(imu_sample_count== WAVELOGBUFNO)
+					 {
+						SD_File_Close(&File); //NB Remember to close file
+						waveLogNo++;
+						imu_sample_count = 0;
+						SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
+						printmsg("New log! \r\n");
+					 }
 
-			  		data_status = HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, DATA_RDY_STATUS, I2C_MEMADD_SIZE_8BIT, &data_status, 1, 100);
+				  	ICM20649_Is_Data_Ready(&hi2c1, &data_status);
 
-			  		//printmsg("Data status %d \r\n", data_status);
+					if(data_status)
+					{
 
-			  		if(data_status&0b1)
-			  		{
+						ICM20649_Get_IMU_RawData(&hi2c1, imu);
 
-			  			if(imu_sample_count<=N_SAMPLES)
-			  			{
-			  				HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[imu_sample_count*SAMPLE_SIZE], 12, 100);
-			  				imu_sample_count++;
-			  				data_status = 0;
-			  				//printmsg("Values %d \r\n", imu_sample_count);
-			  			}
-			  			else
-			  			{
-			  				fifo_sample_complete = 1;
-			  				imu_sample_count = 0;
-			  			}
+						HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
 
-			  		}
+						accelTemp[0] = ( (int16_t) (imu[0] << 8) | imu[1]);
+						accelTemp[1] = ( (int16_t) (imu[2] << 8) | imu[3]);
+						accelTemp[2] = ( (int16_t) (imu[4] << 8) | imu[5]);
+						gyroTemp[0] = ( (int16_t) (imu[6] << 8) | imu[7]);
+						gyroTemp[1] = ( (int16_t) (imu[8] << 8) | imu[9]);
+						gyroTemp[2] = ( (int16_t) (imu[10] << 8) | imu[11]);
+
+					   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
+					   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
+
+					   printmsg(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
+					   SD_File_Write(&File, tempFIFOBuf);
+
+					   imu_sample_count++;
+
+					}
 
 
+					  if(waveLogNo == WAVELOGNO+1)
+					  {
+						  SD_File_Close(&File); //NB Remember to close file
+						  waveDirNo++;
+						  waveLogNo = 0 ;
+						  break;
+					  }
 
-			  	  if(fifo_sample_complete == 1)
-			  	  {
-
-			  		  memcpy(IMU_Buffer, FIFO_Buffer, IMU_BUFFER_SIZE);
-			  		  //printmsg("FIFO SAMPLE COMPLETE \r\n");
-
-			  		  RTC_TimeTypeDef gTime;
-			  		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-
-			  	  		 for (int i = 0; i < IMU_BUFFER_SIZE; i+=SAMPLE_SIZE)
-			  			   {
-			  				   accelTemp[0] = ( (int16_t) (imu[i+0] << 8) | imu[i+1]);
-			  				   accelTemp[1] = ( (int16_t) (imu[i+2] << 8) | imu[i+3]);
-			  				   accelTemp[2] = ( (int16_t) (imu[i+4] << 8) | imu[i+5]);
-			  				   gyroTemp[0] = ( (int16_t) (imu[i+6] << 8) | imu[i+7]);
-			  				   gyroTemp[1] = ( (int16_t) (imu[i+8] << 8) | imu[i+9]);
-			  				   gyroTemp[2] = ( (int16_t) (imu[i+10] << 8) | imu[i+11]);
-
-			  				   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
-			  				   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
-			  				   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
-			  				   SD_File_Write(&File, tempFIFOBuf);
-
-			  	  	       	}
-
-			  	  		fifo_sample_count++;
-
-			  	  		printmsg("fifo_sample_count: %d", fifo_sample_count);
-
-			  	  		fifo_sample_complete = 0;
-
-			  	  	   }
-
-			  	  if(waveLogNo == WAVELOGNO)
-			  	  {
-			  		  SD_File_Close(&File); //NB Remember to close file
-			  	  	  waveDirNo++;
-			  	  	  waveLogNo = 0 ;
-			  	  	  break;
-			  	  }
-
+			  }
 
 		  	  }
+
 		  	  else
 		  	  {
-		  		  printf("IMU Offline!\r\n");
+		  		  printmsg("IMU Offline!\r\n");
 		  	  }
+
 		  ICM20649_Deinit_IMU();
 
 	  }
@@ -635,7 +611,7 @@ static void Routine_STATE_SAMPLE(void)
 
 static void Routine_STATE_TRANSMIT(void)
 {
-	  printf("Current State: TRANS \t Next State: SLEEP\r\n");
+	  printmsg("Current State: TRANS \t Next State: SLEEP\r\n");
 
 	  //Enable SD card interface
 
@@ -655,7 +631,7 @@ static void Routine_STATE_TRANSMIT(void)
 	  if(IR_On)
 	  {
 
-		  printf("Preparing To Transmit...");
+		  printmsg("Preparing To Transmit...");
 		  //getlength of data
 
 		  uint8_t trans_Buffer[256];
@@ -672,7 +648,7 @@ static void Routine_STATE_TRANSMIT(void)
 
 	  	  if(flag == IR_MSG_UPLOAD_OK)
 	  	  {
-		  	  printf("Message Uploaded!\r\nTransmitting...");
+		  	  printmsg("Message Uploaded!\r\nTransmitting...");
 		  	  //create SBD Session
 		  	  SBDX_Status_t sbd;
 		  	  for (int i = 0; i < 5; ++i)
@@ -684,11 +660,11 @@ static void Routine_STATE_TRANSMIT(void)
 		  	  		  {
 		  			  	  //message sent
 		  	  			  IR_send_AT_CMD("AT+SBDD0\r");
-		  			  	  printf("Success!\r\n");
+		  			  	  printmsg("Success!\r\n");
 		  			  	  break;
 		  		  	  }else
 		  		  	  {
-		  		  		  printf("Failed!\r\n");
+		  		  		  printmsg("Failed!\r\n");
 
 		  		  	  }
 		 	  	  }
@@ -710,7 +686,7 @@ static void Routine_STATE_TRANSMIT(void)
 static void Routine_Init_STATE(void)
 {
 	//Initialize and configure the SD cards
-	printf("Setting Up Flash Chips...\r\n");
+	printmsg("Setting Up Flash Chips...\r\n");
 	uint8_t status;
 
 	uint32_t backup_val;
@@ -734,10 +710,10 @@ static void Routine_Init_STATE(void)
 	 }
 	 if(IR_On)
 	 {
-		 printf("Iridium Module online!\r\n");
+		 printmsg("Iridium Module online!\r\n");
 	 }else
 	 {
-		 printf("Error Connecting To Modem\r\n");
+		 printmsg("Error Connecting To Modem\r\n");
 	 }
 	 IR_DeInit_Module();
 
@@ -746,32 +722,32 @@ static void Routine_Init_STATE(void)
 	 BMP280_Init_Preset_Mode(Weather_Monitoring,&BMP_InitStruct);
 	 if(BMP280_Init(&BMP_InitStruct) == BMP_OK)
 	 {
-		 printf("Environmental Sensor Online!\r\n");
+		 printmsg("Environmental Sensor Online!\r\n");
 	 }else
 	 {
-		 printf("Environmental Sensor Offline!\r\n");
+		 printmsg("Environmental Sensor Offline!\r\n");
 	 }
 
 	 /* Test INA 219 Sensor */
 	 if(INA219_Init_Sensor() == INA_OK)
 	 {
-		 printf("Current Monitor Online!\r\n");
+		 printmsg("Current Monitor Online!\r\n");
 	 } else
 	 {
-		 printf("Current Monitor Offline!\r\n");
+		 printmsg("Current Monitor Offline!\r\n");
 	 }
 
 	 /* Test MPU6050 Sensor */
 
 	/* if(MPU6050_Init_MPU(GYRO_CONFIG_FSSEL_500DPS,ACC_CONFIG_AFSSEL_2G,CONFIG_DLFP_2) == MPU_OK)
 	 {
-		 printf("IMU Online\r\n");
+		 printmsg("IMU Online\r\n");
 		 //perform self-test
 		 float test_results[6];
 		 MPU6050_SelfTest(&hi2c1,test_results);
 	 }else
 	 {
-		 printf("IMU Offline\r\n");
+		 printmsg("IMU Offline\r\n");
 	 }
 	 MPU6050_Deinit_MPU(); */
 

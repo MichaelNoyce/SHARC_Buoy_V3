@@ -266,7 +266,7 @@ void I2C1_ER_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	ICM20649_IntPin_IRQ();
+	//ICM20649_IntPin_IRQ();
   /* USER CODE END EXTI15_10_IRQn 0 */
 
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */

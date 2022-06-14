@@ -196,24 +196,24 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Configure sensor settings
 	ICM20649_Set_Acc_FSR(&hi2c1,a_fsr);
 	ICM20649_Set_Gyro_FSR(&hi2c1,g_fsr);
-	ICM20649_Set_Acc_DLPF(&hi2c1,0, ENABLE);
-	ICM20649_Set_Gyro_DLPF(&hi2c1,0, ENABLE);
+	ICM20649_Set_Acc_DLPF(&hi2c1,1, ENABLE);
+	ICM20649_Set_Gyro_DLPF(&hi2c1, 1, ENABLE);
 	//ICM20649_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
 	ICM20649_Set_Sample_Rate(&hi2c1);
 
 	//Enable Temperature Sensor
-	ICM20649_Init_TempSensor(&hi2c1, ENABLE);
+	ICM20649_Init_TempSensor(&hi2c1, DISABLE);
 
 	//Enable and config FIFO
-	ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
-	ICM20649_Init_FIFO(&hi2c1, ENABLE);
+	//ICM20649_Init_FIFO(&hi2c1, IMU_RESET);
+	ICM20649_Init_FIFO(&hi2c1, DISABLE);
 	ICM20649_Config_FIFO(&hi2c1, DISABLE, DISABLE, DISABLE, DISABLE);
-	ICM20649_Config_FIFO(&hi2c1, ENABLE, ENABLE, DISABLE, ENABLE);
+	//ICM20649_Config_FIFO(&hi2c1, ENABLE, ENABLE, DISABLE, ENABLE);
 
 	//configure interrupt pin
 	ICM20649_Disable_Interrupts(&hi2c1);
-	ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
-	ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_INT, INT_ENABLE_1);
+	//ICM20649_Config_Interrupt_Pin(INT_PIN_CFG_LEVEL_HIGH, INT_PIN_CFG_PIN_PUSH_PULL,INT_PIN_CFG_LATCH_INT_DIS);
+	//ICM20649_Enable_Interrupt(&hi2c1, RAW_DATA_0_RDY_INT, INT_ENABLE_1);
 
 	Reset_FIFO(&hi2c1);
 
@@ -427,6 +427,7 @@ imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 	if((configbyte &0b1) > 0)
 	{
 		smplrtdiv= (uint8_t)(GYRO_OUTPUT_RATE_DLPF_EN/SAMPLE_RATE - 1);
+		printmsg("Gyro DPLF Enabled! \r\n");
 	}else
 	{
 		smplrtdiv = (uint8_t)(GYRO_OUTPUT_RATE_DLPF_DIS/SAMPLE_RATE -1);
@@ -438,6 +439,7 @@ imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 		return IMU_I2C_ERROR;
 	}
 
+	printmsg("Gyro smplrt: %d \r\n", smplrtdiv);
 
 	configbyte = 0;
 	smplrtdiv = 0;
@@ -449,6 +451,7 @@ imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 
 	if((configbyte &0b1) > 0)
 	{
+		printmsg("Accel DPLF Enabled! \r\n");
 		smplrtdiv= (uint16_t)(ACC_OUTPUT_RATE_DLPF_EN/SAMPLE_RATE - 1);
 	}else
 	{
@@ -459,6 +462,9 @@ imu_status_t ICM20649_Set_Sample_Rate(I2C_HandleTypeDef *hi2c)
 	{
 		return IMU_I2C_ERROR;
 	}
+
+	printmsg("Accel smplrt: %d \r\n", smplrtdiv);
+
 
 	return IMU_OK;
 }
@@ -793,30 +799,30 @@ imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_so
 	return IMU_OK;
 }
 
-imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu)
+
+imu_status_t ICM20649_Is_Data_Ready(I2C_HandleTypeDef *hi2c, uint8_t *status)
 {
+	uint8_t data_status = 0;
 
-	//Indicate DMA Transfer
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+	ICM20649_Register_Bank_Select(&hi2c1, 0);
 
-	if(imu_sample_count<N_SAMPLES)
+	if(HAL_I2C_Mem_Read(&hi2c1,IMU_Device_Address, INT_STATUS_1, I2C_MEMADD_SIZE_8BIT, &data_status, 1, 10) != HAL_OK)
 	{
-
-		if(HAL_I2C_Mem_Read(hi2c, IMU_Device_Address, FIFO_R_W, 1, &FIFO_Buffer[imu_sample_count*12], 12, 1) != HAL_OK)
-		{
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-		}
-
-	}
-	else
-	{
-		fifo_sample_count = 1;
+		return IMU_I2C_ERROR;
 	}
 
-    imu_sample_count++;
+    *status = data_status&RAW_DATA_0_RDY_INT;
 
-	//Reset FIFO
-	Reset_FIFO(&hi2c1);
+    return IMU_OK;
+}
+
+
+imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t *imu)
+{
+	if(HAL_I2C_Mem_Read(&hi2c1, IMU_Device_Address, ACCEL_XOUT_H, 1, imu, 12, 10) != HAL_OK)
+	{
+		return IMU_I2C_ERROR;
+	}
 
 	return IMU_OK;
 }
@@ -1140,7 +1146,8 @@ void ICM20649_IntPin_IRQ()
 {
 
 	//HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-	ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	//ICM20649_Get_IMU_RawData(&hi2c1, IMU_Buffer);
+	fifo_sample_complete = 1;
 	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
 
 }

@@ -456,9 +456,11 @@ typedef struct
 #define ACC_30G_WORD_LENGTH 1024
 
 //Data Defines
-#define N_SAMPLES 340
-#define IMU_BUFFER_SIZE N_SAMPLES*12
-#define DMA_TX_BUFFER_SIZE 10 //Number of N_SAMPLES in DMA Buffer
+#define N_SAMPLES 1
+#define SAMPLE_SIZE 12 //12 bytes per sample ax ay az gx gy gz
+#define IMU_BUFFER_SIZE N_SAMPLES*SAMPLE_SIZE
+#define WAVELOGBUFNO 100 //Number of local buffers written to each wavelog file 5min*60sec*100Hz
+#define WAVELOGNO 5 //Number of wave logs
 
 
 //I2C Peripheral Defines
@@ -478,6 +480,12 @@ typedef struct
 uint32_t imu_sample_count;   //Keeps track of the number of samples from the IMU
 
 uint32_t fifo_sample_count;   //Keeps track of the number of samples in the FIFO Buffer
+
+uint32_t fifo_sample_complete;   //Current FIFO sample is complete
+
+uint32_t waveLogNo;
+
+uint32_t waveDirNo;
 
 uint8_t IMU_Log_On;			 //used in EXTI IRQ to determine what routine to run
 
@@ -544,12 +552,13 @@ imu_status_t ICM20649_Init_FIFO(I2C_HandleTypeDef *hi2c, uint8_t enable);
 imu_status_t ICM20649_Init_TempSensor(I2C_HandleTypeDef *hi2c, uint8_t cmd);
 
 //======================= 10. Sensor Read Functions ====================================================
-
+imu_status_t ICM20649_Is_Data_Ready(I2C_HandleTypeDef *hi2c, uint8_t *status);
 imu_status_t ICM20649_Get_SelfTestResponse_Values(I2C_HandleTypeDef *hi2c,IMU_SelfTest_t *IMU);
 imu_status_t ICM20649_Get_ID(I2C_HandleTypeDef *hi2c,uint8_t* ID);
 imu_status_t ICM20649_Get_MST_Status(I2C_HandleTypeDef *hi2c, uint8_t* status_byte);
 imu_status_t ICM20649_Get_FIFO_Count(I2C_HandleTypeDef *hi2c, uint16_t* count);
 imu_status_t ICM20649_SelfTest(I2C_HandleTypeDef *hi2c,float* test_res);
+imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t *imu);
 imu_status_t ICM20649_Get_IMU_RawData_FIFO(I2C_HandleTypeDef *hi2c, uint8_t* imuBuf, uint8_t count);
 imu_status_t Reset_FIFO(I2C_HandleTypeDef *hi2c);
 //======================= 11. Power Mode Config Function ===============================================
@@ -560,7 +569,6 @@ imu_status_t ICM20649_Set_Low_Power_Mode_Acc(I2C_HandleTypeDef *hi2c,uint8_t Cyc
 imu_status_t ICM20649_Set_Sleep_Power_Mode(I2C_HandleTypeDef *hi2c);
 imu_status_t ICM20649_Get_Interrupt_Status(I2C_HandleTypeDef *hi2c, Interrupt_source_t interrupt_src,uint8_t* res);
 imu_status_t ICM20649_Signal_conditioned_Reset(I2C_HandleTypeDef *hi2c);
-imu_status_t ICM20649_Get_IMU_RawData(I2C_HandleTypeDef *hi2c, uint8_t* imu);
 imu_status_t ICM20649_reset(I2C_HandleTypeDef *hi2c);
 
 void ICM20649_DMA_PeriphIRQHandler(void);
