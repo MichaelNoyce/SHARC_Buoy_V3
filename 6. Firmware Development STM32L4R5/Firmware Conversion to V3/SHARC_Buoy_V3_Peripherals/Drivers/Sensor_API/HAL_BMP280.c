@@ -44,26 +44,25 @@ static void Init_Control_Pins(void);
 static HAL_StatusTypeDef MX_SPI1_Init(void)
 {
 
-	  /* USER CODE END SPI1_Init 1 */
-	  /* SPI1 parameter configuration*/
-	  hspi1.Instance = SPI1;
-	  hspi1.Init.Mode = SPI_MODE_MASTER;
-	  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-	  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-	  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-	  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-	  hspi1.Init.NSS = SPI_NSS_HARD_OUTPUT;
-	  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-	  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-	  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-	  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
-	  hspi1.Init.CRCPolynomial = 7;
-	  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-	  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
-	  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-	  {
-	    return HAL_ERROR;
-	  }
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = BMP_SPI_PORT;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 7;
+  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    return HAL_ERROR;
+  }
   return HAL_OK;
 }
 
@@ -107,7 +106,57 @@ static void Init_Control_Pins(void)
  *  3. In the stm32l4xx_hal_msp.c file, include the header "HAL_BMP280.h"
  */
 
-
+///**
+//* @brief SPI MSP Initialization
+//* This function configures the hardware resources used in this example
+//* @param hspi: SPI handle pointer
+//* @retval None
+//*/
+//void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
+//{
+//  GPIO_InitTypeDef GPIO_InitStruct = {0};
+//  if(hspi->Instance==SPI1)
+//  {
+//    /* Peripheral clock enable */
+//    __HAL_RCC_SPI1_CLK_ENABLE();
+//    __HAL_RCC_GPIOB_CLK_ENABLE();
+//    /**SPI1 GPIO Configuration
+//    PB3 (JTDO-TRACESWO)     ------> SPI1_SCK
+//    PB4 (NJTRST)     ------> SPI1_MISO
+//    PB5     ------> SPI1_MOSI
+//    */
+//    GPIO_InitStruct.Pin = BMP_SPI_SCLK_PIN|BMP_SPI_MISO_PIN| BMP_SPI_MOSI_PIN;
+//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+//    GPIO_InitStruct.Pull = GPIO_NOPULL;
+//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+//    GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+//    HAL_GPIO_Init(BMP_SPI_GPIO_PORT, &GPIO_InitStruct);
+//  }
+//
+//}
+//
+///**
+//* @brief SPI MSP De-Initialization
+//* This function freeze the hardware resources used in this example
+//* @param hspi: SPI handle pointer
+//* @retval None
+//*/
+//void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
+//{
+//  if(hspi->Instance==SPI1)
+//  {
+//    /* Peripheral clock disable */
+//    __HAL_RCC_SPI1_CLK_DISABLE();
+//
+//    /**SPI1 GPIO Configuration
+//    PB3 (JTDO-TRACESWO)     ------> SPI1_SCK
+//    PB4 (NJTRST)     ------> SPI1_MISO
+//    PB5     ------> SPI1_MOSI
+//    */
+//    HAL_GPIO_DeInit(BMP_SPI_GPIO_PORT,BMP_SPI_SCLK_PIN|BMP_SPI_MISO_PIN| BMP_SPI_MOSI_PIN);
+//  }
+//
+//}
 
 //========================= 6. Init Function Definitions =============================
 
@@ -139,6 +188,7 @@ BMPStatus_t BMP280_Init(BMP_Init_Typedef * BMP_InitStruct)
 		uint8_t flag = BMP280_Get_ID(&dev_id);
 		if( flag!= BMP_OK)
 		{
+			printmsg("Returned ID: %d", dev_id);
 			return flag;
 		}
 		//check device ID matches

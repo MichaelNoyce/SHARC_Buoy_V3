@@ -153,13 +153,15 @@ int main(void)
 			waveLogNo++;
 			imu_sample_count = 0;
 			SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
-			printmsg("New log! \r\n");
+			//printmsg("New log! \r\n");
 		 }
 
 	  	ICM20649_Is_Data_Ready(&hi2c1, &data_status);
 
 		if(data_status)
 		{
+
+			printmsg("Data ready, imu sample count %d\r\n", imu_sample_count);
 
 			ICM20649_Get_IMU_RawData(&hi2c1, imu);
 

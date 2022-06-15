@@ -125,7 +125,7 @@ int main(void)
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  char fail_cond[100] = {0};
+ /* char fail_cond[100] = {0};
   UT_Result_t result = AT001_Connection_Test(fail_cond);
   char res_buff[500] = {0};
   sprintf(res_buff, "%s", fail_cond);
@@ -135,14 +135,24 @@ int main(void)
   }else
   {
 	  printmsg(" AT001 Test Status: Fail \t INFO: %s \r\n",res_buff);
-  }
+  } */
+
+  //uint8_t dev_id = 0;
+  //uint8_t flag = BMP280_Get_ID(&dev_id);
+  //printmsg("Returned ID: %d", dev_id);
+
+  BMP_Init_Typedef BMP_InitStruct;
+  BMP280_Init_Preset_Mode(Weather_Monitoring,&BMP_InitStruct);
+  BMPStatus_t flag = BMP280_Init(&BMP_InitStruct);
+
+  printmsg("flag %d \r\n", flag);
   /* USER CODE END 2 */
 
   while (1)
 {
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
- 	/* uint32_t temp,press,P;
+ 	uint32_t temp,press,P;
  	int32_t T ,t_fine;
 
 	  //wait for device to finish converting
@@ -152,7 +162,7 @@ int main(void)
 	  P = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;
 
 	  //create a string
-	  printmsg("Temp = %ld C\tPressure = %lu KPa\r\n",T,P); */
+	  printmsg("Temp = %ld C\tPressure = %lu KPa\r\n",T,P);
 
     /* USER CODE END WHILE */
 

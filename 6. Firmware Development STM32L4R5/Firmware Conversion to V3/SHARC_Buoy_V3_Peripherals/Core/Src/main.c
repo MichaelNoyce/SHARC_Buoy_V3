@@ -416,6 +416,10 @@ static void Routine_STATE_RESET(void)
 	 printmsg("Device Online!\r\n");
 	 printmsg("Current State: RESET \t Next State: SAMPLE\r\n");
 	 HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+	 waveDirNo = 1; // Reset sets initial directory values
+	 waveLogNo = 1;
+	 gpsDirNo = 1;
+	 gpsLogNo = 1;
 
 
 }
@@ -502,11 +506,12 @@ static void Routine_STATE_SAMPLE(void)
 		  //create variables
 		  uint32_t temp,press;
 		  int32_t t_fine;
-		  for (int i = 0; i < 5; ++i)
+		  for (int i = 0; i < 60; ++i)
 		  {
 			BMP280_Force_Measure(&temp,&press);		//trigger conversion
 			Gdata.env_Temp = BMP280_Compensate_Temp(temp,&t_fine,bmp.Factory_Trim);			//compensate temperature
 			Gdata.atm_Press = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;	//compensate pressure
+			HAL_Delay(1000);
 
 		  }
 		  printmsg("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
@@ -537,16 +542,12 @@ static void Routine_STATE_SAMPLE(void)
 	  RTC_TimeTypeDef gTime;
 	  uint8_t data_status;
 
-	  waveDirNo = 1;
-	  waveLogNo = 1;
-	  fifo_sample_complete = 0;
 	  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
 
-	  while (1)
-	  {
 		  if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
 		  	  {
-			  while (1)
+
+			  while (IMU_On)
 			  {
 
 				  if(imu_sample_count== WAVELOGBUFNO)
@@ -555,7 +556,7 @@ static void Routine_STATE_SAMPLE(void)
 						waveLogNo++;
 						imu_sample_count = 0;
 						SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
-						printmsg("New log! \r\n");
+						printmsg("New Wave log! \r\n");
 					 }
 
 				  	ICM20649_Is_Data_Ready(&hi2c1, &data_status);
@@ -577,7 +578,7 @@ static void Routine_STATE_SAMPLE(void)
 					   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
 					   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
 
-					   printmsg(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
+					   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
 					   SD_File_Write(&File, tempFIFOBuf);
 
 					   imu_sample_count++;
@@ -603,11 +604,10 @@ static void Routine_STATE_SAMPLE(void)
 		  	  }
 
 		  ICM20649_Deinit_IMU();
-
-	  }
-
+		  SD_Unmount(SDFatFs);
 
 }
+
 
 static void Routine_STATE_TRANSMIT(void)
 {
@@ -639,6 +639,8 @@ static void Routine_STATE_TRANSMIT(void)
 		  /* Load data Frome Memory*/
 		 /* FLASH_SetAddress(0x00,0x00,0x01);
 		 memcpy(trans_Buffer,FLASH_READ_BufferHF(chip,BUFFER1),256);*/
+
+
 
 		  /* 3. Upload Drift Data */
 		  IR_Status_t flag;
@@ -686,15 +688,25 @@ static void Routine_STATE_TRANSMIT(void)
 static void Routine_Init_STATE(void)
 {
 	//Initialize and configure the SD cards
-	printmsg("Setting Up Flash Chips...\r\n");
-	uint8_t status;
+	printmsg("Setting Up SD Cards...\r\n");
 
-	uint32_t backup_val;
+	uint32_t backup_wave_dir;
+	uint32_t backup_wave_log;
+	uint32_t backup_gps_dir;
+	uint32_t backup_gps_log;
+
+	backup_wave_dir = waveDirNo;
+	backup_wave_log = waveLogNo;
+	backup_gps_dir = gpsDirNo;
+	backup_gps_log = gpsLogNo;
 
 
-	//Store Chip status variable in RTC->BCKUP byte 0 : chip status, byte 1 : active chip, byte 2: back up chip
+	//Store current SD and log numbers variable in RTC->BCKUP//
 	 __HAL_RCC_PWR_CLK_ENABLE();
-	 RTC->BKP1R = backup_val;
+	 RTC->BKP1R = backup_wave_dir;
+	 RTC->BKP2R = backup_wave_log;
+	 RTC->BKP3R = backup_gps_dir;
+     RTC->BKP4R = backup_gps_log;
 	 __HAL_RCC_PWR_CLK_DISABLE();
 
 	 /* Test Iridium Modem */

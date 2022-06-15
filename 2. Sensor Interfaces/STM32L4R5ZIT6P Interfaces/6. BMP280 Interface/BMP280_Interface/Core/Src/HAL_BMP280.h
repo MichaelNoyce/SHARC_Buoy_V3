@@ -237,7 +237,7 @@ typedef struct
 //======================== 3. Macro Definitions =========================================
 
 //SPI Definitions
-#define SPI_CS_Pin GPIO_PIN_7
+#define SPI_CS_Pin GPIO_PIN_4
 #define SPI_CS_GPIO_Port GPIOA
 
 /*
@@ -321,7 +321,7 @@ typedef struct
 #define BMP280_Soft_Reset 0xB6		//Causes device to reset when written to the reset register
 #define BMP280_SPI_READ 0x80		//SPI READ COMMAND
 #define BMP280_SPI_WRITE 0x7F		//SPI WRITE COMMAND
-#define BMP280_ID 0x58				//Device ID
+#define BMP280_ID 0x60			//Device ID
 #define __SPI_CS_ENABLE()	(SPI_CS_GPIO_Port->ODR) &= ~ SPI_CS_Pin	//SETS CHIP SELECT ENABLED
 #define __SPI_CS_DISABLE()	(SPI_CS_GPIO_Port->ODR) |=  SPI_CS_Pin	//SETS CHIP SELECT DISABLED
 

@@ -103,7 +103,6 @@ uint32_t gpsDirNo;
 
 //============================= 6. Handlers ===============================================
 
-CRC_HandleTypeDef hcrc;
 
 UART_HandleTypeDef hlpuart1;
 

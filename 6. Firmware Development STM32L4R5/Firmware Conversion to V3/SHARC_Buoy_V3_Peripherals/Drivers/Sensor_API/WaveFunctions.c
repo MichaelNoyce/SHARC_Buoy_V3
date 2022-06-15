@@ -8,7 +8,6 @@
 
 /*User Includes-------------------------------------------------*/
 #include "WaveFunctions.h"
-#include "waveData.h"
 #include "HAL_SD.h"
 /*End User Includes--------------------------------------------*/
 
