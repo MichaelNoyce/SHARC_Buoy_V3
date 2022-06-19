@@ -118,7 +118,7 @@ typedef struct
 
 #define __WEEKS_TO_SECS(x) x*__DAYS_TO_SECS(7)  //for Twake > 6 days
 
-#define T_SLEEP __MINS_TO_SECS(30)	//set the sleep period in seconds
+#define T_SLEEP __MINS_TO_SECS(3600-Sample_Time)	//set the sleep period in seconds
 /*
  * @brief: state machine Macros
  */
@@ -224,6 +224,8 @@ UART_HandleTypeDef hlpuart1;
 //uint32_t time;
 Buoy_State_typedef Current_State;
 uint8_t Sample_On,sample_count,IMU_On;
+uint32_t Sample_Time_Start; //used to measure length of Routine_STATE_SAMPLE
+uint32_t Sample_Time; //used to measure length of Routine_STATE_SAMPLE
 /* Private function prototypes -----------------------------------------------*/
 
 /*

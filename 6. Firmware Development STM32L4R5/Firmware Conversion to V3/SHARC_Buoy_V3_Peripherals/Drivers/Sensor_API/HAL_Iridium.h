@@ -155,28 +155,28 @@ typedef struct
 //======================== 3. Macro Definitions =========================================
 
 //GPIO Pins
-#define IR_OnOff_Pin GPIO_PIN_7				//ONOFF Control pin
-#define IR_Ring_Pin GPIO_PIN_13				//Ring Indicator Pin
-#define IR_NetAv_Pin GPIO_PIN_11				//Network Available Pin
+#define IR_OnOff_Pin GPIO_PIN_1				//ONOFF Control pin
+#define IR_Ring_Pin GPIO_PIN_3				//Ring Indicator Pin
+#define IR_NetAv_Pin GPIO_PIN_2				//Network Available Pin
 
 //GPIO Ports
 #define IR_OnOff_GPIO_Port GPIOC				//ONOFF GPIO PORT
-#define IR_Ring_GPIO_Port GPIOC				//RING INDICATOR GPIO PORT
-#define IR_NetAv_GPIO_Port GPIOA				//NETWORK AVAILABILITY GPIO PORT
+#define IR_Ring_GPIO_Port GPIOF				//RING INDICATOR GPIO PORT
+#define IR_NetAv_GPIO_Port GPIOF				//NETWORK AVAILABILITY GPIO PORT
 
 
 #define IR_OnOff_PWR_GPIO_Port PWR_GPIO_C		//ONOFF PWR Port
 
 //IRQn Definitions
-#define IR_Ring_EXTI_IRQn EXTI15_10_IRQn		//RING INDICATOR IRQn Line
-#define IR_NetAv_EXTI_IRQn  EXTI9_5_IRQn		//NETWORK AVAILABILTY IRQN LINE
+#define IR_Ring_EXTI_IRQn EXTI2_IRQn		//RING INDICATOR IRQn Line
+#define IR_NetAv_EXTI_IRQn  EXTI3_IRQn		//NETWORK AVAILABILTY IRQN LINE
 
 //USART Definitions
-#define IR_USART_PORT UART5						//IRIDIUM USART PERIPHERAL
-#define IR_TX_Pin GPIO_PIN_12					//IRIDIUM USART TX PIN
-#define IR_RX_Pin GPIO_PIN_2					//IRIDIUM USART RX PIN
+#define IR_USART_PORT USART3					//IRIDIUM USART PERIPHERAL
+#define IR_TX_Pin GPIO_PIN_4					//IRIDIUM USART TX PIN
+#define IR_RX_Pin GPIO_PIN_5					//IRIDIUM USART RX PIN
 #define IR_TX_GPIO_Port GPIOC					//IRIDIUM USART TX GPIO PORT
-#define IR_RX_GPIO_Port GPIOD					//IRIDIUM USART RX GPIO PORT
+#define IR_RX_GPIO_Port GPIOC					//IRIDIUM USART RX GPIO PORT
 
 //TIM Definitions
 #define IR_TIM_PORT TIM3						//IRIDIUM TIMER PERIPHERAL
@@ -195,12 +195,9 @@ uint32_t IR_length;			//Recieved USART data length
 uint32_t msg_len;				//AT return message length
 
 //============================= 5. Handlers =============================================
+UART_HandleTypeDef huart3;
+DMA_HandleTypeDef hdma_usart3_rx;
 TIM_HandleTypeDef htim3;
-
-UART_HandleTypeDef huart5;
-
-DMA_HandleTypeDef hdma_uart5_rx;
-
 DMA_HandleTypeDef hdma_memtomem_dma1_channel2;
 
 //============================ 6. Data Buffers ==========================================
@@ -259,6 +256,20 @@ IR_Status_t IR_DeInit_Module(void);
  */
 IR_Status_t IR_send_AT_CMD(char* cmd);
 
+/*
+ * Function Name IR_Status_t send_AT_CMD_Bin(uint8_t* cmd,size_t len);
+ *
+ * @brief: Sends an AT Command in Binary Representation to the Iridium Modem over USART. The device then recieves the return message
+ * 		   based on the command. If the return message is valid, the message will be stored in the RM_Buffer. This
+ * 		   function uses the USART DMA in a circular buffer with Slave reset to allow for variable data to be sent
+ * 		   through the DMA
+ *
+ * @param: cmd - AT binary sequence. Must contain a 0x0D terminator
+ * @param: len - number of bytes in the message sequence
+ *
+ * @return: IR_Status_t return status of the function
+ */
+IR_Status_t IR_send_AT_CMD_Bin(uint8_t* cmd,size_t len);
 
 /*
  * Function Name IR_Status_t get_Signal_Strength(uint8_t* signal_Strength);

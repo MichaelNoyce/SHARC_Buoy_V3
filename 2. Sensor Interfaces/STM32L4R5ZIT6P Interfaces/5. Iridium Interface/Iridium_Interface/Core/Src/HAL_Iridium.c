@@ -471,12 +471,12 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 
 {
 
-	printmsg("IR_send_AT_CMD entered \r\n");
+	//printmsg("IR_send_AT_CMD entered \r\n");
 
 	int size = strlen(cmd);
 	memcpy(IR_TX_Buffer,cmd,size);
 
-	printmsg("memcpy success \r\n");
+	//printmsg("memcpy success \r\n");
 
 	if(HAL_UART_Transmit(&huart3,IR_TX_Buffer,size,100) != HAL_OK)
 	{
@@ -485,7 +485,7 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 	}
 	else
 	{
-	printmsg("UART Transmit OK \r\n");
+	//printmsg("UART Transmit OK \r\n");
 	}
 
 	__HAL_DMA_ENABLE_IT(&hdma_usart3_rx,DMA_IT_TC);
@@ -498,9 +498,9 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 	__HAL_TIM_ENABLE_IT(&htim3,TIM_IT_CC1);
 	HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_Base_Start_IT(&htim3);
-	printmsg("While loop starting");
+	//printmsg("While loop starting");
 	while(IR_RX_Flag == RESET);
-	printmsg("While loop ended");
+	//printmsg("While loop ended");
 	if(IR_RX_Flag == -2)
 	{
 		printmsg("IR_Rx_Timeout \r\n");
@@ -654,7 +654,7 @@ IR_Status_t IR_send_Bin_String(uint8_t* bin_string,uint32_t len)
 	 	 }
 	  //decode return pack
 	  //return status
-
+	  printmsg("Message upload error \r\n");
 	  return IR_MSG_UPLOAD_ERROR;
 }
 
@@ -903,7 +903,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 
 			    if(len > 0)
 			    {
-			    	printmsg("Length greater than 0");
+			    	//printmsg("Length greater than 0");
 			    	__HAL_DMA_ENABLE_IT(&hdma_memtomem_dma1_channel2,DMA_IT_TC);
 			    	if(Session_Flag == SBDWB || Session_Flag == SBDRT)
 			    	{

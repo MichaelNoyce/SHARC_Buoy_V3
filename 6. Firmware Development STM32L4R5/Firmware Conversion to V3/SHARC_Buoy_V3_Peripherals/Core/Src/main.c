@@ -30,6 +30,7 @@
 #include "HAL_ICM20649.h"
 #include "HAL_SD.h"
 #include "stm32l4xx_hal.h"	//HAL library
+#include "waveFunctions.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +56,7 @@
  uint8_t IR_On = 0; //flag to show if Iridium is online
 
  uint8_t wavebuffer[WAVEBUFFER_SIZE];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,188 +143,190 @@ int main(void)
 	//GPIO_Set_Pin_LP();		//Configure all unused GPIO pins to low Power mode
 	Init_Debug();			// initialize debug peripherals
 
-	printmsg("SHARC BUOY STARTING!");
+	printmsg("SHARC BUOY STARTING! \r\n");
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
 
 //=================================== 1. END ====================================//
 
-//======================= 2. POWER AND RESET STATE CHECK ========================//
+	//======================= 2. POWER AND RESET STATE CHECK ========================//
 
-	/*
-	 * When system powers on, check for any asynchronous resets that
-	 * may have occured. Use this area to add in any reset handling
-	 */
-		if(__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST) == SET)
-		{
-		  BOR_Handler();
-		}
-		uint8_t flag = __HAL_RCC_GET_PORRST_FLAG();
-		if(flag  == SET)
-		{
-		  printmsg("Software Reset Detected. Initializing main program...\r\n");
-		  POR_Handler();
-		}
-//=================================== 2. END ====================================//
+		/*
+		 * When system powers on, check for any asynchronous resets that
+		 * may have occured. Use this area to add in any reset handling
+		 */
+			if(__HAL_RCC_GET_FLAG(RCC_FLAG_BORRST) == SET)
+			{
+			  BOR_Handler();
+			}
+			uint8_t flag = __HAL_RCC_GET_PORRST_FLAG();
+			if(flag  == SET)
+			{
+			  printmsg("Software Reset Detected. Initializing main program...\r\n");
+			  POR_Handler();
+			}
+	//=================================== 2. END ====================================//
 
 
-	  /* Infinite loop START */
-	  while (1)
-	  {
-
-//========================= 3. ASYNCHRONOUS STATE CHECK ===========================//
-
-		  /*
-		   * If an interrupt occurred while the device was sleeping, check the
-		   * flags to determine if this occurred
-		   */
-
-		  //check for interrupts on wake up pins during deep sleep
-		  __HAL_RCC_PWR_CLK_ENABLE();
-		  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG)|| __HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))
+		  /* Infinite loop START */
+		  while (1)
 		  {
-			  Current_State = __GET_PREV_STATE();			//get previous state from back up reg
-			  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG))
-			  {
-				  __HAL_PWR_CLEAR_FLAG(IMU_EVENT_WAKE_FLAG);	//clear  flag in PWR SR
-				  Routine_ASYNC_IMU_EVENT();				//Perform IMU Event Detection Routine
-			  }
-			  if(__HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))	//clear  flag in PWR SR
-			  {
-				__HAL_PWR_CLEAR_FLAG(IRIDIUM_RING_WAKE_FLAG);
-				Routine_ASYNC_IRIDIUM_RX();
 
-			  }
-			  if(Current_State == STATE_SLEEP)				//return to sleep if Interrupt event handled before wake up
-			  {
+	//========================= 3. ASYNCHRONOUS STATE CHECK ===========================//
 
-				  printmsg("System Going Back To Sleep\r\n"); 	//check how long device was asleep for
-				  set_WUP_Pin(IMU_EVENT_WAKE_PIN, MODE_WUP);	//reenable wake up pins
-				  Go_To_Sleep(STDBY,T_SLEEP);						//return to sleep
-			  }
-			  	 else
-			  {
-
-			  	  printmsg("Going Back to Main Loop:\r\n");		//if come from wake mode
-				  __SET_CURRENT_STATE(STATE_ASYNCINT);
-			  }
-		  }
-
-//=================================== 3. END ====================================//
-
-//=========================== 4. SYSTEM STATE CHECK =============================//
-		  	  /*
-		  	   * Main Loop state detection: use this area to implement state
-		  	   * check.States are positive integers written to Back up Register
-		  	   * 0. State functions include Reading/ Writing to Back Up register
-		  	   * determing previous state before sleep and writing state to back up register
-		  	   * states are defined in the enum Buoy_State_typedef. The state check block performs the following routine
-		  	   *
-		  	   */
-
-		  	  //enable access to back up registers
-		  	  switch(__GET_PREV_STATE())
-		  	  {
-		  	  	 case STATE_ASYNCINT:
-		  	  	 case STATE_RESET:
-		  	  	 //system encountered a power on reset, put peripherals here
-		  	  	 Current_State = STATE_SAMPLE;
-		  	  	 break;
-
-		  	  	 case STATE_SAMPLE:
-		  	  	 //check how many samples have been recorded by the Buoy
-		  	  	 sample_count = __GET_SAMPLE_COUNT();
-		  	  	 if(sample_count > 3)
-		  	  	 {
-		  	  		 //set next Buoy State to Transmit
-		  	  		 Current_State = STATE_TRANSMIT;
-		  	  		 IMU_On = 1;
-		  	  	 }
-		  	  	 // Set Buoy Next state to Sleep
-		  	  	 else
-		  	  	 {
-		  	  		 IMU_On = 0;
-		  	  		 Current_State = STATE_SLEEP;
-		  	  		 __HAL_RCC_PWR_CLK_ENABLE();
-		  	  		 __SET_CURRENT_STATE(Current_State);
-		  	  		 __HAL_RCC_PWR_CLK_DISABLE();
-		  	  	 }
-		  	  	 break;
-
-		  	  	 case STATE_SLEEP:
-		  	  	hrtc.Instance = RTC;					 			//attach RTC instance to handler
-		  	  	HAL_PWREx_DisableInternalWakeUpLine();				//clear wake up pending interrupt from internal wake up
-		  	  	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);					//clear pending interrupt from ext wake up pins
-		  	  	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
-		  		set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI); 	  		//reconfigure wake up pins
-		  	  	Current_State = STATE_SAMPLE;
-		  	  	 break;
-
-		  	  	 case STATE_TRANSMIT:
-		  	  	 Current_State = STATE_SLEEP;
-		    		 __SET_CURRENT_STATE(Current_State);
-		  	  	 break;
-
-		  	  	 //default case: reset state
-		  	  	 default:
-		  	  	 Current_State = STATE_INIT;
-		  	  }
-		  	  __HAL_RCC_PWR_CLK_DISABLE();
-
-//=================================== 4. END ====================================//
-
-//============================== 5. STATE FUNCTIONS =============================//
-
-		  	  /*
-		  	   * Place Routine code Here
-		  	   */
-		  	  if(Current_State == STATE_INIT)
-		  	  {
-		  		  Routine_Init_STATE();
-		  		  Current_State = STATE_RESET;
-		  	  }
-
-		  	  if(Current_State == STATE_RESET)
-		  	  {
-		  	  	Routine_STATE_RESET();
-		  	  }
-		  	  // SLEEP STATE
-		  	  else if(Current_State == STATE_SLEEP)
-		  	  {
-		  		  Routine_STATE_SLEEP();
-		  	  }
-		  	  //RESET STATE
-
-		  	  //SAMPLE STATE
-		  	  else if(Current_State == STATE_SAMPLE)
-		  	  {
-		  		  Routine_STATE_SAMPLE();
-		  	  }
-		  	  //TRANSMIT STATE
-		  	  else if(Current_State == STATE_TRANSMIT)
-		  	  {
-		  		  Routine_STATE_TRANSMIT();
-		  	  }
-		  	  // ADDITONAL STATE FUNCTIONS HERE:
-
-//=================================== 5. END ====================================//
-//========================= 6. END OF ROUTINE FUNCTION ==========================//
 			  /*
-			   * After each routine has run, save state to the back up registers
+			   * If an interrupt occurred while the device was sleeping, check the
+			   * flags to determine if this occurred
 			   */
+
+			  //check for interrupts on wake up pins during deep sleep
 			  __HAL_RCC_PWR_CLK_ENABLE();
-			  if(Current_State == STATE_SAMPLE)			//increment sample counter after each sampe
+			  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG)|| __HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))
 			  {
-				  sample_count = __GET_SAMPLE_COUNT();
-				  __SET_SAMPLE_COUNT(++sample_count);
+				  Current_State = __GET_PREV_STATE();			//get previous state from back up reg
+				  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG))
+				  {
+					  __HAL_PWR_CLEAR_FLAG(IMU_EVENT_WAKE_FLAG);	//clear  flag in PWR SR
+					  Routine_ASYNC_IMU_EVENT();				//Perform IMU Event Detection Routine
+				  }
+				  if(__HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))	//clear  flag in PWR SR
+				  {
+					__HAL_PWR_CLEAR_FLAG(IRIDIUM_RING_WAKE_FLAG);
+					Routine_ASYNC_IRIDIUM_RX();
+
+				  }
+				  if(Current_State == STATE_SLEEP)				//return to sleep if Interrupt event handled before wake up
+				  {
+
+					  printmsg("System Going Back To Sleep\r\n"); 	//check how long device was asleep for
+					  set_WUP_Pin(IMU_EVENT_WAKE_PIN, MODE_WUP);	//reenable wake up pins
+					  Go_To_Sleep(STDBY,T_SLEEP);						//return to sleep
+				  }
+				  	 else
+				  {
+
+				  	  printmsg("Going Back to Main Loop:\r\n");		//if come from wake mode
+					  __SET_CURRENT_STATE(STATE_ASYNCINT);
+				  }
 			  }
 
+	//=================================== 3. END ====================================//
 
-			  __SET_CURRENT_STATE(Current_State);	    //write value to back up register
-			  __HAL_RCC_PWR_CLK_DISABLE();
+	//=========================== 4. SYSTEM STATE CHECK =============================//
+			  	  /*
+			  	   * Main Loop state detection: use this area to implement state
+			  	   * check.States are positive integers written to Back up Register
+			  	   * 0. State functions include Reading/ Writing to Back Up register
+			  	   * determing previous state before sleep and writing state to back up register
+			  	   * states are defined in the enum Buoy_State_typedef. The state check block performs the following routine
+			  	   *
+			  	   */
 
-//=================================== 6. END ====================================//
-	 }
-		/* Infinite loop END*/
+			  	  //enable access to back up registers
+			  	  switch(__GET_PREV_STATE())
+			  	  {
+			  	  	 case STATE_ASYNCINT:
+			  	  	 case STATE_RESET:
+			  	  	 //system encountered a power on reset, put peripherals here
+			  	  	 Current_State = STATE_SAMPLE;
+			  	  	 break;
+
+			  	  	 case STATE_SAMPLE:
+			  	  	 //check how many samples have been recorded by the Buoy
+			  	  	 sample_count = __GET_SAMPLE_COUNT();
+			  	  	 if(sample_count > 3)
+			  	  	 {
+			  	  		 //set next Buoy State to Transmit
+			  	  		 Current_State = STATE_TRANSMIT;
+			  	  		 IMU_On = 1;
+			  	  	 }
+			  	  	 // Set Buoy Next state to Sleep
+			  	  	 else
+			  	  	 {
+			  	  		 IMU_On = 0;
+			  	  		 Current_State = STATE_SLEEP;
+			  	  		 __HAL_RCC_PWR_CLK_ENABLE();
+			  	  		 __SET_CURRENT_STATE(Current_State);
+			  	  		 __HAL_RCC_PWR_CLK_DISABLE();
+			  	  	 }
+			  	  	 break;
+
+			  	  	 case STATE_SLEEP:
+			  	  	hrtc.Instance = RTC;					 			//attach RTC instance to handler
+			  	  	HAL_PWREx_DisableInternalWakeUpLine();				//clear wake up pending interrupt from internal wake up
+			  	  	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);					//clear pending interrupt from ext wake up pins
+			  	  	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+			  		set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI); 	  		//reconfigure wake up pins
+			  	  	Current_State = STATE_SAMPLE;
+			  	  	 break;
+
+			  	  	 case STATE_TRANSMIT:
+			  	  	 Current_State = STATE_SLEEP;
+			    		 __SET_CURRENT_STATE(Current_State);
+			  	  	 break;
+
+			  	  	 //default case: reset state
+			  	  	 default:
+			  	  	 Current_State = STATE_INIT;
+			  	  }
+			  	  __HAL_RCC_PWR_CLK_DISABLE();
+
+	//=================================== 4. END ====================================//
+
+	//============================== 5. STATE FUNCTIONS =============================//
+
+			  	  /*
+			  	   * Place Routine code Here
+			  	   */
+			  	  if(Current_State == STATE_INIT)
+			  	  {
+			  		  Routine_Init_STATE();
+			  		  Current_State = STATE_RESET;
+			  	  }
+
+			  	  if(Current_State == STATE_RESET)
+			  	  {
+			  	  	Routine_STATE_RESET();
+			  	  }
+			  	  // SLEEP STATE
+			  	  else if(Current_State == STATE_SLEEP)
+			  	  {
+			  		  Routine_STATE_SLEEP();
+			  	  }
+			  	  //RESET STATE
+
+			  	  //SAMPLE STATE
+			  	  else if(Current_State == STATE_SAMPLE)
+			  	  {
+			  		  Routine_STATE_SAMPLE();
+			  	  }
+			  	  //TRANSMIT STATE
+			  	  else if(Current_State == STATE_TRANSMIT)
+			  	  {
+			  		  Routine_STATE_TRANSMIT();
+			  	  }
+			  	  // ADDITONAL STATE FUNCTIONS HERE:
+
+	//=================================== 5. END ====================================//
+	//========================= 6. END OF ROUTINE FUNCTION ==========================//
+				  /*
+				   * After each routine has run, save state to the back up registers
+				   */
+				  __HAL_RCC_PWR_CLK_ENABLE();
+				  if(Current_State == STATE_SAMPLE)			//increment sample counter after each sampe
+				  {
+					  sample_count = __GET_SAMPLE_COUNT();
+					  __SET_SAMPLE_COUNT(++sample_count);
+				  }
+
+
+				  __SET_CURRENT_STATE(Current_State);	    //write value to back up register
+				  __HAL_RCC_PWR_CLK_DISABLE();
+
+	//=================================== 6. END ====================================//
+		 }
+			/* Infinite loop END*/
+
+
 }
 
 //==================== 7. Configuration & Initialization Functions ====================//
@@ -412,15 +416,10 @@ static void Routine_STATE_RESET(void)
 	 //initialise RTC
 	 MX_RTC_Init();
 	 //Enable Interrupt pins as EXTI Outputs
-	 set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI);
+	 //set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI);
 	 printmsg("Device Online!\r\n");
 	 printmsg("Current State: RESET \t Next State: SAMPLE\r\n");
 	 HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-	 waveDirNo = 1; // Reset sets initial directory values
-	 waveLogNo = 1;
-	 gpsDirNo = 1;
-	 gpsLogNo = 1;
-
 
 }
 
@@ -434,6 +433,36 @@ static void Routine_STATE_SLEEP(void)
 
 static void Routine_STATE_SAMPLE(void)
 {
+	//Initialize RTC struct to get current time
+	RTC_TimeTypeDef gTime;
+
+	//Log initial time
+	Sample_Time_Start = HAL_GetTick();
+
+	//Get Previous Directory and Log Numbers for SD Cards
+	  __HAL_RCC_PWR_CLK_ENABLE();
+	  waveLogNo = (RTC->BKP0R)&0xFF;
+	  waveDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  gpsLogNo = (RTC->BKP0R)&0xFF;
+	  gpsDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  envLogNo = (RTC->BKP0R)&0xFF;
+	  envDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  pwrLogNo = (RTC->BKP0R)&0xFF;
+	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  __HAL_RCC_PWR_CLK_ENABLE();
+
+
+
+	//SD Init Routine
+	if(SD_Init()==SD_OK)
+	{
+		printmsg("SD Card online \r\n");
+	}
+	else
+	{
+		printmsg("SD Card offline \r\n");
+	}
+
 	  //GPS  Init Routine
 	  GPS_Data_t Gdata;
 	  sample_count = __GET_SAMPLE_COUNT();
@@ -447,52 +476,64 @@ static void Routine_STATE_SAMPLE(void)
 	  }
 
 	  /* Attempt to initialize sensor within a number of retries */
-	  uint8_t retries = 0;
-	  do
-	  {
-		  //initialise gps peripherals and begin comms on sensor instance
-		  if(init_GPS(&hgps)== GPS_Init_OK)
+		  uint8_t retries = 0;
+		  do
 		  {
-			 printmsg("GPS Online! Acquiring Signal...\r\n");
-			 GPS_On = 1;
-			 break;
-		  }
-		deinit_GPS(&hgps);
-		retries++;
-	  }
-	  while (retries < GPS_INIT_RETRIES);
-
-	  // Sample Routine
-
-	  if(GPS_On)
-	  {
-		  	  int x = HAL_GetTick();
-			  while(packet_full != 7)
+			  //initialise gps peripherals and begin comms on sensor instance
+			  if(init_GPS(&hgps)== GPS_Init_OK)
 			  {
-				  GPS_Log_Begin();
-				  int y = HAL_GetTick()- x;
-				  if(y >  30000) //30s to acquire signal
-				  {
-					  printmsg("Failed to Acquire Signal\r\n");
-					  break;
-				  }
-
+				 printmsg("GPS Online! Acquiring Signal...\r\n");
+				 GPS_On = 1;
+				 break;
 			  }
-			  GPS_Log_Stop();
-			  printmsg("Logging Data...\r\n");
-			  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-			  Gdata.coordinates = GPS_coord;
-			  Gdata.Etime = eTime;
-			  Gdata.diag = diag;
-			  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-			  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision);
-			  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
+			deinit_GPS(&hgps);
+			retries++;
+		  }
+		  while (retries < GPS_INIT_RETRIES);
 
-		  deinit_GPS(&hgps);
-	  }else
-	  {
-		  printmsg("Error GPS Not Found!\r\n");
-	  }
+		  // Sample Routine
+
+		  if(GPS_On)
+		  {
+			  	  int x = HAL_GetTick();
+				  while(packet_full != 7)
+				  {
+					  GPS_Log_Begin();
+					  int y = HAL_GetTick()- x;
+					  if(y >  30000) //30s to acquire signal
+					  {
+						  printmsg("Failed to Acquire Signal\r\n");
+						  break;
+					  }
+
+				  }
+				  GPS_Log_Stop();
+				  printmsg("Logging Data...\r\n");
+				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+				  Gdata.coordinates = GPS_coord;
+				  Gdata.Etime = eTime;
+				  Gdata.diag = diag;
+				  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
+				  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
+				  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
+
+			  deinit_GPS(&hgps);
+		  }else
+		  {
+			  printmsg("Error GPS Not Found!\r\n");
+		  }
+
+		  // Record all GPS data onto SD cards
+		  uint8_t tempGPSBuf[500];
+		  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
+		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+		  sprintf(tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.Etime, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
+		  SD_File_Write(&File, tempGPSBuf);
+		  SD_File_Close(&File);
+		  SD_Unmount(SDFatFs);
+
+
+
 	  // Environmental Sensor Init Routine
 	  BMP_Init_Typedef BMP_InitStruct = {0};
 	  //configure device for environmental sensing
@@ -506,7 +547,7 @@ static void Routine_STATE_SAMPLE(void)
 		  //create variables
 		  uint32_t temp,press;
 		  int32_t t_fine;
-		  for (int i = 0; i < 60; ++i)
+		  for (int i = 0; i < 60; ++i) //60 second compensation period for averaging
 		  {
 			BMP280_Force_Measure(&temp,&press);		//trigger conversion
 			Gdata.env_Temp = BMP280_Compensate_Temp(temp,&t_fine,bmp.Factory_Trim);			//compensate temperature
@@ -516,6 +557,19 @@ static void Routine_STATE_SAMPLE(void)
 		  }
 		  printmsg("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
 	  }
+
+
+	  //Store environmental samples
+	  uint8_t tempENVBuf[200];
+	  SD_ENV_Open(&File, &Dir, &fno,envDirNo, envLogNo);
+	  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	  sprintf(tempENVBuf, "%d:%d:%d, %ld, %lu \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.env_Temp, Gdata.atm_Press);
+	  SD_File_Write(&File, tempGPSBuf);
+	  SD_File_Close(&File);
+	  SD_Unmount(SDFatFs);
+	  envDirNo++;
+	  envLogNo++;
+
 
 	  //INA219 Sample Routine
 	  if(INA219_Init_Sensor() == INA_OK)
@@ -533,13 +587,24 @@ static void Routine_STATE_SAMPLE(void)
 		  printmsg("V_Shunt %d mV V_Bus %d mV Current %d mA Power %d mW\r\n",Gdata.shunt_v,Gdata.bus_v, Gdata.current,Gdata.power);
 	  }
 
+	  uint8_t tempPWRBuf[200];
+	  SD_ENV_Open(&File, &Dir, &fno,pwrDirNo, pwrLogNo);
+	  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	  sprintf(tempPWRBuf, "%d:%d:%d, %d, %d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.shunt_v, Gdata.bus_v, Gdata.current, Gdata.power);
+	  SD_File_Write(&File, tempGPSBuf);
+	  SD_File_Close(&File);
+	  SD_Unmount(SDFatFs);
+	  pwrDirNo++;
+	  pwrLogNo++;
+
+
 	  /* High Frequency IMU sampling */
 
+	  //Temporary variables related to IMU sampling
 	  int32_t accelTemp[3];
 	  int32_t gyroTemp[3];
 	  uint8_t tempFIFOBuf[500];
 	  uint8_t imu[12] = {0};
-	  RTC_TimeTypeDef gTime;
 	  uint8_t data_status;
 
 	  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
@@ -578,7 +643,7 @@ static void Routine_STATE_SAMPLE(void)
 					   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
 					   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
 
-					   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
+					   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
 					   SD_File_Write(&File, tempFIFOBuf);
 
 					   imu_sample_count++;
@@ -606,14 +671,44 @@ static void Routine_STATE_SAMPLE(void)
 		  ICM20649_Deinit_IMU();
 		  SD_Unmount(SDFatFs);
 
+	//Store updated directory and log numbers
+	  __HAL_RCC_PWR_CLK_ENABLE();
+	  WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF00)|(waveLogNo));
+	  WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF)|((waveDirNo)<<8));
+	  WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF00)|(gpsLogNo));
+	  WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF)|((gpsDirNo)<<8));
+      WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF00)|(envLogNo));
+	  WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF)|((envDirNo)<<8));
+	  WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF00)|(pwrLogNo));
+	  WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF)|((pwrDirNo)<<8));
+	  __HAL_RCC_PWR_CLK_DISABLE();
+
+	  Sample_Time = HAL_GetTick() - Sample_Time_Start;
+
 }
 
 
 static void Routine_STATE_TRANSMIT(void)
 {
+
 	  printmsg("Current State: TRANS \t Next State: SLEEP\r\n");
 
+	  //Transfer Buffer
+	  uint8_t trans_Buffer[256];
+
 	  //Enable SD card interface
+	  SD_Init();
+
+	  //Calculate wave parameter extraction
+	  Wave_Data_t waveData;
+	  fullPipeline(waveData, waveDirNo);
+
+	  //Read in values to transmit buffer
+
+
+
+	  //Dismount SD cards!
+	  SD_Unmount(SDFatFs);
 
 	  uint8_t retry = 0;
 	  IR_On = 1;
@@ -633,13 +728,6 @@ static void Routine_STATE_TRANSMIT(void)
 
 		  printmsg("Preparing To Transmit...");
 		  //getlength of data
-
-		  uint8_t trans_Buffer[256];
-
-		  /* Load data Frome Memory*/
-		 /* FLASH_SetAddress(0x00,0x00,0x01);
-		 memcpy(trans_Buffer,FLASH_READ_BufferHF(chip,BUFFER1),256);*/
-
 
 
 		  /* 3. Upload Drift Data */
@@ -683,6 +771,7 @@ static void Routine_STATE_TRANSMIT(void)
   __SET_SAMPLE_COUNT(0);
   //erase page and reset counter
 
+
 }
 
 static void Routine_Init_STATE(void)
@@ -690,23 +779,26 @@ static void Routine_Init_STATE(void)
 	//Initialize and configure the SD cards
 	printmsg("Setting Up SD Cards...\r\n");
 
-	uint32_t backup_wave_dir;
-	uint32_t backup_wave_log;
-	uint32_t backup_gps_dir;
-	uint32_t backup_gps_log;
-
-	backup_wave_dir = waveDirNo;
-	backup_wave_log = waveLogNo;
-	backup_gps_dir = gpsDirNo;
-	backup_gps_log = gpsLogNo;
-
+	//Initial log and directory values for SD cards
+	waveLogNo = 1;
+	waveDirNo = 1;
+	gpsLogNo = 1;
+	gpsDirNo = 1;
+	envLogNo = 1;
+	envDirNo = 1;
+	pwrLogNo = 1;
+	pwrDirNo = 1;
 
 	//Store current SD and log numbers variable in RTC->BCKUP//
 	 __HAL_RCC_PWR_CLK_ENABLE();
-	 RTC->BKP1R = backup_wave_dir;
-	 RTC->BKP2R = backup_wave_log;
-	 RTC->BKP3R = backup_gps_dir;
-     RTC->BKP4R = backup_gps_log;
+	 WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF00)|(waveLogNo));
+	 WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF)|((waveDirNo)<<8));
+	 WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF00)|(gpsLogNo));
+	 WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF)|((gpsDirNo)<<8));
+     WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF00)|(envLogNo));
+	 WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF)|((envDirNo)<<8));
+     WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF00)|(pwrLogNo));
+	 WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF)|((pwrDirNo)<<8));
 	 __HAL_RCC_PWR_CLK_DISABLE();
 
 	 /* Test Iridium Modem */
@@ -749,19 +841,26 @@ static void Routine_Init_STATE(void)
 		 printmsg("Current Monitor Offline!\r\n");
 	 }
 
-	 /* Test MPU6050 Sensor */
-
-	/* if(MPU6050_Init_MPU(GYRO_CONFIG_FSSEL_500DPS,ACC_CONFIG_AFSSEL_2G,CONFIG_DLFP_2) == MPU_OK)
+	 /* Test SD Cards */
+	 if(SD_Init() == SD_OK)
 	 {
-		 printmsg("IMU Online\r\n");
-		 //perform self-test
-		 float test_results[6];
-		 MPU6050_SelfTest(&hi2c1,test_results);
+		 printmsg(" SD Cards Online! \r\n");
+	 }
+	 else
+	 {
+		 printmsg("SD Cards Offline! \r\n");
+	 }
+
+	 /* Test ICM20649 Sensor */
+
+	if(ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) == IMU_OK)
+	 {
+		 printmsg("IMU Online \r\n");
 	 }else
 	 {
-		 printmsg("IMU Offline\r\n");
+		 printmsg("IMU Offline \r\n");
 	 }
-	 MPU6050_Deinit_MPU(); */
+	ICM20649_Deinit_IMU();
 
 }
 //===================================== 9. END ======================================//

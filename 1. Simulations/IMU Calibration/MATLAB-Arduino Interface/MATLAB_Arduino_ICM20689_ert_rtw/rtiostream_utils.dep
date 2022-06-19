@@ -1,0 +1,11 @@
+rtiostream_utils.o: \
+ C:/PROGRA~1/MATLAB/R2021a/toolbox/coder/rtiostream/src/utils/rtiostream_utils.c \
+ C:/PROGRA~1/MATLAB/R2021a/toolbox/coder/rtiostream/src/utils/rtiostream_utils.h \
+ C:/Users/mpnoy/OneDrive/DOCUME~1/MASTER~1/SHARC_~2/1FC8B~1.SIM/IMUCAL~1/MATLAB~1/MATLAB_Arduino_ICM20689_ert_rtw/rtwtypes.h \
+ C:/PROGRA~1/MATLAB/R2021a/toolbox/coder/rtiostream/src/rtiostream.h
+
+C:/PROGRA~1/MATLAB/R2021a/toolbox/coder/rtiostream/src/utils/rtiostream_utils.h:
+
+C:/Users/mpnoy/OneDrive/DOCUME~1/MASTER~1/SHARC_~2/1FC8B~1.SIM/IMUCAL~1/MATLAB~1/MATLAB_Arduino_ICM20689_ert_rtw/rtwtypes.h:
+
+C:/PROGRA~1/MATLAB/R2021a/toolbox/coder/rtiostream/src/rtiostream.h:

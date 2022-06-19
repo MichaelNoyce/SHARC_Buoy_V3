@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <dirs>
+    <entry loc="C:\ST\STM32CubeIDE_1.8.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.jre.win64_2.1.0.202111292251\jre" stamp="1651154119926"/>
     <entry loc="C:\ST\STM32CubeIDE_1.8.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.jre.win64_2.0.100.202110150814" stamp="1641815993981"/>
+    <entry loc="C:\ST\STM32CubeIDE_1.8.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.jre.win64_2.1.0.202111292251" stamp="1651154124209"/>
     <entry loc="C:\ST\STM32CubeIDE_1.8.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.jre.win64_2.0.100.202110150814\jre" stamp="1641815995960"/>
 </dirs>

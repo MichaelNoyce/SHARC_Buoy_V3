@@ -218,7 +218,7 @@ typedef struct
 
 /* Other Defines*/
 
-#define GPS_INIT_RETRIES 100 		//maximum number of attempts to receive an acknowledgment
+#define GPS_INIT_RETRIES 1 		//maximum number of attempts to receive an acknowledgment
 
 
 //========================== 4. Global Variables ==========================================

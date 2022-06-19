@@ -126,7 +126,7 @@ int main(void)
 //==================TEST Transmission==========================//
 	  if(IR_Init_Module() == IR_OK)
 	  {
-		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,SET);
 	  }
   uint8_t msg[24] = "This is A Test in Binary";
   if(IR_send_Bin_String(msg,24) == IR_MSG_UPLOAD_OK)
@@ -140,6 +140,7 @@ int main(void)
 		 		  {
 		 			  //message sent
 		 			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+		 			  printmsg("Message sent!");
 		 		  }
 
 		 }
@@ -157,7 +158,12 @@ int main(void)
   uint8_t strength;
   if(IR_get_Signal_Strength(&strength) == IR_OK)
   {
+	  printmsg("Iridium strength okay! \r\n");
 	  __NOP();
+  }
+  else
+  {
+	  printmsg("Iridium strength issue \r\n");
   }
   IR_DeInit_Module();
 

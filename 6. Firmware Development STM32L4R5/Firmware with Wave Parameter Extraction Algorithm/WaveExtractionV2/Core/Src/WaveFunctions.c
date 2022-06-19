@@ -31,7 +31,7 @@ const float32_t firCoeffs32[NUM_TAPS_ARRAY_SIZE] = {
 void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 {
 
-	float32_t PSD[FFT_LENGTH];
+	float32_t PSD[FFT_LENGTH/2];
 
 	//Welch Method - calls single segment pipeline in function
 	WelchMethod(PSD, WaveDirNo);
@@ -46,6 +46,9 @@ void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 	//PSD Spectra input - wave parameter output
 	//waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 	waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
+
+	//Spectra
+
 
 	printmsg("Hm0 %.8f \r\n", waveData.Hm0);
 	printmsg("Hrms %.8f \r\n", waveData.Hrms);

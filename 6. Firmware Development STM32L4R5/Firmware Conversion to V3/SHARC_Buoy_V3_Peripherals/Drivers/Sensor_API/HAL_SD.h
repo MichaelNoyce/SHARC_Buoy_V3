@@ -94,11 +94,15 @@ uint32_t waveLogNo;
 uint32_t waveDirNo;
 uint32_t gpsLogNo;
 uint32_t gpsDirNo;
+uint32_t envLogNo;
+uint32_t envDirNo;
+uint32_t pwrLogNo;
+uint32_t pwrDirNo;
 
 
 //============================= 5. Defines ===============================================
 
-#define SD_Detect_Pin GPIO_PIN_3
+#define SD_Detect_Pin GPIO_PIN_5
 #define SD_Detect_GPIO_Port GPIOF
 
 //============================= 6. Handlers ===============================================
@@ -144,7 +148,7 @@ sd_status_t SD_Mount(FATFS SDFatFs, char myPath[]);
  */
 sd_status_t SD_Unmount(FATFS SDFatFs);
 
-//======================== 6. SD Read/Write Functions ============================================
+//======================== 8. SD Read/Write/Open Functions ============================================
 
 sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNo);
 
@@ -205,9 +209,6 @@ sd_status_t SD_Wave_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t wavDirN
  */
 sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, uint32_t WaveLogNo,  IMU_Data_SD_t inertialDataType, uint32_t *fpointer);
 
-
-
-
 /**
  * @brief Opens file in GPS file directory
  *
@@ -219,6 +220,31 @@ sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, ui
  */
 sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo, uint8_t GPSLogNo);
 
+
+/**
+ * @brief Opens file in environmental directory
+ *
+ * @param myFile
+ * @param myDir
+ * @param fno
+ * @param ENVDirNo
+ * @param ENVLogNo
+ * @return
+ */
+sd_status_t SD_ENV_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t ENVDirNo, uint8_t ENVLogNo);
+
+
+/**
+ * @brief Opens file in power directory
+ *
+ * @param myFile
+ * @param myDir
+ * @param fno
+ * @param PWRDirNo
+ * @param PWRLogNo
+ * @return
+ */
+sd_status_t SD_PWR_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t PWRDirNo, uint8_t PWRLogNo);
 
 /**
  * @brief

@@ -9,6 +9,8 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2022\Firmware Development\GPS Code\SHARC_M9N_Driver"/>
+			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_Repo_MPN\BouyDev-v2-master (1)\BouyDev-v2-master\1. Firmware\STM32 - HAL Driver code\STM32L4\Buoy_Firmware_V1_2"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with Wave Parameter Extraction Algorithm\WaveExtractionV2"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with HF Mode\Standalone HF Mode\HF_Mode_Standalone"/>
 			<item value="C:\Users\mpnoy\OneDrive\Documents\Masters 2022\Hardware\SD\FatFs_uSD_DMA_Standalone"/>

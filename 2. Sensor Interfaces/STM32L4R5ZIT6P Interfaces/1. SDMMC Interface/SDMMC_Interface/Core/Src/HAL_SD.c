@@ -565,7 +565,7 @@ sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint
 {
 
 	uint8_t dataBuf[60];
-	int maxLen = 60;
+	int maxLen = 500;
 	char diskPath[16]; /* User logical drive path */
 	FSIZE_t fp = *fpointer;
 
@@ -590,21 +590,7 @@ sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint
 				  printmsg("Initial file pointer location %ld \r\n", *fpointer);
 				  f_lseek(myFile, fp);
 
-				  for(int i = 0; i<=1024; i++)
-				  {
-					  f_gets(dataBuf, maxLen, myFile);
-
-					  p = strtok(dataBuf, delim);
-
-					  //Value in string is determined by IMU_data_t enum
-					  for(int i=0; i<GPSDataType; i++)
-					  {
-						  p = strtok(NULL, delim);
-					  }
-
-					  GPSArray[i] = atoi(p);
-
-				  }
+				  f_gets(dataBuf, maxLen, myFile);
 
 				  //store current file pointer location
 				  *fpointer = f_tell(myFile);

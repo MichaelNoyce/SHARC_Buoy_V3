@@ -101,20 +101,6 @@ int main(void)
   MX_GPIO_Init();
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
-   	 GPS_Init_msg_t init_flag;
-  	 int retries = GPS_INIT_RETRIES;  //flag to check if gps was initialised
-  	 while(retries--)
-  	 {
-  	  	 init_flag = init_GPS(&hgps); //init routine - get return status from init function
-  	  	  if(init_flag == GPS_Init_OK)
-  	  	  {
-  	  		  printmsg("GPS initiated! \r\n");
-  	  		  break;
-  	  	  }
-  	  	deinit_GPS(&hgps);
-  	 }
-
-   printmsg("GPS Init error, %d", (int)init_flag);
 
   /* USER CODE END 2 */
 

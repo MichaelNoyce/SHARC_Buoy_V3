@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 #include "fatfs.h"
+#include "HAL_SD.h"
 
 uint8_t retSD;    /* Return value for SD */
 char SDPath[4];   /* SD logical drive path */
@@ -51,7 +52,19 @@ void MX_FATFS_Init(void)
 DWORD get_fattime(void)
 {
   /* USER CODE BEGIN get_fattime */
-  return 0;
+	 RTC_DateTypeDef gDate;
+	 RTC_TimeTypeDef gTime;
+	/* Get the RTC current Time */
+	 HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	/* Get the RTC current Date */
+	 HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
+
+	 return (DWORD)(gDate.Year + 20) << 25 | //Time since 1980
+	            (DWORD)(gDate.Month) << 21 |
+	            (DWORD)(gDate.Date) << 16 |
+	            (DWORD)gTime.Hours << 11 |
+	            (DWORD)gTime.Minutes << 5 |
+	            (DWORD)gTime.Seconds >> 1;
   /* USER CODE END get_fattime */
 }
 
