@@ -1,0 +1,5 @@
+Experiment setup:
+
+1. Spectrum type: JOSNWAP 
+2. Spectral spread, Gamma: 3.3
+3. Wave spread: long crested 

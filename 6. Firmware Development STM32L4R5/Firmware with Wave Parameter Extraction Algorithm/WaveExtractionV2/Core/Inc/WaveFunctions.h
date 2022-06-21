@@ -47,7 +47,7 @@ typedef struct
 	float32_t M0; //0th Spectral moment
 	float32_t M1; //1st spectral moment
 	float32_t M2; //2nd spectral moment
-	uint32_t PSD[40]; //PSD Period in spectral bins
+	float32_t PSD[40]; //PSD Period in spectral bins
 
 }Wave_Data_t;
 
