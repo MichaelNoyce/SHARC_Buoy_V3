@@ -171,47 +171,7 @@ int main(void)
 		  while (1)
 		  {
 
-	//========================= 3. ASYNCHRONOUS STATE CHECK ===========================//
-
-			  /*
-			   * If an interrupt occurred while the device was sleeping, check the
-			   * flags to determine if this occurred
-			   */
-
-			  //check for interrupts on wake up pins during deep sleep
-			  __HAL_RCC_PWR_CLK_ENABLE();
-			  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG)|| __HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))
-			  {
-				  Current_State = __GET_PREV_STATE();			//get previous state from back up reg
-				  if(__HAL_PWR_GET_FLAG(IMU_EVENT_WAKE_FLAG))
-				  {
-					  __HAL_PWR_CLEAR_FLAG(IMU_EVENT_WAKE_FLAG);	//clear  flag in PWR SR
-					  Routine_ASYNC_IMU_EVENT();				//Perform IMU Event Detection Routine
-				  }
-				  if(__HAL_PWR_GET_FLAG(IRIDIUM_RING_WAKE_FLAG))	//clear  flag in PWR SR
-				  {
-					__HAL_PWR_CLEAR_FLAG(IRIDIUM_RING_WAKE_FLAG);
-					Routine_ASYNC_IRIDIUM_RX();
-
-				  }
-				  if(Current_State == STATE_SLEEP)				//return to sleep if Interrupt event handled before wake up
-				  {
-
-					  printmsg("System Going Back To Sleep\r\n"); 	//check how long device was asleep for
-					  set_WUP_Pin(IMU_EVENT_WAKE_PIN, MODE_WUP);	//reenable wake up pins
-					  Go_To_Sleep(STDBY,T_SLEEP);						//return to sleep
-				  }
-				  	 else
-				  {
-
-				  	  printmsg("Going Back to Main Loop:\r\n");		//if come from wake mode
-					  __SET_CURRENT_STATE(STATE_ASYNCINT);
-				  }
-			  }
-
-	//=================================== 3. END ====================================//
-
-	//=========================== 4. SYSTEM STATE CHECK =============================//
+	//=========================== 3. SYSTEM STATE CHECK =============================//
 			  	  /*
 			  	   * Main Loop state detection: use this area to implement state
 			  	   * check.States are positive integers written to Back up Register
@@ -224,7 +184,6 @@ int main(void)
 			  	  //enable access to back up registers
 			  	  switch(__GET_PREV_STATE())
 			  	  {
-			  	  	 case STATE_ASYNCINT:
 			  	  	 case STATE_RESET:
 			  	  	 //system encountered a power on reset, put peripherals here
 			  	  	 Current_State = STATE_SAMPLE;
@@ -233,7 +192,7 @@ int main(void)
 			  	  	 case STATE_SAMPLE:
 			  	  	 //check how many samples have been recorded by the Buoy
 			  	  	 sample_count = __GET_SAMPLE_COUNT();
-			  	  	 if(sample_count > 3)
+			  	  	 if(sample_count > 2)
 			  	  	 {
 			  	  		 //set next Buoy State to Transmit
 			  	  		 Current_State = STATE_TRANSMIT;
@@ -270,9 +229,9 @@ int main(void)
 			  	  }
 			  	  __HAL_RCC_PWR_CLK_DISABLE();
 
-	//=================================== 4. END ====================================//
+	//=================================== 3. END ====================================//
 
-	//============================== 5. STATE FUNCTIONS =============================//
+	//============================== 4. STATE FUNCTIONS =============================//
 
 			  	  /*
 			  	   * Place Routine code Here
@@ -306,8 +265,8 @@ int main(void)
 			  	  }
 			  	  // ADDITONAL STATE FUNCTIONS HERE:
 
-	//=================================== 5. END ====================================//
-	//========================= 6. END OF ROUTINE FUNCTION ==========================//
+	//=================================== 4. END ====================================//
+	//========================= 5. END OF ROUTINE FUNCTION ==========================//
 				  /*
 				   * After each routine has run, save state to the back up registers
 				   */
@@ -322,14 +281,14 @@ int main(void)
 				  __SET_CURRENT_STATE(Current_State);	    //write value to back up register
 				  __HAL_RCC_PWR_CLK_DISABLE();
 
-	//=================================== 6. END ====================================//
+	//=================================== 5. END ====================================//
 		 }
 			/* Infinite loop END*/
 
 
 }
 
-//==================== 7. Configuration & Initialization Functions ====================//
+//==================== 6. Configuration & Initialization Functions ====================//
 
 /* Private functions */
 
@@ -383,9 +342,9 @@ static void MX_RTC_Init(void)
 
 }
 
-//====================================== 7. END ======================================//
+//====================================== 6. END ======================================//
 
-//==================================== 8. Handlers ===================================//
+//==================================== 7. Handlers ===================================//
 
 void Error_Handler(void)
 {
@@ -395,22 +354,9 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-//===================================== 8. END ======================================//
+//===================================== 7. END ======================================//
 
-//=============================== 9. Routines =======================================//
-static void Routine_ASYNC_IMU_EVENT(void)
-{
-	 printmsg("IMU Event Detected: Sampling...");
-	 for (int i = 0; i < 50; ++i)
-	 {
-	 	HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
-	 	HAL_Delay(100);
-	 }
-	 printmsg("Done\r\n");
-}
-
-
-
+//=============================== 8. Routines =======================================//
 static void Routine_STATE_RESET(void)
 {
 	 //initialise RTC
@@ -449,7 +395,7 @@ static void Routine_STATE_SAMPLE(void)
 	  envDirNo = ((RTC->BKP0R)&0xFF00)>>8;
 	  pwrLogNo = (RTC->BKP0R)&0xFF;
 	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  __HAL_RCC_PWR_CLK_ENABLE();
+	  __HAL_RCC_PWR_CLK_DISABLE();
 
 
 
@@ -466,7 +412,7 @@ static void Routine_STATE_SAMPLE(void)
 	  //GPS  Init Routine
 	  GPS_Data_t Gdata;
 	  sample_count = __GET_SAMPLE_COUNT();
-	  if(sample_count < 3)
+	  if(sample_count < 2)
 	  {
 		  printmsg("Current State: SAMPLE \t Next State: SLEEP\r\n");
 	  } else
@@ -693,21 +639,145 @@ static void Routine_STATE_TRANSMIT(void)
 
 	  printmsg("Current State: TRANS \t Next State: SLEEP\r\n");
 
+
+	  //Get Previous Directory and Log Numbers for SD Cards
+	  __HAL_RCC_PWR_CLK_ENABLE();
+	  waveLogNo = (RTC->BKP0R)&0xFF;
+	  waveDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  gpsLogNo = (RTC->BKP0R)&0xFF;
+	  gpsDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  envLogNo = (RTC->BKP0R)&0xFF;
+	  envDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  pwrLogNo = (RTC->BKP0R)&0xFF;
+	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
+	  __HAL_RCC_PWR_CLK_DISABLE();
+
 	  //Transfer Buffer
-	  uint8_t trans_Buffer[256];
+	  uint8_t GPS_trans_Buffer[340];
+	  uint8_t WAVE_trans_Buffer[340];
+
+	  //File pointer
+	  uint32_t fpointer = 0;
 
 	  //Enable SD card interface
 	  SD_Init();
 
-	  //Calculate wave parameter extraction
-	  Wave_Data_t waveData;
-	  fullPipeline(waveData, waveDirNo);
-
-	  //Read in values to transmit buffer
-
+	  //Create Temporary Arrays
+	  float32_t gpsData[9] = {0};
+	  float32_t envData[3] = {0};
+	  float32_t pwrData[5] = {0};
 
 
-	  //Dismount SD cards!
+	  //GPS Buffer - Log GPS data here
+	  GPS_Data_t GdataT; //GPS struct used for transmission and binary conversion
+
+	  /* First GPS Buffer */
+
+	  //Get GPS data from SD card
+	  fpointer = 0;
+	  SD_GPS_Read(&File, gpsData, gpsDirNo-1, gpsLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //Note: gpsData[0] is a timestamp
+	  GdataT.coordinates.lat =  gpsData[1];
+	  GdataT.coordinates.longi = gpsData[2];
+	  GdataT.diag.HDOP.digit = (uint8_t)gpsData[3];
+	  GdataT.diag.HDOP.precision = (uint8_t)gpsData[4];
+	  GdataT.diag.VDOP.digit = (uint8_t)gpsData[5];
+	  GdataT.diag.VDOP.precision = (uint8_t)gpsData[6];
+	  GdataT.diag.PDOP.digit = (uint8_t)gpsData[7];
+	  GdataT.diag.PDOP.precision = (uint8_t)gpsData[8];
+
+	  //Get Environmental data from SD card
+	  fpointer = 0;
+	  SD_ENV_Read(&File, envData, envDirNo-1, envLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //ENV Data
+	  //Note: envData[0] is a timestamp
+	  GdataT.env_Temp = (uint32_t)envData[1];
+	  GdataT.atm_Press = (uint32_t)envData[2];
+
+	  //Get power data from SD Card
+	  fpointer = 0;
+	  SD_PWR_Read(&File, pwrData, pwrDirNo-1, pwrLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //PWR Data
+	  //Note: pwrData[0] is a timestamp
+	  GdataT.shunt_v = pwrData[1];
+	  GdataT.bus_v = pwrData[2];
+	  GdataT.current = pwrData[3];
+	  GdataT.power = pwrData[4];
+
+
+	  //Convert GData Buffer to binary
+	  uint8_t* buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT()-1);
+
+	  //Populate first packet of GPS data into array
+	  memcpy(&GPS_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
+
+	  /* Second GPS Buffer */
+
+  	  //Get GPS data from SD card
+	  fpointer = 0;
+	  SD_GPS_Read(&File, gpsData, gpsDirNo, gpsLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //Note: gpsData[0] is a timestamp
+	  GdataT.coordinates.lat =  gpsData[1];
+	  GdataT.coordinates.longi = gpsData[2];
+	  GdataT.diag.HDOP.digit = (uint8_t)gpsData[3];
+	  GdataT.diag.HDOP.precision = (uint8_t)gpsData[4];
+	  GdataT.diag.VDOP.digit = (uint8_t)gpsData[5];
+	  GdataT.diag.VDOP.precision = (uint8_t)gpsData[6];
+	  GdataT.diag.PDOP.digit = (uint8_t)gpsData[7];
+	  GdataT.diag.PDOP.precision = (uint8_t)gpsData[8];
+
+	  //Get Environmental data from SD card
+	  fpointer = 0;
+	  SD_ENV_Read(&File, envData, envDirNo-1, envLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //ENV Data
+	  //Note: envData[0] is a timestamp
+	  GdataT.env_Temp = (uint32_t)envData[1];
+	  GdataT.atm_Press = (uint32_t)envData[2];
+
+	  //Get power data from SD Card
+	  fpointer = 0;
+	  SD_PWR_Read(&File, pwrData, pwrDirNo, pwrLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //PWR Data
+	  //Note: pwrData[0] is a timestamp
+	  GdataT.shunt_v = pwrData[1];
+	  GdataT.bus_v = pwrData[2];
+	  GdataT.current = pwrData[3];
+	  GdataT.power = pwrData[4];
+
+	  //Convert GData Buffer to binary
+	  buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT());
+
+	  //Populate Second packet of GPS data into array
+	  memcpy(&GPS_trans_Buffer[DRIFTBUFFER_SIZE], buffer, DRIFTBUFFER_SIZE);
+
+	  //Wave Buffer
+	  //Calculate wave parameter extraction for previous two logs
+	  Wave_Data_t waveData1;
+	  fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
+	  Wave_Data_t waveData2;
+	  fullPipeline(waveData2, waveDirNo); //get wave data from previous record
+
+	  buffer = to_binary_format_Wave(waveData1, __GET_SAMPLE_COUNT() -1);
+
+	  memcpy(&WAVE_trans_Buffer[0], buffer, WAVEBUFFER_SIZE);
+
+	  buffer = to_binary_format_Wave(waveData2, __GET_SAMPLE_COUNT());
+
+	  memcpy(&WAVE_trans_Buffer[WAVEBUFFER_SIZE], buffer, WAVEBUFFER_SIZE);
+
+	  //Dismount SD cards! DO NOT WANT MOUNTED SD CARDS DURING IRIDIUM TRANSMISSION
 	  SD_Unmount(SDFatFs);
 
 	  uint8_t retry = 0;
@@ -734,7 +804,7 @@ static void Routine_STATE_TRANSMIT(void)
 		  IR_Status_t flag;
 		 for (int i = 0; i < 2; ++i)
 		 {
-			 flag = (i<1)? IR_send_Bin_String(trans_Buffer,(4*DRIFTBUFFER_SIZE)):IR_send_Bin_String(wavebuffer,WAVEBUFFER_SIZE);
+			 flag = (i<1)? IR_send_Bin_String(GPS_trans_Buffer,sizeof(GPS_trans_Buffer)):IR_send_Bin_String(WAVE_trans_Buffer,sizeof(WAVE_trans_Buffer));
 
 	  	  if(flag == IR_MSG_UPLOAD_OK)
 	  	  {
@@ -863,5 +933,5 @@ static void Routine_Init_STATE(void)
 	ICM20649_Deinit_IMU();
 
 }
-//===================================== 9. END ======================================//
+//===================================== 8. END ======================================//
 

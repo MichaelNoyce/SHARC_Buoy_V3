@@ -99,14 +99,12 @@ uint32_t envDirNo;
 uint32_t pwrLogNo;
 uint32_t pwrDirNo;
 
-
 //============================= 5. Defines ===============================================
 
 #define SD_Detect_Pin GPIO_PIN_5
 #define SD_Detect_GPIO_Port GPIOF
 
 //============================= 6. Handlers ===============================================
-
 
 UART_HandleTypeDef hlpuart1;
 
@@ -148,7 +146,7 @@ sd_status_t SD_Mount(FATFS SDFatFs, char myPath[]);
  */
 sd_status_t SD_Unmount(FATFS SDFatFs);
 
-//======================== 8. SD Read/Write/Open Functions ============================================
+//======================== 6. SD Read/Write Functions ============================================
 
 sd_status_t SD_File_Open(FIL *myFile, uint32_t fileNo);
 
@@ -209,6 +207,9 @@ sd_status_t SD_Wave_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t wavDirN
  */
 sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, uint32_t WaveLogNo,  IMU_Data_SD_t inertialDataType, uint32_t *fpointer);
 
+
+
+
 /**
  * @brief Opens file in GPS file directory
  *
@@ -219,6 +220,46 @@ sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, ui
  * @return
  */
 sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo, uint8_t GPSLogNo);
+
+
+/**
+ * @brief
+ *
+ * @param myFile
+ * @param GPSArray
+ * @param GPSDirNo
+ * @param GPSLogNo
+ * @param GPSDataType
+ * @param fpointer
+ * @return
+ */
+sd_status_t SD_GPS_Read(FIL *myFile, float *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, uint32_t *fpointer);
+
+
+/**
+ * @brief
+ *
+ * @param myFile
+ * @param ENVArray
+ * @param ENVDirNo
+ * @param ENVLogNo
+ * @param fpointer
+ * @return
+ */
+sd_status_t SD_ENV_Read(FIL *myFile, float *ENVArray,  uint32_t ENVDirNo, uint32_t ENVLogNo, uint32_t *fpointer);
+
+
+/**
+ * @brief
+ *
+ * @param myFile
+ * @param PWRArray
+ * @param PWRDirNo
+ * @param PWRLogNo
+ * @param fpointer
+ * @return
+ */
+sd_status_t SD_PWR_Read(FIL *myFile, float *PWRArray,  uint32_t PWRDirNo, uint32_t PWRLogNo, uint32_t *fpointer);
 
 
 /**
@@ -245,25 +286,6 @@ sd_status_t SD_ENV_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t ENVDirNo
  * @return
  */
 sd_status_t SD_PWR_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t PWRDirNo, uint8_t PWRLogNo);
-
-/**
- * @brief
- *
- * @param myFile
- * @param GPSArray
- * @param GPSDirNo
- * @param GPSLogNo
- * @param GPSDataType
- * @param fpointer
- * @return
- */
-sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, GPS_Data_SD_t GPSDataType, uint32_t *fpointer);
-
-
-
-
-
-
 
 
 #endif /* HAL_SD_H_ */

@@ -10,6 +10,7 @@
 
 
 static uint8_t driftbuffer[DRIFTBUFFER_SIZE] = {0};
+static uint8_t wavebuffer[WAVEBUFFER_SIZE] = {0};
 
 
 HAL_StatusTypeDef Init_Debug(void)
@@ -483,7 +484,7 @@ void Set_Next_Active_Chip(uint8_t chipnumber)
 	__HAL_RCC_PWR_CLK_DISABLE();
 }
 
-uint8_t* to_binary_format(GPS_Data_t gps_data ,uint8_t ID)
+uint8_t* to_binary_format_GPS(GPS_Data_t gps_data ,uint8_t ID)
 {
 	//define union to convert 32 bit float to unsigned uint8_t array
 	union
@@ -551,6 +552,56 @@ uint8_t* to_binary_format(GPS_Data_t gps_data ,uint8_t ID)
 
 	//return a pointer the the array driftbuffer;
 	return driftbuffer;
+}
+
+uint8_t* to_binary_format_Wave(Wave_Data_t wave_data, uint8_t ID)
+{
+	//define union to convert 32 bit float to unsigned uint8_t array
+	union
+	{
+		float a;					//for 32 bit floats
+		unsigned char bytes[4];		//for 4 byte long unsigned integer arrays
+		uint32_t num;				//for long numbers
+	} byte_converter;
+	//define union to convert uint16_t/int16_t into unsigned 8-bit byte arrays
+	union
+	{
+		int16_t  s_halfword;
+		unsigned char bytes[2];
+	}halfword_converter;
+
+	/*0. Byte 0: Packet ID*/
+	*wavebuffer = ID;
+	/*1. Bytes 1 - 4:  Significant wave height*/
+	byte_converter.a = wave_data.Hm0;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*2. Bytes 5 - 9:  Root mean square wave height*/
+	byte_converter.a = wave_data.Hrms;
+	memcpy(&wavebuffer[5],(byte_converter).bytes,4);
+	/*3. Bytes 9 - 13:  Mean zero crossing period */
+	byte_converter.a = wave_data.T0;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*4. Bytes 14 - 17: Peak wave period*/
+	byte_converter.a = wave_data.TM01;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*5. Bytes 18 - 21:  0th spectral moment*/
+	byte_converter.a = wave_data.Tp;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*6. Bytes 22 - 25:  1st spectral moment*/
+	byte_converter.a = wave_data.M0;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*7. Bytes 26 - 29:  2nd spectral moment*/
+	byte_converter.a = wave_data.M1;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+	/*8. Bytes 30 - 150:  PSD Spectra */
+	byte_converter.a = wave_data.M2;
+	memcpy(&wavebuffer[1],(byte_converter).bytes,4);
+
+
+	wavebuffer[WAVEBUFFER_SIZE-1] = 0xd; //end of packet character
+
+	//return a pointer the the array buffer;
+	return wavebuffer;
 }
 
 uint8_t  get_driftBuffer_Size(void)

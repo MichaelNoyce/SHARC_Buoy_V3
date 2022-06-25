@@ -25,6 +25,8 @@
 
 #include "HAL_Iridium.h"
 
+#include "WaveFunctions.h"
+
 /* Private typedef -----------------------------------------------------------*/
 
 /*
@@ -210,7 +212,7 @@ typedef struct
 //define Size of Drift and Wave data payload
 #define DRIFTBUFFER_SIZE 38
 
-#define WAVEBUFFER_SIZE 338
+#define WAVEBUFFER_SIZE 152
 /* Private variables ---------------------------------------------------------*/
 
 extern RTC_HandleTypeDef hrtc;
@@ -424,6 +426,10 @@ uint8_t Get_Next_Active_Chip(void);
 
 void Set_Next_Active_Chip(uint8_t chipnumber);
 
+/*
+ * Function Name: uint8_t  get_driftBuffer_Size(void);
+ */
+uint8_t  get_driftBuffer_Size(void);
 
 
 /*
@@ -432,7 +438,18 @@ void Set_Next_Active_Chip(uint8_t chipnumber);
  * @brief: Converts the data in the GPS_Data_t and
  */
 
-uint8_t* to_binary_format(GPS_Data_t gps_data ,uint8_t ID);
+uint8_t* to_binary_format_GPS(GPS_Data_t gps_data ,uint8_t ID);
+
+
+/**
+ * @brief
+ *
+ * @param wave_data
+ * @param ID
+ * @return
+ */
+uint8_t* to_binary_format_Wave(Wave_Data_t wave_data ,uint8_t ID);
+
 
 /*
  * Function Name: uint8_t  get_driftBuffer_Size(void);

@@ -1,3 +1,4 @@
+
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -103,14 +104,30 @@ int main(void)
   printmsg("Error Code, %d \r\n", errorCode);
 
   uint8_t waveBufferSegment[] = "-0.024, 0.038, 9.992, 3.603, 71.756, -8.321, -18.448 \n";
-  uint8_t gpsBufferSegment[] = "Some GPS data! \r\n";
+  uint8_t gpsBufferSegment[] = "102.27, 245334.12, 14234.15, 22 \r\n";
+  uint8_t envBufferSegment[] = "102.27, 245334.12, 14234.15, 22 \r\n";
+  uint8_t pwrBufferSegment[] = "102.27, 245334.12, 14234.15, 22 \r\n";
 
   waveLogNo = 0;
   waveDirNo = 0;
   gpsLogNo = 0;
   gpsDirNo = 0;
+  envLogNo = 0;
+  envDirNo = 0;
+  pwrLogNo = 0;
+  pwrDirNo = 0;
 
-  //Write Test for directory open functions
+  //Single Write Test
+
+  //Open wave Log
+  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
+  //Write to wave log
+  SD_File_Write(&File, waveBufferSegment);
+  //Close Wave Log
+  SD_File_Close(&File);
+
+
+  //Repeated Write Test for directory open functions
 
   for(int i= 0; i<10; i++)
   {
@@ -119,7 +136,10 @@ int main(void)
 	  waveLogNo++;
 	  waveDirNo++;
 	  gpsLogNo++;
-	  gpsDirNo++;
+	  envDirNo++;
+	  envLogNo++;
+	  pwrDirNo++;
+	  pwrLogNo++;
 
 	  //Open wave Log
 	  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
@@ -135,31 +155,86 @@ int main(void)
 	  //Close GPS Log
 	  SD_File_Close(&File);
 
+	  //Open GPS Log
+	  SD_ENV_Open(&File, &Dir, &fno, envDirNo, envLogNo);
+	  //Write to GPS Log
+	  SD_File_Write(&File, envBufferSegment);
+	  //Close GPS Log
+	  SD_File_Close(&File);
+
+	  //Open GPS Log
+	  SD_PWR_Open(&File, &Dir, &fno, pwrDirNo, pwrLogNo);
+	  //Write to GPS Log
+	  SD_File_Write(&File, pwrBufferSegment);
+	  //Close GPS Log
+	  SD_File_Close(&File);
+
+
   }
 
+  printmsg("Write test complete! \r\n");
   SD_Unmount(SDFatFs);
+
 
   //Read Test
 
   int32_t zAcc[1024];
+  float gpsData[160];
+  float envData[160];
+  float pwrData[160];
 
 
   waveLogNo = 1;
   waveDirNo = 1;
+  gpsLogNo = 1;
+  gpsDirNo = 1;
   uint32_t fpointer = 0;
 
 
-  SD_Wave_Read(&File, zAcc, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+  //Wave Read Test
+  //SD_Wave_Read(&File, zAcc, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
-  SD_File_Close(&File);
+
+  //SD_File_Close(&File);
 
 
-  for(int j = 0; j<1024; j++)
+ /* for(int j = 0; j<1024; j++)
   {
 	 // printmsg("Z_Acc Value \r\n");
-	 // printmsg("Z_acc %d \r\n", zAcc[j]);
-  }
+	 printmsg("Z_acc %d \r\n", zAcc[j]);
+  } */
 
+
+  //GPS Read test
+  fpointer = 0;
+  SD_GPS_Read(&File, gpsData, 1, 1, &fpointer);
+  SD_File_Close(&File);
+
+    for(int j = 0; j<4; j++)
+    {
+  	 printmsg("GPS data %f \r\n", gpsData[j]);
+    }
+
+
+    //ENV Read Test
+    fpointer = 0;
+    SD_ENV_Read(&File, envData, 1, 1, &fpointer);
+    SD_File_Close(&File);
+
+    for(int j = 0; j<4; j++)
+    {
+      printmsg("ENV data %f \r\n", envData[j]);
+    }
+
+    //PWR Read Test
+    fpointer = 0;
+    SD_PWR_Read(&File, pwrData, 1, 1, &fpointer);
+    SD_File_Close(&File);
+
+    for(int j = 0; j<4; j++)
+    {
+      printmsg("pwr data %f \r\n", pwrData[j]);
+     }
 
   RTC_DateTypeDef gDate;
   RTC_TimeTypeDef gTime;
@@ -168,7 +243,6 @@ int main(void)
 
 
 //Check Timestamp
-
   /* Display time Format: hh:mm:ss */
   printmsg("\r\n Time %d:%d:%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds);
   /* Display date Format: dd-mm-yy */

@@ -84,7 +84,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+ 	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -102,31 +102,45 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printmsg("DSP Pipeline V1 Start!\r\n");
 
+
   uint8_t errorCode = SD_Init();
   printmsg("Error Code, %d \r\n", errorCode);
 
+
   uint32_t i = 0;
 
-  float32_t PSD[FFT_LENGTH];
+  float32_t PSD[FFT_LENGTH/2];
+  int32_t rawData[FFT_LENGTH];
 
   Wave_Data_t waveData;
   uint32_t waveDirNo  = 1;
 
+  uint32_t fpointer = 0;
+
+  //SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
 
-  fullPipeline(waveData, waveDirNo);
+
+    /*for(int i=0; i<1024; i++)
+    {
+    	 //printmsg("%.8f \r\n", rawData[i]);
+    } */
+
+  //WelchMethod(PSD, waveDirNo);
 
   //singleSegmentPipeline(PSD, 1, 1);
 
-  //WelchMethod(PSD, 1);
+  //waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
+
+  fullPipeline(waveData, waveDirNo);
+
+ /*for(int i=0; i<512; i++)
+      {
+      	 printmsg("%.8f \r\n", PSD[i]);
+      } */
 
 
-  printmsg("DSP Pipeline Finished!\r\n");
-
-  //for(int i=0; i<1024; i++)
-  //{
-  	 //printmsg("%.8f \r\n", PSD[i]);
-   //}
+    printmsg("DSP Pipeline Finished!\r\n");
 
 
   /* USER CODE END 2 */

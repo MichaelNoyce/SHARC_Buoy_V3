@@ -435,8 +435,6 @@ sd_status_t SD_Wave_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t waveDir
 }
 
 
-
-
 sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo, uint8_t GPSLogNo)
 {
 
@@ -470,6 +468,118 @@ sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo
 			 }
 
 			 	 sprintf(diskPath, "GD/GS%d/G%d.txt", GPSDirNo, GPSLogNo);
+
+				  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+				  {
+					  //printmsg("Opened file! \r\n");
+				  }
+				  else
+				  {
+					  printmsg("Open failed! \r\n");
+					  return SD_OPEN_ERROR;
+				  }
+	  }
+	  else
+	  {
+		   printmsg("Mount failed \r\n");
+		   return SD_MOUNT_ERROR;
+	  }
+
+
+	  return SD_OK;
+
+
+}
+
+sd_status_t SD_ENV_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t ENVDirNo, uint8_t ENVLogNo)
+{
+
+	 //printmsg("SDMMC Interface Starting! \r\n");
+     char diskPath[16]; /* User logical drive path */
+     char dirPath[16]; //max path length is 14 without long path names enabled
+
+     if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+     {
+
+     	sprintf(dirPath, "ED");
+
+		 if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+		 {
+			if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+			{
+				printmsg("Directory not created");
+			}
+		 }
+
+
+		 	 sprintf(dirPath, "ED/ES%d", ENVDirNo);
+
+			 if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+			 {
+
+				 if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+				 {
+					 printmsg("Directory not created \r\n");
+				 }
+			 }
+
+			 	 sprintf(diskPath, "ED/ES%d/E%d.txt", ENVDirNo, ENVLogNo);
+
+				  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+				  {
+					  //printmsg("Opened file! \r\n");
+				  }
+				  else
+				  {
+					  printmsg("Open failed! \r\n");
+					  return SD_OPEN_ERROR;
+				  }
+	  }
+	  else
+	  {
+		   printmsg("Mount failed \r\n");
+		   return SD_MOUNT_ERROR;
+	  }
+
+
+	  return SD_OK;
+
+
+}
+
+sd_status_t SD_PWR_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t PWRDirNo, uint8_t PWRLogNo)
+{
+
+	 //printmsg("SDMMC Interface Starting! \r\n");
+     char diskPath[16]; /* User logical drive path */
+     char dirPath[16]; //max path length is 14 without long path names enabled
+
+     if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+     {
+
+     	sprintf(dirPath, "PD");
+
+		 if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+		 {
+			if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+			{
+				printmsg("Directory not created");
+			}
+		 }
+
+
+		 	 sprintf(dirPath, "PD/PS%d", PWRDirNo);
+
+			 if(f_stat((const TCHAR*)dirPath, fno) == FR_NO_FILE)
+			 {
+
+				 if(f_mkdir((const TCHAR*)dirPath) != FR_OK)
+				 {
+					 printmsg("Directory not created \r\n");
+				 }
+			 }
+
+			 	 sprintf(diskPath, "PD/PS%d/P%d.txt", PWRDirNo, PWRLogNo);
 
 				  if(f_open(myFile, (const TCHAR*)diskPath, FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
 				  {
@@ -560,8 +670,7 @@ sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, ui
 
 }
 
-
-sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, GPS_Data_SD_t GPSDataType, uint32_t *fpointer)
+sd_status_t SD_GPS_Read(FIL *myFile, float *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, uint32_t *fpointer)
 {
 
 	uint8_t dataBuf[60];
@@ -574,7 +683,7 @@ sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint
 	char tempString[60];
 
 
-	sprintf(diskPath, "WD/WS%d/W%d.txt", waveDirNo, waveLogNo);
+	sprintf(diskPath, "GD/GS%d/G%d.txt", GPSDirNo, GPSLogNo);
 
 
 	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
@@ -587,10 +696,23 @@ sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint
 
 				  //Open file to correct location
 				  fp = *fpointer;
-				  printmsg("Initial file pointer location %ld \r\n", *fpointer);
+				  printmsg("Initial GPS file pointer location %ld \r\n", *fpointer);
 				  f_lseek(myFile, fp);
 
 				  f_gets(dataBuf, maxLen, myFile);
+
+				  uint8_t i = 0;
+
+				  p = strtok(dataBuf, delim);
+
+				  GPSArray[i] = atof(p);
+
+				  while(p != NULL)
+				  {
+				 		p = strtok(NULL, delim);
+				 		i++;
+				 		GPSArray[i] = atof(p);
+				  }
 
 				  //store current file pointer location
 				  *fpointer = f_tell(myFile);
@@ -613,3 +735,136 @@ sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint
 	  return SD_OK;
 
 }
+
+sd_status_t SD_ENV_Read(FIL *myFile, float *ENVArray,  uint32_t ENVDirNo, uint32_t ENVLogNo, uint32_t *fpointer)
+{
+
+	uint8_t dataBuf[60];
+	int maxLen = 500;
+	char diskPath[16]; /* User logical drive path */
+	FSIZE_t fp = *fpointer;
+
+	char *p; //pointer for strtok functions
+	const char delim[] = ", ";
+	char tempString[60];
+
+
+	sprintf(diskPath, "ED/ES%d/E%d.txt", ENVDirNo, ENVLogNo);
+
+
+	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+	     {
+
+			 sprintf(diskPath, "ED/ES%d/E%d.txt", ENVDirNo, ENVLogNo);
+
+			  if(f_open(myFile, (const TCHAR*)diskPath, FA_READ) == FR_OK)
+			  {
+
+				  //Open file to correct location
+				  fp = *fpointer;
+				  printmsg("Initial ENV file pointer location %ld \r\n", *fpointer);
+				  f_lseek(myFile, fp);
+
+				  f_gets(dataBuf, maxLen, myFile);
+
+				  uint8_t i = 0;
+
+				  p = strtok(dataBuf, delim);
+
+				  ENVArray[i] = atof(p);
+
+				  while(p != NULL)
+				  {
+				 		p = strtok(NULL, delim);
+				 		i++;
+				 		ENVArray[i] = atof(p);
+				  }
+
+				  //store current file pointer location
+				  *fpointer = f_tell(myFile);
+
+			  }
+			  else
+			  {
+				  printmsg("Open failed! \r\n");
+				  return SD_OPEN_ERROR;
+			  }
+
+
+		  }
+		  else
+		  {
+			   printmsg("Mount failed \r\n");
+			   return SD_MOUNT_ERROR;
+		  }
+
+	  return SD_OK;
+
+}
+
+sd_status_t SD_PWR_Read(FIL *myFile, float *PWRArray,  uint32_t PWRDirNo, uint32_t PWRLogNo, uint32_t *fpointer)
+{
+
+	uint8_t dataBuf[60];
+	int maxLen = 500;
+	char diskPath[16]; /* User logical drive path */
+	FSIZE_t fp = *fpointer;
+
+	char *p; //pointer for strtok functions
+	const char delim[] = ", ";
+	char tempString[60];
+
+
+	sprintf(diskPath, "PD/PS%d/P%d.txt", PWRDirNo, PWRLogNo);
+
+
+	  if(SD_Mount(SDFatFs, diskPath) == SD_OK)
+	     {
+
+			 sprintf(diskPath, "PD/PS%d/P%d.txt", PWRDirNo, PWRLogNo);
+
+			  if(f_open(myFile, (const TCHAR*)diskPath, FA_READ) == FR_OK)
+			  {
+
+				  //Open file to correct location
+				  fp = *fpointer;
+				  printmsg("Initial PWR file pointer location %ld \r\n", *fpointer);
+				  f_lseek(myFile, fp);
+
+				  f_gets(dataBuf, maxLen, myFile);
+
+				  uint8_t i = 0;
+
+				  p = strtok(dataBuf, delim);
+
+				  PWRArray[i] = atof(p);
+
+				  while(p != NULL)
+				  {
+				 		p = strtok(NULL, delim);
+				 		i++;
+				 		PWRArray[i] = atof(p);
+				  }
+
+				  //store current file pointer location
+				  *fpointer = f_tell(myFile);
+
+			  }
+			  else
+			  {
+				  printmsg("Open failed! \r\n");
+				  return SD_OPEN_ERROR;
+			  }
+
+
+		  }
+		  else
+		  {
+			   printmsg("Mount failed \r\n");
+			   return SD_MOUNT_ERROR;
+		  }
+
+	  return SD_OK;
+
+}
+

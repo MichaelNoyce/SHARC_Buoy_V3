@@ -31,10 +31,11 @@ const float32_t firCoeffs32[NUM_TAPS_ARRAY_SIZE] = {
 void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 {
 
-	float32_t PSD[FFT_LENGTH/2];
+	float32_t PSD[FFT_LENGTH];
 
-	//Welch Method - calls single segment pipeline in function
+	//Welch Method - calls single segment pipeline in function and averages
 	WelchMethod(PSD, WaveDirNo);
+
 	/*for(int i=0; i<512; i++)
 	  				    {
 	  				    	printmsg("%.2f \r\n", PSD[i]);
@@ -92,11 +93,11 @@ void singleSegmentPipeline(float32_t* singleSegment, uint32_t waveDirNo, uint32_
     {
     	/*----------Read in data here----------------------*/
 
-    	SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+    	//SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
     	/*----------Read in data here----------------------*/
 
-    	calibrate(rawData, tempBuf);
+    	calibrate(rawDataBuf, tempBuf);
 
     	detrend(tempBuf, tempBuf2);
 
@@ -118,17 +119,17 @@ void singleSegmentPipeline(float32_t* singleSegment, uint32_t waveDirNo, uint32_
 
 
     //Output Inverse - Wave Amplitude series
-    embeddedFFT(tempBuf4, tempBuf5, FFT_LENGTH, IFFT);
+    embeddedFFT(tempBuf4, singleSegment, FFT_LENGTH, IFFT);
 
 
     //Apply Hanning Window to reduce spectral leakage
-   float32_t tempWindow;
+    float32_t tempWindow;
 
-    for(i = 0; i<FFT_LENGTH; i++)
+   /* for(i = 0; i<FFT_LENGTH; i++)
     {
     	tempWindow = 0.5 * (1 - cos(2*PI*i/FFT_LENGTH));
     	singleSegment[i] = tempBuf5[i]*tempWindow;
-    }
+    } */
 
 }
 
@@ -144,7 +145,7 @@ void calibrate(int32_t* rawData, float32_t* calOutput)
 
 	for (i = 0; i < FFT_LENGTH ; i++)
 	{
-		calOutput[i] = ((float32_t)rawData[i] - 92.22)/1686.50 -9.81; //remove bias offset, scale and subtract g
+		calOutput[i] = ((float32_t)rawData[i])/8192 -9.81; //remove bias offset, scale and subtract g
 	}
 
 }
@@ -286,6 +287,9 @@ void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude)
 			waveAmplitude[i] = 0;
 		}
 
+
+		//printmsg("waveAmplitude[%d] = %.2f", i, waveAmplitude[i]);
+
 	}
 
 }
@@ -343,7 +347,7 @@ void WelchMethod(float32_t* PSD, uint32_t waveDirNo)
 		{
 			tempSum += waveAmplitudeArray [j][i];
 		}
-		PSD [i] = tempSum / SEGMENT_NO * FFT_LENGTH ;
+		PSD [i] = tempSum / (SEGMENT_NO*FFT_LENGTH) ;
 	}
 
 	PSD [0] /= 2;
@@ -397,22 +401,26 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 
 	*M0 = m0/10000;
 
-	printmsg("M0 calculated!");
+	printmsg("M0 calculated! \r\n");
 
 	Sum = 0;
+
+
 
 	for(i=2; i<FFT_LENGTH/2; i++)
 	{
 		Sum = Sum + (freq[i])*PSD[i];
 	}
 
-	printmsg("f^2 sum %.8f", Sum);
+	printmsg("f^2 sum %.8f \r\n", Sum);
 
 	m1 = 10000*0.5*subInt_length*(freq[1]*PSD[1]+2*Sum+(freq[subInt_no+1]*PSD[subInt_no+1]));
 
 	*M1 = m1/10000;
 
-	printmsg("M1 calculated!: m1 %.8f", m1);
+
+	printmsg("M1 calculated!: m1 %.8f \r\n", m1);
+
 
 	Sum = 0;
 
@@ -425,7 +433,7 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 
 	 *M2 = m2/10000;
 
-	printmsg("M2 calculated!");
+	printmsg("M2 calculated! \r\n");
 
 	//add M2, T0, Hrms and H0 calculations
 
@@ -434,7 +442,7 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 	*Hrms = sqrt(2)/2*(*Hm0); // Correct
 	*T0 = sqrt(fabsf(m2)/fabsf(m0)); //Correct
 
-	printmsg("Parameters calculated!");
+	printmsg("Parameters calculated! \r\n");
 
 	 for (i = 1; i < FFT_LENGTH/2; ++i) {
 	    if (PSD[0] < PSD[i]) {
@@ -446,7 +454,9 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 
 	*Tp = 1/fm;
 
-	printmsg("Tp calculated!");
+	printmsg("Tp calculated! \r\n");
+
+
 
 }
 

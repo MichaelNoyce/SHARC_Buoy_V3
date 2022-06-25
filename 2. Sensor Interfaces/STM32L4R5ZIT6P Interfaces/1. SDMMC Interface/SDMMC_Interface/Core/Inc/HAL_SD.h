@@ -94,11 +94,14 @@ uint32_t waveLogNo;
 uint32_t waveDirNo;
 uint32_t gpsLogNo;
 uint32_t gpsDirNo;
-
+uint32_t envLogNo;
+uint32_t envDirNo;
+uint32_t pwrLogNo;
+uint32_t pwrDirNo;
 
 //============================= 5. Defines ===============================================
 
-#define SD_Detect_Pin GPIO_PIN_3
+#define SD_Detect_Pin GPIO_PIN_5
 #define SD_Detect_GPIO_Port GPIOF
 
 //============================= 6. Handlers ===============================================
@@ -232,13 +235,59 @@ sd_status_t SD_GPS_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t GPSDirNo
  * @param fpointer
  * @return
  */
-sd_status_t SD_GPS_Read(FIL *myFile, int32_t *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, GPS_Data_SD_t GPSDataType, uint32_t *fpointer);
+sd_status_t SD_GPS_Read(FIL *myFile, float *GPSArray,  uint32_t GPSDirNo, uint32_t GPSLogNo, uint32_t *fpointer);
 
 
+/**
+ * @brief
+ *
+ * @param myFile
+ * @param ENVArray
+ * @param ENVDirNo
+ * @param ENVLogNo
+ * @param fpointer
+ * @return
+ */
+sd_status_t SD_ENV_Read(FIL *myFile, float *ENVArray,  uint32_t ENVDirNo, uint32_t ENVLogNo, uint32_t *fpointer);
 
 
+/**
+ * @brief
+ *
+ * @param myFile
+ * @param PWRArray
+ * @param PWRDirNo
+ * @param PWRLogNo
+ * @param fpointer
+ * @return
+ */
+sd_status_t SD_PWR_Read(FIL *myFile, float *PWRArray,  uint32_t PWRDirNo, uint32_t PWRLogNo, uint32_t *fpointer);
 
 
+/**
+ * @brief Opens file in environmental directory
+ *
+ * @param myFile
+ * @param myDir
+ * @param fno
+ * @param ENVDirNo
+ * @param ENVLogNo
+ * @return
+ */
+sd_status_t SD_ENV_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t ENVDirNo, uint8_t ENVLogNo);
+
+
+/**
+ * @brief Opens file in power directory
+ *
+ * @param myFile
+ * @param myDir
+ * @param fno
+ * @param PWRDirNo
+ * @param PWRLogNo
+ * @return
+ */
+sd_status_t SD_PWR_Open(FIL *myFile, DIR *myDir, FILINFO* fno, uint32_t PWRDirNo, uint8_t PWRLogNo);
 
 
 #endif /* HAL_SD_H_ */
