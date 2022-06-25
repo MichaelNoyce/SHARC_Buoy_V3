@@ -131,10 +131,13 @@ int main(void)
   uint8_t msg[24] = "This is A Test in Binary";
   if(IR_send_Bin_String(msg,24) == IR_MSG_UPLOAD_OK)
   {
+
+	  printmsg("IR Message Upload okay \r\n");
 	  SBDX_Status_t sbd;
 
 		  if(IR_start_SBD_Session(&sbd) == IR_OK)
 		 {
+			  printmsg("Started Iridium session \r\n");
 		 		  //check return status
 		 		  if(sbd.MO_Status == 0)
 		 		  {

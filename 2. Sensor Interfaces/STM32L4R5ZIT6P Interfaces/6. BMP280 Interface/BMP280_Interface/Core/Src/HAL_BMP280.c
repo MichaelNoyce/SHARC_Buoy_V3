@@ -10,6 +10,8 @@
 
 #include  "stm32l4xx_hal.h"		//HAL Functions
 
+#include "main.h"
+
 //========================= 2. Private Function Prototypes =============================
 
 /*
@@ -172,6 +174,7 @@ static void Init_Control_Pins(void)
  */
 BMPStatus_t BMP280_Init(BMP_Init_Typedef * BMP_InitStruct)
 {
+	printmsg("Initialising BMP280 \r\n");
 	//initialise SPI peripheral and control pins
 	  MX_SPI1_Init();
 	  Init_Control_Pins();
@@ -188,12 +191,12 @@ BMPStatus_t BMP280_Init(BMP_Init_Typedef * BMP_InitStruct)
 		uint8_t flag = BMP280_Get_ID(&dev_id);
 		if( flag!= BMP_OK)
 		{
-			printmsg("Returned ID: %d", dev_id);
 			return flag;
 		}
 		//check device ID matches
 		if(dev_id != BMP280_ID)
 		{
+			printmsg("Returned ID: %d \r\n", dev_id);
 			return BMP_DEVICE_CHECK_ERROR;
 		}
 		//soft reset

@@ -161,7 +161,11 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 
 	//Initialise Peripherals
 	MX_DMA_Init();
-	if(MX_I2C1_Init() != HAL_OK) return IMU_PERIPHERAL_INIT_ERROR;
+	if(MX_I2C1_Init() != HAL_OK)
+	{
+		printmsg("I2C init error \r\n");
+		return IMU_PERIPHERAL_INIT_ERROR;
+	}
 	MX_GPIO_Init();
 
 	//reset buffers and flags
@@ -176,7 +180,7 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	uint8_t whoami;
 	if(ICM20649_Get_ID(&hi2c1,&whoami) != IMU_OK)
 	{
-
+		printmsg("IMU offline \r\n");
 		return IMU_I2C_DEVICE_OFFLINE;
 	}
 

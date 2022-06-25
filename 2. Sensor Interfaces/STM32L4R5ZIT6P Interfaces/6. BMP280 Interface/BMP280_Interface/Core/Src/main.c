@@ -125,7 +125,7 @@ int main(void)
   MX_LPUART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
- /* char fail_cond[100] = {0};
+  char fail_cond[100] = {0};
   UT_Result_t result = AT001_Connection_Test(fail_cond);
   char res_buff[500] = {0};
   sprintf(res_buff, "%s", fail_cond);
@@ -135,7 +135,7 @@ int main(void)
   }else
   {
 	  printmsg(" AT001 Test Status: Fail \t INFO: %s \r\n",res_buff);
-  } */
+  }
 
   //uint8_t dev_id = 0;
   //uint8_t flag = BMP280_Get_ID(&dev_id);
@@ -163,6 +163,8 @@ int main(void)
 
 	  //create a string
 	  printmsg("Temp = %ld C\tPressure = %lu KPa\r\n",T,P);
+
+	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 

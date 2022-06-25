@@ -933,7 +933,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_ERR))
 	{
 
-		printmsg("UART error \r\n");
+		printmsg("UART error flags cleared \r\n");
 		//clear framing error
 		if(__HAL_UART_GET_FLAG(huart,UART_FLAG_FE) == SET)
 		{

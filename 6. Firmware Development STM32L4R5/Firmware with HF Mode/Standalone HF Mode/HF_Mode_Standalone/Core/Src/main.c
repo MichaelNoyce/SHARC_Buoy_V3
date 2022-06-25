@@ -98,7 +98,7 @@ int main(void)
 
   if((ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0) != IMU_OK))
   {
-	  printmsg("Error in i2c init \r\n");
+	  printmsg("Error in IMU Init\r\n");
   }
   else
   {
