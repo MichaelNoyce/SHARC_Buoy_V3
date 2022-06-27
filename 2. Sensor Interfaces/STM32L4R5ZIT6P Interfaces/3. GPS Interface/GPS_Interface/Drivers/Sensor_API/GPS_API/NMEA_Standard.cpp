@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file           : NMEA.cpp
-  * @brief          : Source / Header file for NMEA.c/.h
+  * @brief          : Header file for NMEA_Standard.hpp
   * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
@@ -22,42 +22,9 @@
 #include <stdexcept>
 #include <map>
 
-/* End Private Includes */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Defines */
-
-
-/* End Private Defines */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Macros */
-
-
-/* End Private Macros */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Types */
-
-/* End Private Types */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Function Prototypes */
 template<typename T>
 static T safe_stoi(const std::string &__str, std::size_t *__idx = (std::size_t *)0, int __base = 10) noexcept;
 static float safe_stof(const string& __str, size_t* __idx = 0) noexcept;
-
-/* End Private Function Prototypes */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Variables */
-
-/* End Private Variables */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Source Code */
-
-/* NMEA Base Class Methods */
 
 /**
  * @brief Splits a NMEA sentence into a vector containing each field element.
@@ -294,9 +261,7 @@ float NMEA_Standard::Coordinate::operator = (const Coordinate c){
 
 /* NMEA GNS Message */
 
-NMEA_Standard::GNS::GNS(const string & nmea){
-	auto fields = parseFields(nmea);
-
+NMEA_Standard::GNS::GNS(const std::vector<string> & fields){
 	if(fields.size() == 15){
 		// Class constructors will handle empty cases.
 								addr 		= fields[0];
@@ -317,11 +282,12 @@ NMEA_Standard::GNS::GNS(const string & nmea){
 	}
 }
 
+NMEA_Standard::GNS::GNS(const string & msg) :
+	GNS(parseFields(msg)){}
+
 /* NMEA GLL Message */
 
-NMEA_Standard::GLL::GLL(const string & nmea){
-	auto fields = parseFields(nmea);
-	
+NMEA_Standard::GLL::GLL(const std::vector<string> & fields){
 	if(fields.size() == 9) {
 								addr 	= fields[0];
 								lat 	= fields[1];
@@ -335,11 +301,12 @@ NMEA_Standard::GLL::GLL(const string & nmea){
 	}
 }
 
+NMEA_Standard::GLL::GLL(const string & nmea):
+	GLL(parseFields(nmea)){}
+
 /* NMEA GSA Message */
 
-NMEA_Standard::GSA::GSA(const string & nmea){
-	auto fields = parseFields(nmea);
-
+NMEA_Standard::GSA::GSA(const std::vector<string> & fields){
 	if(fields.size() == 20){
 								addr 		= fields[0];
 		if(!fields[1].empty())	opMode 		= fields[1].at(0);
@@ -356,11 +323,13 @@ NMEA_Standard::GSA::GSA(const string & nmea){
 	}
 }
 
+NMEA_Standard::GSA::GSA(const string & nmea) :
+	GSA(parseFields(nmea)){}
+
 /* NMEA ZDA Message */
 
-NMEA_Standard::ZDA::ZDA(const string & nmea){
-	auto fields = parseFields(nmea);
 
+NMEA_Standard::ZDA::ZDA(const std::vector<string> & fields){
 	if(fields.size() == 8){
 		addr		= fields[0];
 		time		= UTC_DateTime(
@@ -370,6 +339,9 @@ NMEA_Standard::ZDA::ZDA(const string & nmea){
 		cs			= fields[7];
 	}
 }
+
+NMEA_Standard::ZDA::ZDA(const string & nmea) :
+	ZDA(parseFields(nmea)){}
 
 NMEA_Standard::ZDA::UTC_DateTime::UTC_DateTime(const string & time, 
 				uint8_t day, uint8_t month, uint16_t year, 
@@ -411,7 +383,7 @@ float safe_stof(const string& __str, size_t* __idx) noexcept{
 	catch(std::out_of_range const &){ return 0.0f; }
 	catch(...) { return 0.0f; }
 }
-/* End Source Code */
+
 
 
 /*** END OF FILE ***/

@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file			: NMEA_PUBX.cpp
-  * @brief			: Source for NMEA_PUBX.hpp
+  * @brief			: Source for PUBX NMEA Protocol Extension.
   * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
@@ -16,11 +16,14 @@
   ******************************************************************************
   */
 
-#include "NMEA_PUBX.hpp"
+#include "M9N_Base.hpp"
 
 M9N_Base::NMEA_PUBX::PUBX::PUBX(uint8_t msgId) :
 	NMEA_PUBX(),
 	addr(msgId) {}
+
+M9N_Base::NMEA_PUBX::PUBX::Address::Address(uint8_t msgId) :
+	msgId(msgId){}
 
 M9N_Base::NMEA_PUBX::Config::Config(
 	M9N_Base::PortID portId, 

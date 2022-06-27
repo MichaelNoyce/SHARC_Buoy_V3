@@ -54,7 +54,10 @@
 
 /* --------------------------------------------------------------------------- */
 /* Begin Source Code */
-
+/*extern "C" int GPS_Log()
+{
+   //some cpp code
+} */
 
 /* End Source Code */
 

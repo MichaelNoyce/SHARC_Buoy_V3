@@ -141,38 +141,19 @@ int main(void)
    {
  	  printmsg("AT001: Fail \t TEST STATUS %s\r\n",(char*)x);
    }
-   /* USER CODE END 2 */
-   int16_t shunt_v, bus_v,current,power, V_bat;
-   /* Infinite loop */
-   /* USER CODE BEGIN WHILE */
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
    while (1)
    {
-     /* USER CODE END WHILE */
- 	  //trigger a conversion
- 	  INA219_Trigger_Conversion(2);
- 	  //read power
- 	  INA219_Get_Shunt_Voltage(&shunt_v);
- 	  INA219_Get_Bus_Voltage(&bus_v);
- 	  INA219_Get_Current(&current);
- 	  INA219_Get_Power(&power);
- 	  //convert dec value to power reading by multiplying by LSB
- 	  power = (ina.INA219_P_LSB*(float)power)*1000;
- 	  V_bat = (shunt_v/100)+bus_v;
- 	  char buff[1000];
- 	  //note: that the bus voltage measured by the device is different to the battery voltage due to the voltage drop
- 	  // accross the shunt resistor. Therefore, the Battery voltage = V_shunt+V_Bus
- 	  printmsg("V_shunt: %d.%d mV\tV_bus: %d.%d V\tV_bat: %d V\tI: %d.%d mA\tP: %d mW\r\n",shunt_v/100,shunt_v %100,bus_v/1000,bus_v%1000,V_bat,current/10,current%10,power);
- 	  HAL_Delay(500);
- 	  __NOP();
+    /* USER CODE END WHILE */
 
-     /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
    }
 
-   /* USER CODE END 3 */
-
+  /* USER CODE END 3 */
 }
-
-
 
 /**
   * @brief System Clock Configuration
@@ -321,12 +302,24 @@ static void MX_LPUART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   HAL_PWREx_EnableVddIO2();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PB7 */
+  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -338,7 +331,7 @@ void printmsg(char *format,...) {
     va_list args;
     va_start(args, format);
     vsprintf(str, format,args);
-    //HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+    HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
     va_end(args);
 }
 /* USER CODE END 4 */

@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file           : M9N.hpp
-  * @brief          : Source / Header file for M9N.c/.h
+  * @brief          : Header file for uBlox M9N Base Driver.
   * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
@@ -19,10 +19,14 @@
 #pragma once
 
 #include <stdio.h>
+#include <vector>
+#include <string>
 #include <map>
 
-#include "NMEA_PUBX.hpp"
 #include "UBX.hpp"
+#include "NMEA_Standard.hpp"
+
+using vect = std::vector<uint8_t>;
 
 class M9N_Base{
 public:
@@ -66,7 +70,10 @@ public:
 		enum class Message;
 
 		class Config;
+		class Position;
 		class Rate;
+		class SvStatus;
+		class Time;
 
 	private:
 		class PUBX;
@@ -74,104 +81,58 @@ public:
 		static string toString(const Message msg);
 	};
 
-	void setConfig(NMEA_PUBX::Config cfg);
+	/* NMEA Protocol API */
+	using NMEA = NMEA_PUBX;
+	void setConfig(NMEA::Config cfg);
+
+	void setRate(NMEA::Rate rate);
 	void silenceDefaultRates();
+
+	/* UBX Protocol API */
+	// TODO
 
 protected:
 	Baud baud {Baud::B38400};	// Assumed MCU Baudrate initialised to 38400.
 	
-	// virtual void write(const string & msg) = 0;
-	virtual void transmit(const string & msg) = 0;
-	virtual void delay(uint32_t delay) = 0;
-	virtual void setBaudrate(Baud baud = Baud::B38400, PortID portId = PortID::UART1) = 0;
+	/*****************************************************************************************************************************/
+										/* Application Specific Communication and Control Interface */
+	/* This class must be extended and must implement the following methods based on the device-specific peripherals.*/
 	
-	void setRate(NMEA_PUBX::Rate rate);
-};
+	/**
+	 * @brief Transmit a vector of byte-sized values on the selected communication interface.
+	 * 
+	 * @param msg
+	 * 
+	 * @note The transmission may occur in non-blocking mode but should send messages in the sequence that they were requested.
+	 */
+	virtual void transmit(const std::vector<uint8_t> & msg) = 0;
+	
+	/**
+	 * @brief Delay the program execution.
+	 * 
+	 * @param delay	Delay in milliseconds.
+	 * 
+	 * @note The delay need not be precise but should delay by at least the the passed amount of time.
+	 */
+	virtual void delay(uint32_t delay) = 0;
 
-enum class M9N_Base::NMEA_PUBX::Message{
-	/* Standard NMEA Sentences. Identical to NMEA_Base::Message */
-	DTM,	// Datum Reference
-	GAQ,	// GA Poll
-	GBQ,	// GB Poll
-	GBS,	// Satellite Fault Detection
-	GGA,	// GPS Fix Data
-	GLL,	// Location with Time and Fix Status
-	GLQ,	// GL Poll
-	GNQ,	// GN Poll
-	GNS,	// GNSS Fix Data
-	GPQ,	// GP Poll
-	GRS,	// GNSS Range Residuals
-	GSA,	// GNSS Dilution of Precision
-	GST,	// GNSS Pseudorange Error Statistics
-	GSV,	// GNSS Satellites in View
-	RLM,	// Return Link Message
-	RMC,	// Recommended Minimum Data
-	TXT,	// Test transmission
-	VLW,	// Dual Ground/Water Distance
-	VTG,	// Course over Ground and Speed
-	ZDA, 	// Time and Date
-
-	/* uBlox PUBX Extensions  */
-	PUBX_CONFIG,	// Protocols and Rate Configuration
-	PUBX_POSITION,	// Positional Data
-	PUBX_RATE,		// Message Output Rate
-	PUBX_SVSTATUS,	// Satellite Status
-	PUBX_TIME		// Time Information
-};
-
-class M9N_Base::NMEA_PUBX::PUBX : public NMEA_PUBX{
+	/**
+	 * @brief Set the baudrate of the relevant communication peripheral device.
+	 * 
+	 * @param baud		The baudrate to set in bits per second.
+	 * @param portId	The Port the baudrate change should occur upon.
+	 * 
+	 * @note This method will not be called at startup. The peripheral communication interface should default to 
+	 * 		 the M9N's default baudrate to begin communication.
+	 */
+	virtual void setBaudrate(Baud baud = Baud::B38400, PortID portId = PortID::UART1) = 0;
+	/*****************************************************************************************************************************/
+	
 protected:
-	struct Address{
-		const string pubx{"PUBX"};
-		uint8_t msgId;
+	virtual void transmit(const string & msg);
 
-		Address(uint8_t msgId);
-	} addr;
-
-	PUBX(uint8_t msgId);
-	virtual string toString() = 0;
 };
 
-class M9N_Base::NMEA_PUBX::Config : public PUBX{
-public:
-	M9N_Base::PortID portId;
-	M9N_Base::InProto inProto;
-	M9N_Base::OutProto outProto;
-	M9N_Base::Baud baudrate;
-	bool autobauding;
-
-	Config(
-		M9N_Base::PortID portId, 
-		M9N_Base::InProto inProto, 
-		M9N_Base::OutProto outProto, 
-		M9N_Base::Baud baudrate, 
-		bool autobauding );
-
-	string toString() override final;
-};
-
-class M9N_Base::NMEA_PUBX::Rate : public PUBX{
-public:
-	Message ID;		// NMEA Message Identifier
-					// Note: Interface Description overloaded "msgId". 
-					// Swapped "msgId" for "ID" to preserve naming with PUBX.
-	uint8_t rddc{};	// Rate on DDC Port
-	uint8_t rus1{};	// Rate on UART1 Port
-	uint8_t rus2{};	// Rate on UART2 Port
-	uint8_t rusb{};	// Rate on USB Port
-	uint8_t rspi{};	// Rate on SPI Port
-	uint8_t reserved{};	// Always 0
-
-	Rate() = default;
-	Rate(
-		Message ID,
-		uint8_t rus1 = 0u,
-		uint8_t rddc = 0u,
-		uint8_t rus2 = 0u,
-		uint8_t rusb = 0u,
-		uint8_t rspi = 0u);
-
-	string toString() override final;
-};
+#include "NMEA_PUBX.hpp"
 
 /*** END OF FILE ***/

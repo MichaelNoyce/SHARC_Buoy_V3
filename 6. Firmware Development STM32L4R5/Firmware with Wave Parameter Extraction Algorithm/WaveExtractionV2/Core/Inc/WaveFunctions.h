@@ -6,6 +6,10 @@
  * Author: Michael Noyce
  */
 
+#ifndef HAL_WAVE_H_
+#define HAL_WAVE_H_
+
+
 /*User Includes------------------------------------------------*/
 #include "arm_math.h"
 #include "string.h"
@@ -31,23 +35,22 @@
 
 
 
-/* Structs ---------------------------------------------------*/
+/* Structs ---------------------------------------------------*?
 
 /*
  * @brief: Wave data structure
  */
 typedef struct
 {
-
 	float32_t Hm0; //Significant waveheight
 	float32_t Hrms; //Root mean square waveheight
-	float32_t T0; //Mean zero corssing period
+	float32_t T0; //Mean zero crossing period
 	float32_t TM01; //Mean spectral wave period
 	float32_t Tp; // Peak wave period
 	float32_t M0; //0th Spectral moment
 	float32_t M1; //1st spectral moment
 	float32_t M2; //2nd spectral moment
-	float32_t PSD[40]; //PSD Period in spectral bins
+	float32_t PSD[30]; //PSD Period in spectral bins
 
 }Wave_Data_t;
 
@@ -125,3 +128,5 @@ void WelchMethod(float32_t* PSD, uint32_t waveDirNo);
  * @param M2
  */
 void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t* Hrms, float32_t* T0, float32_t* Tp, float32_t*  M0, float32_t* M1, float32_t* M2);
+
+#endif /* HAL_WAVE_H_ */

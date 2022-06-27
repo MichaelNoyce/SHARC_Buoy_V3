@@ -1,7 +1,23 @@
-22:27:40 **** Incremental Build of configuration Debug for project INA219_Interface ****
+21:57:35 **** Incremental Build of configuration Debug for project GPS_Interface ****
 make -j4 all 
-arm-none-eabi-size   INA219_Interface.elf 
-   text	   data	    bss	    dec	    hex	filename
-  25484	    120	   1936	  27540	   6b94	INA219_Interface.elf
-Finished building: default.size.stdout
- 
+arm-none-eabi-g++ "../Drivers/Sensor_API/GPS_API/UBX.cpp" -mcpu=cortex-m4 -std=gnu++14 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API" -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API/GPS_API" -O0 -ffunction-sections -fdata-sections -fno-rtti -fno-use-cxa-atexit -Wall -fstack-usage -MMD -MP -MF"Drivers/Sensor_API/GPS_API/UBX.d" -MT"Drivers/Sensor_API/GPS_API/UBX.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/Sensor_API/GPS_API/UBX.o"
+arm-none-eabi-gcc "../Core/Src/M9N_C_API.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API" -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API/GPS_API" -O0 -ffunction-sections -fdata-sections -Wall -fexceptions -fstack-usage -MMD -MP -MF"Core/Src/M9N_C_API.d" -MT"Core/Src/M9N_C_API.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/M9N_C_API.o"
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API" -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/2. Sensor Interfaces/STM32L4R5ZIT6P Interfaces/3. GPS Interface/GPS_Interface/Drivers/Sensor_API/GPS_API" -O0 -ffunction-sections -fdata-sections -Wall -fexceptions -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+<command-line>: error: expected identifier before numeric constant
+../Drivers/Sensor_API/GPS_API/UBX_INF.hpp:25:8: note: in expansion of macro 'DEBUG'
+   25 |  class DEBUG;
+      |        ^~~~~
+<command-line>: error: expected unqualified-id before numeric constant
+../Drivers/Sensor_API/GPS_API/UBX_INF.hpp:25:8: note: in expansion of macro 'DEBUG'
+   25 |  class DEBUG;
+      |        ^~~~~
+<command-line>: error: expected identifier before numeric constant
+../Drivers/Sensor_API/GPS_API/UBX_INF.hpp:32:17: note: in expansion of macro 'DEBUG'
+   32 | class UBX::INF::DEBUG : public UBX::INF{
+      |                 ^~~~~
+<command-line>: error: expected unqualified-id before numeric constant
+../Drivers/Sensor_API/GPS_API/UBX_INF.hpp:32:17: note: in expansion of macro 'DEBUG'
+   32 | class UBX::INF::DEBUG : public UBX::INF{
+      |                 ^~~~~
+make: *** [Drivers/Sensor_API/GPS_API/subdir.mk:37: Drivers/Sensor_API/GPS_API/UBX.o] Error 1
+"make -j4 all" terminated with exit code 2. Build might be incomplete.

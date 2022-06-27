@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * @file           : M9N.cpp
-  * @brief          : Source / Header file for M9N.c/.h
+  * @file           : M9N_Base.cpp
+  * @brief          : Source M9N_Base.hpp
   * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
@@ -16,45 +16,12 @@
   ******************************************************************************
   */
 
-/* --------------------------------------------------------------------------- */
-/* Begin Private Includes */
+
 #include "M9N_Base.hpp"
-#include "NMEA_PUBX.hpp"
-#include "UBX.hpp"
-/* End Private Includes */
 
-/* --------------------------------------------------------------------------- */
-/* Begin Private Defines */
-
-
-/* End Private Defines */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Macros */
-
-
-/* End Private Macros */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Typedefs */
-
-
-/* End Private Typedefs */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Function Prototypes */
-
-
-/* End Private Function Prototypes */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Private Variables */
-
-
-/* End Private Variables */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Source Code */
+void M9N_Base::transmit(const string & msg){
+	transmit( vect(msg.begin(), msg.end()) );
+}
 
 void M9N_Base::setRate(NMEA_PUBX::Rate rate){
 	transmit(rate.toString());
@@ -66,12 +33,10 @@ void M9N_Base::setConfig(NMEA_PUBX::Config cfg){
 	if(cfg.baudrate != baud) setBaudrate(cfg.baudrate, cfg.portId);
 }
 
-
-
 void M9N_Base::silenceDefaultRates(){
 	const std::array<NMEA_PUBX::Message, 7u> msgs = {
 		NMEA_PUBX::Message::GGA, 
-		NMEA_PUBX::Message::GLL, 
+		// NMEA_PUBX::Message::GLL, 
 		NMEA_PUBX::Message::GSA, 
 		NMEA_PUBX::Message::GSV, 
 		NMEA_PUBX::Message::RMC, 

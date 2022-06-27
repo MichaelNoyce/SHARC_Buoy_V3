@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file           : NMEA.hpp
-  * @brief          : Source / Header file for NMEA.c/.h
+  * @brief          : NMEA Protocol Standard Driver
   * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
@@ -17,42 +17,13 @@
   */
 
 #pragma once
-/* --------------------------------------------------------------------------- */
-/* Begin Public Includes */
+
 #include <string>
 #include <vector>
 #include <array>
 #include <memory>
 
 using string = std::string;
-/* End Public Includes */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Public Defines */
-
-
-/* End Public Defines */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Public Typedefs */
-
-
-/* End Public Typedefs */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Global Public Variables */
-
-
-/* End Global Public Variables */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Public Function Prototypes */
-
-/* End Public Function Prototypes */
-
-/* --------------------------------------------------------------------------- */
-/* Begin Public Class Definitions */
-
 
 class NMEA_Standard{
 protected:
@@ -260,8 +231,5 @@ public:
 	ZDA(const string & nmea);
 	inline string toString() final{return "";}	// Unimplemented
 };
-
-
-/* End Public Class Definitions */
 
 /*** END OF FILE ***/

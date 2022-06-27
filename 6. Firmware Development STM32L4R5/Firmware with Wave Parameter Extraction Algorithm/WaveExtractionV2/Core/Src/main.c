@@ -84,7 +84,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
- 	HAL_Init();
+c 	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -135,9 +135,9 @@ int main(void)
   fullPipeline(waveData, waveDirNo);
 
  /*for(int i=0; i<512; i++)
-      {
-      	 printmsg("%.8f \r\n", PSD[i]);
-      } */
+ {
+	 printmsg("%.8f \r\n", PSD[i]);
+ }*/
 
 
     printmsg("DSP Pipeline Finished!\r\n");
