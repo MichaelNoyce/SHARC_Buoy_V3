@@ -291,6 +291,8 @@ void HPFDoubleIntegration(float32_t* rfftInput, float32_t* waveAmplitude)
 
 void WelchMethod(float32_t* PSD, uint32_t waveDirNo)
 {
+	printmsg("Entering Welch method! \r\n");
+
 	uint32_t i;
 	uint32_t j;
 	float32_t singleSegment[FFT_LENGTH];

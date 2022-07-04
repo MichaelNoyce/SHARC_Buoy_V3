@@ -126,6 +126,7 @@ int main(void)
   uint8_t imu[12] = {0};
   int32_t Ax, Ay, Az, Gx, Gy, Gz;
   RTC_TimeTypeDef gTime;
+  RTC_DateTypeDef gDate;
   uint8_t data_status;
 
   waveDirNo = 1;
@@ -167,6 +168,8 @@ int main(void)
 			ICM20649_Get_IMU_RawData(&hi2c1, imu);
 
 			HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+
+			HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN); //unlocks time stamp
 
 			accelTemp[0] = ( (int16_t) (imu[0] << 8) | imu[1]);
 			accelTemp[1] = ( (int16_t) (imu[2] << 8) | imu[3]);

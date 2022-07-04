@@ -74,14 +74,6 @@ static void MX_RTC_Init(void);
   */
 void Error_Handler(void);
 
-/**
-  * @brief Place code for IMU Event Detection here
-  * @param None
-  * @retval None
-  */
-static void Routine_ASYNC_IMU_EVENT(void);
-
-
 /*
  * @brief Code for Reset State Routine
  * @param None
@@ -615,6 +607,7 @@ static void Routine_STATE_SAMPLE(void)
 		  	  }
 
 		  ICM20649_Deinit_IMU();
+		  SD_File_Close(&File); //NB Remember to close file
 		  SD_Unmount(SDFatFs);
 
 	//Store updated directory and log numbers

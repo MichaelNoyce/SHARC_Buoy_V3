@@ -38,7 +38,7 @@
 /* The following macros allow for the time.h library to be ported to embedded systems*/
 
 #define _XOPEN_SOURCE // Definition for time.h to work
-#define ARM_MATH_CM4  // Also defined for the time.h embedded implementation
+//#define ARM_MATH_CM4  // Also defined for the time.h embedded implementation
 
 //============================= 1. Includes ==============================================
 

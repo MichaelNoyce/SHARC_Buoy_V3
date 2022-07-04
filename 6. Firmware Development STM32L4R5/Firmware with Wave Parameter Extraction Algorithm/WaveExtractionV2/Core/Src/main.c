@@ -84,7 +84,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-c 	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -117,22 +117,22 @@ c 	HAL_Init();
 
   uint32_t fpointer = 0;
 
-  //SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+  SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
 
 
-    /*for(int i=0; i<1024; i++)
+    for(int i=0; i<1024; i++)
     {
-    	 //printmsg("%.8f \r\n", rawData[i]);
-    } */
+    	 printmsg("%.8f \r\n", rawData[i]);
+    }
 
   //WelchMethod(PSD, waveDirNo);
 
   //singleSegmentPipeline(PSD, 1, 1);
 
-  //waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
+ //waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
 
-  fullPipeline(waveData, waveDirNo);
+  //fullPipeline(waveData, waveDirNo);
 
  /*for(int i=0; i<512; i++)
  {

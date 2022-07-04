@@ -26,13 +26,13 @@
 
 #include "HAL_Iridium.h"
 
-#include "DATAFLASH.h"
+#include "HAL_SD.h"
 
 #include "HAL_BMP280.h"
 
 #include "HAL_INA219.h"
 
-#include "HAL_MPU6050.h"
+#include "HAL_ICM20649.h"
 
 /** @addtogroup STM32L4xx_HAL_Driver
   * @{

@@ -35,34 +35,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := BUOY_FIRMWARE_V3
+BUILD_ARTIFACT_NAME := BUOY_FIRMWARE_V3_Initial
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-BUOY_FIRMWARE_V3.elf \
+BUOY_FIRMWARE_V3_Initial.elf \
 
 MAP_FILES += \
-BUOY_FIRMWARE_V3.map \
+BUOY_FIRMWARE_V3_Initial.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-BUOY_FIRMWARE_V3.list \
+BUOY_FIRMWARE_V3_Initial.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: BUOY_FIRMWARE_V3.elf secondary-outputs
+main-build: BUOY_FIRMWARE_V3_Initial.elf secondary-outputs
 
 # Tool invocations
-BUOY_FIRMWARE_V3.elf BUOY_FIRMWARE_V3.map: $(OBJS) $(USER_OBJS) C:\Users\mpnoy\OneDrive\Documents\Masters\ 2021\SHARC_Buoy_V3\6.\ Firmware\ Development\ STM32L4R5\Firmware\ Conversion\ to\ V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -u _printf_float -o "BUOY_FIRMWARE_V3.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware Conversion to V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="BUOY_FIRMWARE_V3.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
+BUOY_FIRMWARE_V3_Initial.elf BUOY_FIRMWARE_V3_Initial.map: $(OBJS) $(USER_OBJS) C:\Users\mpnoy\OneDrive\Documents\Masters\ 2021\SHARC_Buoy_V3\6.\ Firmware\ Development\ STM32L4R5\Firmware\ Conversion\ to\ V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -u _printf_float -o "BUOY_FIRMWARE_V3_Initial.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware Conversion to V3\Buoy_Firmware_V3\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="BUOY_FIRMWARE_V3_Initial.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=soft -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,14 +71,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-BUOY_FIRMWARE_V3.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "BUOY_FIRMWARE_V3.list"
+BUOY_FIRMWARE_V3_Initial.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "BUOY_FIRMWARE_V3_Initial.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) BUOY_FIRMWARE_V3.elf BUOY_FIRMWARE_V3.list BUOY_FIRMWARE_V3.map default.size.stdout
+	-$(RM) BUOY_FIRMWARE_V3_Initial.elf BUOY_FIRMWARE_V3_Initial.list BUOY_FIRMWARE_V3_Initial.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
