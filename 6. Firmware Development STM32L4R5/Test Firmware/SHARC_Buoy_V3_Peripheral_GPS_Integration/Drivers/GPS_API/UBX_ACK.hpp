@@ -28,17 +28,16 @@ protected:
 	uint8_t ackClsID;	//Class ID of Acknowledged/Not Acknowledged Message.
 	uint8_t ackMsgID;	//Message ID of Acknowledged/Not Acknowledged Message.
 
-	ACKNAK(const vect & ubx);
 };
 
 class UBX::ACKNAK::ACK : public ACKNAK{
 public:
-	ACK(const vect & ubx);
+
 };
 
 class UBX::ACKNAK::NAK : public ACKNAK{
 public:
-	NAK(const vect & ubx);
+
 };
 
 

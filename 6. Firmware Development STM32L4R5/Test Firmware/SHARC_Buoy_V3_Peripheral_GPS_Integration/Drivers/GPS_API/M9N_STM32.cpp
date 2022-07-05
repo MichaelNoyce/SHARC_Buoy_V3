@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "M9N_C_API.hpp"
+#include "M9N_C_API.h"
 
 M9N::M9N(UART_HandleTypeDef * h, IRQn_Type uartIrq, IRQn_Type dmaTxIrq, IRQn_Type dmaRxIrq) :
 	uart(h, uartIrq, dmaTxIrq, dmaRxIrq) {}

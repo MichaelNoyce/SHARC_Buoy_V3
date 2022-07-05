@@ -922,7 +922,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 			{
 				//reciever timeout
 				IR_RX_Flag = -2;
-				printmsg('Receiver timeout \r\n');
+				printmsg("Receiver timeout \r\n");
 			}
 			IR_TIM_IDLE_Timeout = 0;
 			__HAL_UART_CLEAR_IDLEFLAG(huart);

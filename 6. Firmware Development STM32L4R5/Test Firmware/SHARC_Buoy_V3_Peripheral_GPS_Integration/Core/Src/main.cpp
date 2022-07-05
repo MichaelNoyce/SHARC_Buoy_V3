@@ -22,20 +22,31 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+#pragma GCC diagnostic ignored "-Wformat"
+
+
 #include "M9N_STM32.hpp"
-#include "M9N_C_API.hpp"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "M9N_C_API.h"
 #include "HAL_INA219.h"
 #include "HAL_Iridium.h"
 #include "HAL_BMP280.h"
-#include "Sharc_Frame.h"
 #include "HAL_ICM20649.h"
 #include "HAL_SD.h"
 #include "stm32l4xx_hal.h"	//HAL library
 #include "waveFunctions.h"
+#include "Sharc_Frame.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+GPS_Data_t gpsDataLive;
+
 
 /* USER CODE END PTD */
 
@@ -50,7 +61,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
- RTC_HandleTypeDef hrtc; //RTC Handler Instance
+// extern RTC_HandleTypeDef hrtc; //RTC Handler Instance
 
  uint8_t GPS_On = 0; //flag to show if sensor is online
 
@@ -59,7 +70,6 @@
  uint8_t wavebuffer[WAVEBUFFER_SIZE];
 
 
- GPS_Data_t gpsDataLive;
 
 /* USER CODE END PV */
 
@@ -78,12 +88,12 @@ static void MX_RTC_Init(void);
   */
 void Error_Handler(void);
 
-/**
-  * @brief Place code for IMU Event Detection here
-  * @param None
-  * @retval None
-  */
-static void Routine_ASYNC_IMU_EVENT(void);
+///**
+//  * @brief Place code for IMU Event Detection here
+//  * @param None
+//  * @retval None
+//  */
+//static void Routine_ASYNC_IMU_EVENT(void);
 
 
 /*
@@ -119,6 +129,8 @@ static void Routine_STATE_TRANSMIT(void);
  * @retval None
  */
 static void Routine_Init_STATE(void);
+
+}	/*Extern C*/
 /* USER CODE END PFP */
 
 /**
@@ -369,7 +381,7 @@ static void Routine_STATE_RESET(void)
 	 //set_WUP_Pin(IMU_EVENT_WAKE_PIN,MODE_EXTI);
 	 printmsg("Device Online!\r\n");
 	 printmsg("Current State: RESET \t Next State: SAMPLE\r\n");
-	 HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+//	 HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
 
 }
 
@@ -434,11 +446,10 @@ static void Routine_STATE_SAMPLE(void)
 	  //initialise gps peripherals and begin comms on sensor instance
 	  GPS_InterruptsOn();
 
-	  if(GPS_Init == GPS_Init_OK)
+	  if(GPS_Init() == GPS_Init_OK)
 	  {
 		 printmsg("GPS Online! Acquiring Signal...\r\n");
 		 GPS_On = 1;
-		 break;
 	  }
 
 
@@ -451,11 +462,10 @@ static void Routine_STATE_SAMPLE(void)
 			  	  GPS_InterruptsOn();
 
 				  printmsg("Logging Data...\r\n");
-				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+//				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
 				  Gdata.coordinates = gpsDataLive.coordinates;
-				  Gdata.Etime = gpsDataLive.coordinates;
 				  Gdata.diag = gpsDataLive.diag;
-				  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
+				  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.coordinates.time, Gdata.coordinates.lat, Gdata.coordinates.longi);
 				  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
 				  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
 
@@ -463,7 +473,7 @@ static void Routine_STATE_SAMPLE(void)
 				  uint8_t tempGPSBuf[500];
 				  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
 				  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-				  sprintf(tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.Etime, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
+				  sprintf((char *)tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.coordinates.time, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
 				  SD_File_Write(&File, tempGPSBuf);
 				  SD_File_Close(&File);
 				  SD_Unmount(SDFatFs);
@@ -504,7 +514,7 @@ static void Routine_STATE_SAMPLE(void)
 		  uint8_t tempENVBuf[200];
 		  SD_ENV_Open(&File, &Dir, &fno,envDirNo, envLogNo);
 		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-		  sprintf(tempENVBuf, "%d:%d:%d, %ld, %lu \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.env_Temp, Gdata.atm_Press);
+		  sprintf((char *)tempENVBuf, "%d:%d:%d, %ld, %lu \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.env_Temp, Gdata.atm_Press);
 		  SD_File_Write(&File, tempENVBuf);
 		  SD_File_Close(&File);
 		  SD_Unmount(SDFatFs);
@@ -525,9 +535,9 @@ static void Routine_STATE_SAMPLE(void)
 		  //Trigger a conversion
 		  INA219_Trigger_Conversion(2);
 		  //read registers
-		  INA219_Get_Shunt_Voltage(&Gdata.shunt_v);
-		  INA219_Get_Bus_Voltage(&Gdata.bus_v);
-		  INA219_Get_Current(&Gdata.current);
+		  INA219_Get_Shunt_Voltage((int16_t *)&Gdata.shunt_v);
+		  INA219_Get_Bus_Voltage((int16_t *)&Gdata.bus_v);
+		  INA219_Get_Current((int16_t *)&Gdata.current);
 		  INA219_Get_Power(&p_temp);
 		  Gdata.power = (ina.INA219_P_LSB*(float)p_temp)*1000;
 		  printmsg("V_Shunt %d mV V_Bus %d mV Current %d mA Power %d mW\r\n",Gdata.shunt_v,Gdata.bus_v, Gdata.current,Gdata.power);
@@ -535,7 +545,7 @@ static void Routine_STATE_SAMPLE(void)
 		  uint8_t tempPWRBuf[200];
 		  SD_ENV_Open(&File, &Dir, &fno,pwrDirNo, pwrLogNo);
 		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-		  sprintf(tempPWRBuf, "%d:%d:%d, %d, %d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.shunt_v, Gdata.bus_v, Gdata.current, Gdata.power);
+		  sprintf((char *)tempPWRBuf, "%d:%d:%d, %d, %d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.shunt_v, Gdata.bus_v, Gdata.current, Gdata.power);
 		  SD_File_Write(&File, tempPWRBuf);
 		  SD_File_Close(&File);
 		  SD_Unmount(SDFatFs);
@@ -591,7 +601,7 @@ static void Routine_STATE_SAMPLE(void)
 					   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
 					   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
 
-					   sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
+					   sprintf((char *)tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
 					   SD_File_Write(&File, tempFIFOBuf);
 
 					   imu_sample_count++;
@@ -716,7 +726,7 @@ static void Routine_STATE_TRANSMIT(void)
 
 
 	  //Convert GData Buffer to binary
-	  uint8_t* buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT()-1);
+	  uint8_t* buffer = to_binary_format_GPS(GdataT, (__GET_SAMPLE_COUNT()-1) );
 
 	  //Populate first packet of GPS data into array
 	  memcpy(&GPS_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
@@ -937,5 +947,7 @@ static void Routine_Init_STATE(void)
 	ICM20649_Deinit_IMU();
 
 }
+
+
 //===================================== 8. END ======================================//
 

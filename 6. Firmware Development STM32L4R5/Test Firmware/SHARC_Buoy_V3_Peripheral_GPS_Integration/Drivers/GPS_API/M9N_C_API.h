@@ -35,14 +35,14 @@ extern "C" typedef enum{
 	GPS_Init_Offline_Error = 7
 }GPS_Init_msg_t;
 
-typedef enum{
+extern "C" typedef enum{
 	GPS_MSG_RDY = 1,
 	GPS_BUSY= 2,
 	GPS_OFFLINE = 3,
 	GPS_ERROR = 4,
 }GPS_Status_t;
 
-typedef enum{
+extern "C" typedef enum{
 	UBX_OK = 2,
 	UBX_ACK_ACK = 1,
 	UBX_ACK_NACK = 0,
@@ -57,7 +57,7 @@ typedef enum{
  *
  * @return
  */
-GPS_Init_msg_t GPS_Init();
+extern "C" GPS_Init_msg_t GPS_Init();
 
 /**
  * @brief Configure update rate
@@ -94,10 +94,6 @@ extern "C" uint8_t GPS_Data_Ready();
 extern "C" void GPS_InterruptsOff();
 
 extern "C" void GPS_InterruptsOn();
-
-void receiveGLL(const NMEA_Standard::GLL & gll);
-void receiveGSA(const NMEA_Standard::GSA & gsa);
-void receiveZDA(const NMEA_Standard::ZDA & zda);
 
 
 /*** END OF FILE ***/

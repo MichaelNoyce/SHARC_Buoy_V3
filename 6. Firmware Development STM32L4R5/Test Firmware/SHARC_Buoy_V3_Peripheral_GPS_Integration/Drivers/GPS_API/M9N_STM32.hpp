@@ -27,6 +27,10 @@
 
 using string = StaticString;
 
+void receiveGLL(const NMEA_Standard::GLL & gll);
+void receiveGSA(const NMEA_Standard::GSA & gsa);
+void receiveZDA(const NMEA_Standard::ZDA & zda);
+
 class M9N : public M9N_Base{
 public:
 	M9N(UART_HandleTypeDef * h, IRQn_Type uartIrq, IRQn_Type dmaTxIrq, IRQn_Type dmaRxIrq);

@@ -90,7 +90,6 @@ public:
 	void silenceDefaultRates();
 
 	/* UBX Protocol API */
-	void poll(UBX::POLL_REQ & pr);
 
 protected:
 	Baud baud {Baud::B38400};	// Assumed MCU Baudrate initialised to 38400.

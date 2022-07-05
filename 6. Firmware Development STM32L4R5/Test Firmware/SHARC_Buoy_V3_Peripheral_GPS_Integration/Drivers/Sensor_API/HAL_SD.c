@@ -11,6 +11,7 @@
 #include "HAL_SD.h"
 #include "string.h"
 #include "main.h"
+#include "Sharc_Frame.h"
 
 //======================== 2. Private Variables =====================================================
 
@@ -305,13 +306,14 @@ sd_status_t SD_Dir_Close(DIR *myDir)
  * @param myFile
  * @return
  */
+/*
 sd_status_t SD_File_TimeStamp(FIL *myFile)
 {
 	RTC_DateTypeDef gDate;
 	RTC_TimeTypeDef gTime;
-	/* Get the RTC current Time */
+
 	HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-	/* Get the RTC current Date */
+
 	HAL_RTC_GetDate(&hrtc, &gDate, RTC_FORMAT_BIN);
 
 	FILINFO fno;
@@ -328,7 +330,7 @@ sd_status_t SD_File_TimeStamp(FIL *myFile)
 
 		return SD_OK;
 
-}
+} */
 
 
 

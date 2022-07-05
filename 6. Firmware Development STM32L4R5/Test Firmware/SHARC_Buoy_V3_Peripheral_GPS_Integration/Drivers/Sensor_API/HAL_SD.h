@@ -71,19 +71,6 @@ typedef enum
 }IMU_Data_SD_t;
 
 
-typedef enum
-{
-	ETIME,		// UTC Epoch representation of time
-	COORD,	//GPS coordinates
-	DIAG,		//Diagnostic information
-	ENV_TEMP,		//environmental temperature
-	ATM_PRESS,		//atmospheric pressure
-	SHUNT_V,		//shunt voltage (mv)
-	BUS_V,			//bus voltage   (mV)
-	CURRENT,		//battery current (mA)
-	POWER,			//power consumption (mW)
-}GPS_Data_SD_t;
-
 //========================== 4. Global Variables ==========================================
 
 FATFS SDFatFs; /* File system object for User logical drive */
@@ -106,11 +93,11 @@ uint32_t pwrDirNo;
 
 //============================= 6. Handlers ===============================================
 
-UART_HandleTypeDef hlpuart1;
+//extern UART_HandleTypeDef hlpuart1;
 
 SD_HandleTypeDef hsd1;
 
-RTC_HandleTypeDef hrtc; // this is only included for the standalone module - remove if using code with own RTC
+//RTC_HandleTypeDef hrtc; // this is only included for the standalone module - remove if using code with own RTC
 
 
 //======================== 7. SD Configuration Functions =========================================

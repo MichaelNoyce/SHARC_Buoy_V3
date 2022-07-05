@@ -483,9 +483,9 @@ uint32_t fifo_sample_count;   //Keeps track of the number of samples in the FIFO
 
 uint32_t fifo_sample_complete;   //Current FIFO sample is complete
 
-uint32_t waveLogNo;
+extern uint32_t waveLogNo;
 
-uint32_t waveDirNo;
+extern uint32_t waveDirNo;
 
 uint8_t IMU_Log_On;			 //used in EXTI IRQ to determine what routine to run
 

@@ -21,13 +21,6 @@
 #include "UBX.hpp"
 #include "UBX_ACK.hpp"
 #include "UBX_CFG.hpp"
-#include "UBX_INF.hpp"
-#include "UBX_LOG.hpp"
-#include "UBX_MGA.hpp"
-#include "UBX_MON.hpp"
-#include "UBX_NAV.hpp"
-#include "UBX_RXM.hpp"
-#include "UBX_TIM.hpp"
 
 /* End Private Includes */
 

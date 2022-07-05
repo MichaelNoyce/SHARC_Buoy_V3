@@ -17,19 +17,6 @@
   */
 #include "UBX_ACK.hpp"
 
-UBX::ACKNAK::ACKNAK(const vect & ubx) :
-	UBX(0x05, 0x01, 2) {
-	if(ubx.size() == 10u){
-		ackClsID = ubx[4];
-		ackMsgID = ubx[5];
-	}
-	else ackClsID = ackMsgID = 0;
-}
 
-UBX::ACKNAK::ACK::ACK(const vect & ubx) :
-	ACKNAK(ubx){}
-
-UBX::ACKNAK::NAK::NAK(const vect & ubx) :
-	ACKNAK(ubx){}
 
 /*** END OF FILE ***/

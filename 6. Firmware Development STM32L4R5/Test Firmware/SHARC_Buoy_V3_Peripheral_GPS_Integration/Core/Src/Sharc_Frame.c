@@ -7,7 +7,10 @@
 
 #include "Sharc_Frame.h"
 
+#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
 
+extern UART_HandleTypeDef hlpuart1;
+extern RTC_HandleTypeDef hrtc;
 
 static uint8_t driftbuffer[DRIFTBUFFER_SIZE] = {0};
 static uint8_t wavebuffer[WAVEBUFFER_SIZE] = {0};
@@ -199,7 +202,7 @@ HAL_StatusTypeDef Go_To_Sleep(PWR_MODE_t mode, uint32_t seconds)
 	 return HAL_OK;
 }
 
-HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
+/*HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
 {
 	//step 1, wait for ongoing uart transmissions to finish
 	printf("Heading to Sleep\r\n");
@@ -229,7 +232,7 @@ HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
 	HAL_UARTEx_EnableStopMode(huart);
 	HAL_PWREx_EnterSTOP1Mode(PWR_STOPENTRY_WFI);
 	return HAL_OK;
-}
+} */
 
 void set_WUP_Pin(uint32_t Pin, PinMode_typedef mode)
 {
@@ -503,7 +506,7 @@ uint8_t* to_binary_format_GPS(GPS_Data_t gps_data ,uint8_t ID)
 	/*0. Byte 0: Packet ID*/
 	*driftbuffer = ID;
 	/*1. Bytes 1 - 4:  Epoch Time*/
-	byte_converter.num = gps_data.Etime;
+	byte_converter.num = gps_data.coordinates.time;
 	memcpy(&driftbuffer[1],(byte_converter).bytes,4);
 
 	/* Add coordinates bytes 1 - 5 = lat, bytes 6 - 10 = long*/

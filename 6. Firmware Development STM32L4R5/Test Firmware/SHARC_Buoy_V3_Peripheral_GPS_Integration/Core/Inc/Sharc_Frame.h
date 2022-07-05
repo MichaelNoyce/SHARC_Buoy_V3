@@ -8,6 +8,10 @@
 #ifndef SHARC_FRAME_H_
 #define SHARC_FRAME_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Private includes ----------------------------------------------------------*/
 #include <stdio.h>
 
@@ -21,11 +25,11 @@
 
 #include "stm32l4xx_hal.h"
 
-#include "HAL_GPS.h"
-
 #include "HAL_Iridium.h"
 
 #include "WaveFunctions.h"
+
+#include "GPS_Struct.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -86,22 +90,6 @@ typedef enum
    MODE_EXTI
 } PinMode_typedef;
 
-/*
- * @brief: Structure to store data from GPS in an organised format. Note: custom data types from HAL_GPS.h
- */
-typedef struct
-{
-	uint32_t Etime;			// UTC Epoch representation of time
-	Coord_t  coordinates;	//GPS coordinates
-	Diagnostic_t diag;		//Diagnostic information
-	uint32_t env_Temp;		//environmental temperature
-	int32_t  atm_Press;		//atmospheric pressure
-	int16_t  shunt_v;		//shunt voltage (mv)
-	int16_t  bus_v;			//bus voltage   (mV)
-	int16_t  current;		//battery current (mA)
-	int16_t  power;			//power consumption (mW)
-}GPS_Data_t;
-
 
 //============
 /* Private Macro Functions ------------------------------------------------------------*/
@@ -129,7 +117,7 @@ typedef struct
 
 #define __SET_CURRENT_STATE(state) WRITE_REG(RTC->BKP0R,(RTC->BKP0R &0xFF00)|(state))
 
-#define __GET_SAMPLE_COUNT()  ((RTC->BKP0R)&0xFF00)>>8
+#define __GET_SAMPLE_COUNT()  (((RTC->BKP0R)&0xFF00)>>8)
 
 #define __SET_SAMPLE_COUNT(count)  WRITE_REG(RTC->BKP0R,(RTC->BKP0R &0xFF)|((count)<<8))
 
@@ -215,12 +203,13 @@ typedef struct
 #define WAVEBUFFER_SIZE 152
 /* Private variables ---------------------------------------------------------*/
 
-extern RTC_HandleTypeDef hrtc;
+UART_HandleTypeDef hlpuart1;
+RTC_HandleTypeDef hrtc;
+
 RTC_DateTypeDef hdate;
 RTC_TimeTypeDef htime;
 //__IO uint8_t in_Shutdown = 0;
 #ifdef DEBUG_USART_ENABLE
-UART_HandleTypeDef hlpuart1;
 #endif
 
 //uint32_t time;
@@ -462,7 +451,7 @@ uint8_t  get_driftBuffer_Size(void);
   * @retval None
   */
 
-void Routine_ASYNC_IRIDIUM_RX(void);
+//extern "C" void Routine_ASYNC_IRIDIUM_RX(void);
 
 void Routine_Async_IMUevent_Sample(void);
 
@@ -476,5 +465,9 @@ void POR_Handler(void);
  *  Routines that runs when device recovers from a brown out Vbat < Vbrountout
  */
 void BOR_Handler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SHARC_FRAME_H_ */
