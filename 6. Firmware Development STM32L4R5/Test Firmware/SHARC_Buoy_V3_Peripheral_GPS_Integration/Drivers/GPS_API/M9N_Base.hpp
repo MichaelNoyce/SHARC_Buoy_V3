@@ -48,7 +48,7 @@ public:
 		NMEA  = 0x0002u
 	};
 
-	enum class Baud : UBX::U4{
+	enum class Baud : uint32_t{
 		B9600 = 9600u,
 		B19200 = 19200u,
 		B38400 = 38400u,

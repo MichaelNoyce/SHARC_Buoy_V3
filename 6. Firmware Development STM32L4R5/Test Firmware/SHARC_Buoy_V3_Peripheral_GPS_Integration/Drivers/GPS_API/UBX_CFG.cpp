@@ -21,7 +21,6 @@
 
 #include <type_traits>
 
-
 /**
  * @brief 
  * 
@@ -40,7 +39,7 @@ uint8_t UBX::CFG::VAL::KeyValuePair::size() const{
 	}
 }
 
-std::pair<std::array<uint8_t, 12>, uint8_t> UBX::CFG::VAL::KeyValuePair::binary() const{
+std::pair<std::array<uint8_t, 12>, uint8_t> UBX::CFG::VAL::KeyValuePair::value() const{
 	std::pair<std::array<uint8_t, 12>, uint8_t> b;
 
 	for(auto i = 0u; i < 4; i++ ) b.first[i] = (keyId.toKey() & (0xFFul << 8*i)) >> 8*i; 
@@ -73,23 +72,6 @@ std::pair<std::array<uint8_t, 12>, uint8_t> UBX::CFG::VAL::KeyValuePair::binary(
 	return b;
 }
 
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::L val)  : keyId(key), tag(KeyValuePair::L), l(val){}
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U1 val) : keyId(key), tag(KeyValuePair::U1), u1(val){}
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I1 val) : keyId(key), tag(KeyValuePair::I1), i1(val){}
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E1 val) : keyId(key), tag(KeyValuePair::E1), e1(val){}	// Type Conflict. Use Initialiser List.
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X1 val) : keyId(key), tag(KeyValuePair::X1), x1(val){}	// Type Conflict. Use Initialiser List.
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U2 val) : keyId(key), tag(KeyValuePair::U2), u2(val){}
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I2 val) : keyId(key), tag(KeyValuePair::I2), i2(val){}
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E2 val) : keyId(key), tag(KeyValuePair::E2), e2(val){}	// Type Conflict. Use Initialiser List.
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X2 val) : keyId(key), tag(KeyValuePair::X2), x2(val){}	// Type Conflict. Use Initialiser List.
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U4 val) : keyId(key), tag(KeyValuePair::U4), u4(val){}
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I4 val) : keyId(key), tag(KeyValuePair::I4), i4(val){}
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E4 val) : keyId(key), tag(KeyValuePair::E4), e4(val){}	// Type Conflict. Use Initialiser List.
-// template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X4 val) : keyId(key), tag(KeyValuePair::X4), x4(val){}	// Type Conflict. Use Initialiser List.
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::R4 val) : keyId(key), tag(KeyValuePair::R4), r4(val){}
-
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, CFG_PM_OPERATEMODE val) : KeyValuePair(key, static_cast<std::underlying_type<CFG_PM_OPERATEMODE>::type>(val)){}
-template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, M9N_Base::Baud val) : KeyValuePair(key, static_cast<std::underlying_type<M9N_Base::Baud>::type>(val)){}
 
 
 
@@ -97,8 +79,8 @@ UBX::X4 UBX::CFG::VAL::KeyID::toKey() const {
 	return ( ( ((X4)size) << 28 ) | ( ((X4)groupID) << 16 ) | ( ((X4)itemID) ) );
 }
 
-std::pair<std::array<uint8_t, 6+64*12>, uint8_t> UBX::CFG::VAL::SET::binary() const noexcept {
-	std::array<uint8_t, 6+64*12> data;
+std::pair<std::array<uint8_t, 8+64*12>, uint8_t> UBX::CFG::VAL::SET::binary() const noexcept {
+	std::array<uint8_t, 8+64*12> data;
 	auto head = header();
 
 	std::copy(head.begin(), head.end(), data.begin());
@@ -110,10 +92,15 @@ std::pair<std::array<uint8_t, 6+64*12>, uint8_t> UBX::CFG::VAL::SET::binary() co
 
 	size_t k = 8;
 	for(auto i = 0u; i < cfgData.second; i++){
-		auto b = cfgData.first[i].binary();
+		auto b = cfgData.first[i].value();
 		std::copy(b.first.begin(), b.first.begin() + b.second, data.begin() + k);
 		k += b.second;
 	}
+
+	// cs = Checksum(data.begin() + 2, data.begin() + k);
+	data[k++] = cs.ckA;
+	data[k++] = cs.ckB;
+
 	return {data, k};
 }
 

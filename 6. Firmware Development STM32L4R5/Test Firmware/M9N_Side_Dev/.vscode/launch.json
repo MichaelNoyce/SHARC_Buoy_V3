@@ -1,0 +1,36 @@
+{
+	"configurations": [
+		{
+			"showDevDebugOutput": "parsed",
+			"cwd": "${workspaceRoot}",
+			"executable": "./build/SHARC_M9N.elf",
+			"name": "Debug STM32",
+			"request": "launch",
+			"type": "cortex-debug",
+			"servertype": "openocd",
+			"preLaunchTask": "Build STM",
+			"device": "stm32l4r5",
+			"configFiles": [
+				"openocd.cfg"
+			],
+			"interface": "swd",
+			"gdbPath": "gdb",
+			"runToEntryPoint": "main"
+
+		},
+		{
+			"showDevDebugOutput": "parsed",
+			"cwd": "${workspaceRoot}",
+			"executable": "./build/SHARC_M9N.elf",
+			"name": "Attach STM32",
+			"request": "attach",
+			"type": "cortex-debug",
+			"servertype": "openocd",
+			"preLaunchTask": "Build STM",
+			"device": "stm32l4r5",
+			"configFiles": [
+				"openocd.cfg"
+			]
+		}
+	]
+}

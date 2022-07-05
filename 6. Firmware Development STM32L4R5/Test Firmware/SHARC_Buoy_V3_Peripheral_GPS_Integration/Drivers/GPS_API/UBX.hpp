@@ -20,13 +20,11 @@
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
 
-#include "stdio.h"
-
+#include <stdio.h>
 #include <array>
 #include <string>
-#include <vector>
 
-using vect = std::vector<uint8_t>;
+#include "M9N_Base.hpp"
 
 class UBX{
 public:
@@ -80,9 +78,6 @@ public:
 	typedef float	R4;
 	typedef double	R8;
 	typedef char	CH;
-
-	static U2 getPayloadLen(const std::vector<uint8_t> & ubx);	// Extracts a UBX frame length specifier value from a frame hex vector.
-
 	
 protected:
 	static const U1 sync1 = 0xB5;	// 'mu'
@@ -96,13 +91,14 @@ protected:
 		U1 ckB;
 
 		Checksum() = default;
-		Checksum(const vect & ubxProto);
+		Checksum(const uint8_t * begin, const uint8_t * end);
 		Checksum(U1 _ckA, U1 _ckB);
-
 	} cs;
 
 	UBX() = delete;
 	UBX(U1 msgClass, U1 msgID, U2 len = 0);
+
+	static U2 getPayloadLen(const uint8_t * begin, const uint8_t * end);
 
 	std::array<uint8_t, 6> header() const;
 };
@@ -115,7 +111,7 @@ public:
 
 class UBX::SEC::UNIQID : public UBX::SEC{
 public:
-	UNIQID(const vect & ubx);
+	UNIQID();
 };
 
 class UBX::UPD : public UBX{
@@ -125,16 +121,9 @@ public:
 
 class UBX::UPD::SOS : public UBX::UPD{
 public:
-	SOS(const vect & ubx);
+	SOS();
 };
 
 #include "UBX_CFG.hpp"
-
-class BAD : public UBX{
-private:
-	vect ubx;
-public:
-	BAD(const vect & ubx) : UBX(0, 0), ubx(vect(ubx.begin(), ubx.end())) {}
-};
 
 /*** END OF FILE ***/

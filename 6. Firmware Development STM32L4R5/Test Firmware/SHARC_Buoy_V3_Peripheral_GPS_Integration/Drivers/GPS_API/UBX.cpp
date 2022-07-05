@@ -29,8 +29,6 @@
 #include "UBX_RXM.hpp"
 #include "UBX_TIM.hpp"
 
-using string = std::string;
-using vect = std::vector<uint8_t>;
 /* End Private Includes */
 
 /* --------------------------------------------------------------------------- */
@@ -69,17 +67,11 @@ using vect = std::vector<uint8_t>;
 UBX::UBX(U1 msgClass, U1 msgID, U2 len) :
 	msgClass(msgClass), msgID(msgID), len(len) {}
 
-/**
- * @brief CalcuUBX::Checksum::Checksum object from a UBX frame prototype (without any checksum> attached.
- * 
- * @param ubxProto
- */
-UBX::Checksum::Checksum(const vect & ubxProto){
-	auto v = vect(ubxProto.begin()+2, ubxProto.end());	// Checksum string excludes preamble.
+UBX::Checksum::Checksum(const uint8_t * begin, const uint8_t * end){
 	ckA = ckB = 0;
 
-	for(const auto c : v){
-		ckA += c;
+	for(auto c  = begin; c < end; c++){
+		ckA += *c;
 		ckB += ckA;
 	}
 }
@@ -87,10 +79,10 @@ UBX::Checksum::Checksum(const vect & ubxProto){
 UBX::Checksum::Checksum(U1 ckA, U1 ckB) :
 	ckA(ckA), ckB(ckB) {}
 
-UBX::U2 UBX::getPayloadLen(const std::vector<uint8_t> & ubx){
-	if(ubx.size() >= 6){
+UBX::U2 UBX::getPayloadLen(const uint8_t * begin, const uint8_t * end){
+	if(end - begin >= 6){
 		#ifdef __ARMEL__	// If ARM Little Endian. This should be the default for all STM32 devices.
-		return *(uint16_t *)(ubx.data() + 4);
+		return *(uint16_t *)(begin + 4);
 		#elif __ARMEB__		// If ARM Big Endian.
 		return (*(uint16_t *)(
 		ubx.data() + 4) << 8) | *(

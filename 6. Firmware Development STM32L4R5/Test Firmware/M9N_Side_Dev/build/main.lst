@@ -1,0 +1,1778 @@
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"main.cpp"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text._ZL12MX_GPIO_Initv,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	_ZL12MX_GPIO_Initv:
+  26              		.fnstart
+  27              	.LFB2268:
+  28              		.file 1 "Core/Src/main.cpp"
+   1:Core/Src/main.cpp **** /* USER CODE BEGIN Header */
+   2:Core/Src/main.cpp **** /**
+   3:Core/Src/main.cpp ****   ******************************************************************************
+   4:Core/Src/main.cpp ****   * @file           : main.c
+   5:Core/Src/main.cpp ****   * @brief          : Main program body
+   6:Core/Src/main.cpp ****   ******************************************************************************
+   7:Core/Src/main.cpp ****   * @attention
+   8:Core/Src/main.cpp ****   *
+   9:Core/Src/main.cpp ****   * Copyright (c) 2022 STMicroelectronics.
+  10:Core/Src/main.cpp ****   * All rights reserved.
+  11:Core/Src/main.cpp ****   *
+  12:Core/Src/main.cpp ****   * This software is licensed under terms that can be found in the LICENSE file
+  13:Core/Src/main.cpp ****   * in the root directory of this software component.
+  14:Core/Src/main.cpp ****   * If no LICENSE file comes with this software, it is provided AS-IS.
+  15:Core/Src/main.cpp ****   *
+  16:Core/Src/main.cpp ****   ******************************************************************************
+  17:Core/Src/main.cpp ****   */
+  18:Core/Src/main.cpp **** /* USER CODE END Header */
+  19:Core/Src/main.cpp **** /* Includes ------------------------------------------------------------------*/
+  20:Core/Src/main.cpp **** #include "main.h"
+  21:Core/Src/main.cpp **** 
+  22:Core/Src/main.cpp **** /* Private includes ----------------------------------------------------------*/
+  23:Core/Src/main.cpp **** /* USER CODE BEGIN Includes */
+  24:Core/Src/main.cpp **** #include "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmwa
+  25:Core/Src/main.cpp **** #include "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmwa
+  26:Core/Src/main.cpp **** /* USER CODE END Includes */
+  27:Core/Src/main.cpp **** 
+  28:Core/Src/main.cpp **** /* Private typedef -----------------------------------------------------------*/
+  29:Core/Src/main.cpp **** /* USER CODE BEGIN PTD */
+  30:Core/Src/main.cpp **** 
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 2
+
+
+  31:Core/Src/main.cpp **** /* USER CODE END PTD */
+  32:Core/Src/main.cpp **** 
+  33:Core/Src/main.cpp **** /* Private define ------------------------------------------------------------*/
+  34:Core/Src/main.cpp **** /* USER CODE BEGIN PD */
+  35:Core/Src/main.cpp **** /* USER CODE END PD */
+  36:Core/Src/main.cpp **** 
+  37:Core/Src/main.cpp **** /* Private macro -------------------------------------------------------------*/
+  38:Core/Src/main.cpp **** /* USER CODE BEGIN PM */
+  39:Core/Src/main.cpp **** 
+  40:Core/Src/main.cpp **** /* USER CODE END PM */
+  41:Core/Src/main.cpp **** 
+  42:Core/Src/main.cpp **** /* Private variables ---------------------------------------------------------*/
+  43:Core/Src/main.cpp **** UART_HandleTypeDef huart4;
+  44:Core/Src/main.cpp **** DMA_HandleTypeDef hdma_uart4_rx;
+  45:Core/Src/main.cpp **** DMA_HandleTypeDef hdma_uart4_tx;
+  46:Core/Src/main.cpp **** 
+  47:Core/Src/main.cpp **** /* USER CODE BEGIN PV */
+  48:Core/Src/main.cpp **** GPS_Data_t gpsDataLive;
+  49:Core/Src/main.cpp **** /* USER CODE END PV */
+  50:Core/Src/main.cpp **** 
+  51:Core/Src/main.cpp **** /* Private function prototypes -----------------------------------------------*/
+  52:Core/Src/main.cpp **** void SystemClock_Config(void);
+  53:Core/Src/main.cpp **** static void MX_GPIO_Init(void);
+  54:Core/Src/main.cpp **** static void MX_DMA_Init(void);
+  55:Core/Src/main.cpp **** static void MX_UART4_Init(void);
+  56:Core/Src/main.cpp **** /* USER CODE BEGIN PFP */
+  57:Core/Src/main.cpp **** 
+  58:Core/Src/main.cpp **** /* USER CODE END PFP */
+  59:Core/Src/main.cpp **** 
+  60:Core/Src/main.cpp **** /* Private user code ---------------------------------------------------------*/
+  61:Core/Src/main.cpp **** /* USER CODE BEGIN 0 */
+  62:Core/Src/main.cpp **** int main(){
+  63:Core/Src/main.cpp **** 	HAL_Init();
+  64:Core/Src/main.cpp **** 
+  65:Core/Src/main.cpp **** 	MX_GPIO_Init();
+  66:Core/Src/main.cpp **** 	MX_DMA_Init();
+  67:Core/Src/main.cpp **** 	MX_UART4_Init();
+  68:Core/Src/main.cpp **** 
+  69:Core/Src/main.cpp **** 	GPS_Init();
+  70:Core/Src/main.cpp **** 
+  71:Core/Src/main.cpp **** 	while(true){
+  72:Core/Src/main.cpp **** 
+  73:Core/Src/main.cpp **** 	}
+  74:Core/Src/main.cpp **** }
+  75:Core/Src/main.cpp **** /* USER CODE END 0 */
+  76:Core/Src/main.cpp **** 
+  77:Core/Src/main.cpp **** /**
+  78:Core/Src/main.cpp ****   * @brief  The application entry point.
+  79:Core/Src/main.cpp ****   * @retval int
+  80:Core/Src/main.cpp ****   */
+  81:Core/Src/main.cpp **** 
+  82:Core/Src/main.cpp **** /**
+  83:Core/Src/main.cpp ****   * @brief System Clock Configuration
+  84:Core/Src/main.cpp ****   * @retval None
+  85:Core/Src/main.cpp ****   */
+  86:Core/Src/main.cpp **** void SystemClock_Config(void)
+  87:Core/Src/main.cpp **** {
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 3
+
+
+  88:Core/Src/main.cpp ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  89:Core/Src/main.cpp ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  90:Core/Src/main.cpp **** 
+  91:Core/Src/main.cpp ****   /** Configure the main internal regulator output voltage
+  92:Core/Src/main.cpp ****   */
+  93:Core/Src/main.cpp ****   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
+  94:Core/Src/main.cpp ****   {
+  95:Core/Src/main.cpp ****     Error_Handler();
+  96:Core/Src/main.cpp ****   }
+  97:Core/Src/main.cpp **** 
+  98:Core/Src/main.cpp ****   /** Initializes the RCC Oscillators according to the specified parameters
+  99:Core/Src/main.cpp ****   * in the RCC_OscInitTypeDef structure.
+ 100:Core/Src/main.cpp ****   */
+ 101:Core/Src/main.cpp ****   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
+ 102:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+ 103:Core/Src/main.cpp ****   RCC_OscInitStruct.MSICalibrationValue = 0;
+ 104:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_10;
+ 105:Core/Src/main.cpp ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 106:Core/Src/main.cpp ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 107:Core/Src/main.cpp ****   {
+ 108:Core/Src/main.cpp ****     Error_Handler();
+ 109:Core/Src/main.cpp ****   }
+ 110:Core/Src/main.cpp **** 
+ 111:Core/Src/main.cpp ****   /** Initializes the CPU, AHB and APB buses clocks
+ 112:Core/Src/main.cpp ****   */
+ 113:Core/Src/main.cpp ****   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 114:Core/Src/main.cpp ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 115:Core/Src/main.cpp ****   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+ 116:Core/Src/main.cpp ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 117:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 118:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 119:Core/Src/main.cpp **** 
+ 120:Core/Src/main.cpp ****   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+ 121:Core/Src/main.cpp ****   {
+ 122:Core/Src/main.cpp ****     Error_Handler();
+ 123:Core/Src/main.cpp ****   }
+ 124:Core/Src/main.cpp **** }
+ 125:Core/Src/main.cpp **** 
+ 126:Core/Src/main.cpp **** /**
+ 127:Core/Src/main.cpp ****   * @brief UART4 Initialization Function
+ 128:Core/Src/main.cpp ****   * @param None
+ 129:Core/Src/main.cpp ****   * @retval None
+ 130:Core/Src/main.cpp ****   */
+ 131:Core/Src/main.cpp **** static void MX_UART4_Init(void)
+ 132:Core/Src/main.cpp **** {
+ 133:Core/Src/main.cpp **** 
+ 134:Core/Src/main.cpp ****   /* USER CODE BEGIN UART4_Init 0 */
+ 135:Core/Src/main.cpp **** 
+ 136:Core/Src/main.cpp ****   /* USER CODE END UART4_Init 0 */
+ 137:Core/Src/main.cpp **** 
+ 138:Core/Src/main.cpp ****   /* USER CODE BEGIN UART4_Init 1 */
+ 139:Core/Src/main.cpp **** 
+ 140:Core/Src/main.cpp ****   /* USER CODE END UART4_Init 1 */
+ 141:Core/Src/main.cpp ****   huart4.Instance = UART4;
+ 142:Core/Src/main.cpp ****   huart4.Init.BaudRate = 38400;
+ 143:Core/Src/main.cpp ****   huart4.Init.WordLength = UART_WORDLENGTH_8B;
+ 144:Core/Src/main.cpp ****   huart4.Init.StopBits = UART_STOPBITS_1;
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 4
+
+
+ 145:Core/Src/main.cpp ****   huart4.Init.Parity = UART_PARITY_NONE;
+ 146:Core/Src/main.cpp ****   huart4.Init.Mode = UART_MODE_TX_RX;
+ 147:Core/Src/main.cpp ****   huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 148:Core/Src/main.cpp ****   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+ 149:Core/Src/main.cpp ****   huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+ 150:Core/Src/main.cpp ****   huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+ 151:Core/Src/main.cpp ****   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 152:Core/Src/main.cpp ****   if (HAL_UART_Init(&huart4) != HAL_OK)
+ 153:Core/Src/main.cpp ****   {
+ 154:Core/Src/main.cpp ****     Error_Handler();
+ 155:Core/Src/main.cpp ****   }
+ 156:Core/Src/main.cpp ****   if (HAL_UARTEx_SetTxFifoThreshold(&huart4, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+ 157:Core/Src/main.cpp ****   {
+ 158:Core/Src/main.cpp ****     Error_Handler();
+ 159:Core/Src/main.cpp ****   }
+ 160:Core/Src/main.cpp ****   if (HAL_UARTEx_SetRxFifoThreshold(&huart4, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+ 161:Core/Src/main.cpp ****   {
+ 162:Core/Src/main.cpp ****     Error_Handler();
+ 163:Core/Src/main.cpp ****   }
+ 164:Core/Src/main.cpp ****   if (HAL_UARTEx_EnableFifoMode(&huart4) != HAL_OK)
+ 165:Core/Src/main.cpp ****   {
+ 166:Core/Src/main.cpp ****     Error_Handler();
+ 167:Core/Src/main.cpp ****   }
+ 168:Core/Src/main.cpp ****   /* USER CODE BEGIN UART4_Init 2 */
+ 169:Core/Src/main.cpp **** 
+ 170:Core/Src/main.cpp ****   /* USER CODE END UART4_Init 2 */
+ 171:Core/Src/main.cpp **** 
+ 172:Core/Src/main.cpp **** }
+ 173:Core/Src/main.cpp **** 
+ 174:Core/Src/main.cpp **** /**
+ 175:Core/Src/main.cpp ****   * Enable DMA controller clock
+ 176:Core/Src/main.cpp ****   */
+ 177:Core/Src/main.cpp **** static void MX_DMA_Init(void)
+ 178:Core/Src/main.cpp **** {
+ 179:Core/Src/main.cpp **** 
+ 180:Core/Src/main.cpp ****   /* DMA controller clock enable */
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMAMUX1_CLK_ENABLE();
+ 182:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+ 183:Core/Src/main.cpp **** 
+ 184:Core/Src/main.cpp ****   /* DMA interrupt init */
+ 185:Core/Src/main.cpp ****   /* DMA1_Channel4_IRQn interrupt configuration */
+ 186:Core/Src/main.cpp ****   HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+ 187:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+ 188:Core/Src/main.cpp ****   /* DMA1_Channel5_IRQn interrupt configuration */
+ 189:Core/Src/main.cpp ****   HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+ 190:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+ 191:Core/Src/main.cpp **** 
+ 192:Core/Src/main.cpp **** }
+ 193:Core/Src/main.cpp **** 
+ 194:Core/Src/main.cpp **** /**
+ 195:Core/Src/main.cpp ****   * @brief GPIO Initialization Function
+ 196:Core/Src/main.cpp ****   * @param None
+ 197:Core/Src/main.cpp ****   * @retval None
+ 198:Core/Src/main.cpp ****   */
+ 199:Core/Src/main.cpp **** static void MX_GPIO_Init(void)
+ 200:Core/Src/main.cpp **** {
+  29              		.loc 1 200 1 view -0
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 5
+
+
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 8
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  34 0000 82B0     		sub	sp, sp, #8
+  35              		.cfi_def_cfa_offset 8
+ 201:Core/Src/main.cpp **** 
+ 202:Core/Src/main.cpp ****   /* GPIO Ports Clock Enable */
+ 203:Core/Src/main.cpp ****   __HAL_RCC_GPIOA_CLK_ENABLE();
+  36              		.loc 1 203 3 view .LVU1
+  37              	.LBB4:
+  38              		.loc 1 203 3 view .LVU2
+  39              		.loc 1 203 3 view .LVU3
+  40 0002 064B     		ldr	r3, .L3
+  41 0004 DA6C     		ldr	r2, [r3, #76]
+  42 0006 42F00102 		orr	r2, r2, #1
+  43 000a DA64     		str	r2, [r3, #76]
+  44              		.loc 1 203 3 view .LVU4
+  45 000c DB6C     		ldr	r3, [r3, #76]
+  46 000e 03F00103 		and	r3, r3, #1
+  47 0012 0193     		str	r3, [sp, #4]
+  48              		.loc 1 203 3 view .LVU5
+  49 0014 019B     		ldr	r3, [sp, #4]
+  50              	.LBE4:
+ 204:Core/Src/main.cpp **** 
+ 205:Core/Src/main.cpp **** }
+  51              		.loc 1 205 1 is_stmt 0 view .LVU6
+  52 0016 02B0     		add	sp, sp, #8
+  53              		.cfi_def_cfa_offset 0
+  54              		@ sp needed
+  55 0018 7047     		bx	lr
+  56              	.L4:
+  57 001a 00BF     		.align	2
+  58              	.L3:
+  59 001c 00100240 		.word	1073876992
+  60              		.cfi_endproc
+  61              	.LFE2268:
+  62              		.cantunwind
+  63              		.fnend
+  65              		.section	.text._ZL11MX_DMA_Initv,"ax",%progbits
+  66              		.align	1
+  67              		.syntax unified
+  68              		.thumb
+  69              		.thumb_func
+  71              	_ZL11MX_DMA_Initv:
+  72              		.fnstart
+  73              	.LFB2267:
+ 178:Core/Src/main.cpp **** 
+  74              		.loc 1 178 1 is_stmt 1 view -0
+  75              		.cfi_startproc
+  76              		@ args = 0, pretend = 0, frame = 8
+  77              		@ frame_needed = 0, uses_anonymous_args = 0
+  78 0000 00B5     		push	{lr}
+  79              		.save {lr}
+  80              		.cfi_def_cfa_offset 4
+  81              		.cfi_offset 14, -4
+  82              		.pad #12
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 6
+
+
+  83 0002 83B0     		sub	sp, sp, #12
+  84              		.cfi_def_cfa_offset 16
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+  85              		.loc 1 181 3 view .LVU8
+  86              	.LBB5:
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+  87              		.loc 1 181 3 view .LVU9
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+  88              		.loc 1 181 3 view .LVU10
+  89 0004 124B     		ldr	r3, .L7
+  90 0006 9A6C     		ldr	r2, [r3, #72]
+  91 0008 42F00402 		orr	r2, r2, #4
+  92 000c 9A64     		str	r2, [r3, #72]
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+  93              		.loc 1 181 3 view .LVU11
+  94 000e 9A6C     		ldr	r2, [r3, #72]
+  95 0010 02F00402 		and	r2, r2, #4
+  96 0014 0092     		str	r2, [sp]
+ 181:Core/Src/main.cpp ****   __HAL_RCC_DMA1_CLK_ENABLE();
+  97              		.loc 1 181 3 view .LVU12
+  98 0016 009A     		ldr	r2, [sp]
+  99              	.LBE5:
+ 182:Core/Src/main.cpp **** 
+ 100              		.loc 1 182 3 view .LVU13
+ 101              	.LBB6:
+ 182:Core/Src/main.cpp **** 
+ 102              		.loc 1 182 3 view .LVU14
+ 182:Core/Src/main.cpp **** 
+ 103              		.loc 1 182 3 view .LVU15
+ 104 0018 9A6C     		ldr	r2, [r3, #72]
+ 105 001a 42F00102 		orr	r2, r2, #1
+ 106 001e 9A64     		str	r2, [r3, #72]
+ 182:Core/Src/main.cpp **** 
+ 107              		.loc 1 182 3 view .LVU16
+ 108 0020 9B6C     		ldr	r3, [r3, #72]
+ 109 0022 03F00103 		and	r3, r3, #1
+ 110 0026 0193     		str	r3, [sp, #4]
+ 182:Core/Src/main.cpp **** 
+ 111              		.loc 1 182 3 view .LVU17
+ 112 0028 019B     		ldr	r3, [sp, #4]
+ 113              	.LBE6:
+ 186:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+ 114              		.loc 1 186 3 view .LVU18
+ 186:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+ 115              		.loc 1 186 23 is_stmt 0 view .LVU19
+ 116 002a 0022     		movs	r2, #0
+ 117 002c 1146     		mov	r1, r2
+ 118 002e 0E20     		movs	r0, #14
+ 119 0030 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 120              	.LVL0:
+ 187:Core/Src/main.cpp ****   /* DMA1_Channel5_IRQn interrupt configuration */
+ 121              		.loc 1 187 3 is_stmt 1 view .LVU20
+ 187:Core/Src/main.cpp ****   /* DMA1_Channel5_IRQn interrupt configuration */
+ 122              		.loc 1 187 21 is_stmt 0 view .LVU21
+ 123 0034 0E20     		movs	r0, #14
+ 124 0036 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 125              	.LVL1:
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 7
+
+
+ 189:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+ 126              		.loc 1 189 3 is_stmt 1 view .LVU22
+ 189:Core/Src/main.cpp ****   HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+ 127              		.loc 1 189 23 is_stmt 0 view .LVU23
+ 128 003a 0022     		movs	r2, #0
+ 129 003c 1146     		mov	r1, r2
+ 130 003e 0F20     		movs	r0, #15
+ 131 0040 FFF7FEFF 		bl	HAL_NVIC_SetPriority
+ 132              	.LVL2:
+ 190:Core/Src/main.cpp **** 
+ 133              		.loc 1 190 3 is_stmt 1 view .LVU24
+ 190:Core/Src/main.cpp **** 
+ 134              		.loc 1 190 21 is_stmt 0 view .LVU25
+ 135 0044 0F20     		movs	r0, #15
+ 136 0046 FFF7FEFF 		bl	HAL_NVIC_EnableIRQ
+ 137              	.LVL3:
+ 192:Core/Src/main.cpp **** 
+ 138              		.loc 1 192 1 view .LVU26
+ 139 004a 03B0     		add	sp, sp, #12
+ 140              		.cfi_def_cfa_offset 4
+ 141              		@ sp needed
+ 142 004c 5DF804FB 		ldr	pc, [sp], #4
+ 143              	.L8:
+ 144              		.align	2
+ 145              	.L7:
+ 146 0050 00100240 		.word	1073876992
+ 147              		.cfi_endproc
+ 148              	.LFE2267:
+ 149              		.fnend
+ 151              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_,"ax",%progbits
+ 152              		.align	1
+ 153              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_
+ 154              		.syntax unified
+ 155              		.thumb
+ 156              		.thumb_func
+ 158              	_ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_:
+ 159              		.fnstart
+ 160              	.LVL4:
+ 161              	.LFB1232:
+ 162              		.file 2 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmwa
+   1:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** /**
+   2:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   ******************************************************************************
+   3:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * @file			: UBX_CFG.hpp
+   4:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * @brief			: Configuration classes for UBX Driver.
+   5:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * @author			: Lawrence Stanton
+   6:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   ******************************************************************************
+   7:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * @attention
+   8:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   *
+   9:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * © LD Stanton 2022
+  10:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * 
+  11:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * This file and its content are the copyright property of the author. All 
+  12:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * rights are reserved. No warranty is given. No liability is assumed.
+  13:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * Confidential unless licensed otherwise. If licensed, refer to the 
+  14:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * accompanying file "LICENCE" for license details.
+  15:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   * 
+  16:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   ******************************************************************************
+  17:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp ****   */
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 8
+
+
+  18:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  19:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** #pragma once
+  20:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  21:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** #include <type_traits>
+  22:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  23:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** #include "UBX.hpp"
+  24:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** #include "M9N_Base.hpp"
+  25:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  26:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** class M9N_Base;
+  27:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  28:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** class UBX::CFG {
+  29:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** public:
+  30:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class ANT;			// Depricated
+  31:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class BATCH;			// Depricated
+  32:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class CCFG;			// Depricated
+  33:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class DAT;			// Depricated
+  34:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class GEOFENCE;		// Depricated
+  35:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class GNSS;			// Depricated
+  36:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class INF;			// Depricated
+  37:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class ITFM;			// Depricated
+  38:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class LOGFILTER;		// Depricated
+  39:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class MSG;			// Depricated	
+  40:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class NAV5;			// Depricated
+  41:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class NAVX5;			// Depricated
+  42:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class NMEA;			// Depricated
+  43:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class ODO;			// Depricated
+  44:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class PM2;			// Depricated
+  45:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class PM5;			// Depricated
+  46:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class PMS;			// Depricated
+  47:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class PRT;			// Depricated
+  48:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class POWER;			// Depricated	// PWR. PWR was overloaded by a define.
+  49:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class RATE;			// Depricated
+  50:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class RINV;			// Depricated
+  51:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class RST;
+  52:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class RXM;
+  53:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class SBAS;			// Depricated
+  54:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class TP5;			// Depricated
+  55:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	// class USB;			// Depricated
+  56:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class VAL;
+  57:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  58:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** private:
+  59:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  60:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** };
+  61:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  62:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** class UBX::CFG::RST : public UBX{
+  63:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** public:
+  64:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  65:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** };
+  66:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  67:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** class UBX::CFG::RXM : public UBX{
+  68:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** public:
+  69:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  70:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** };
+  71:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  72:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** class UBX::CFG::VAL : UBX::CFG {
+  73:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** public:
+  74:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class DEL;
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 9
+
+
+  75:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class GET;
+  76:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	class SET;
+  77:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  78:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	enum class Action : U1 {
+  79:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		TRANSACTIONLESS = 0x00u,
+  80:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		RE_START		= 0x01u,
+  81:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		ONGOING			= 0x02u,
+  82:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		APPLY			= 0x03u
+  83:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	};
+  84:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  85:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		struct KeyID{
+  86:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		enum class Size : uint8_t{
+  87:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			BIT = 0x01u,	// 1-bit (will use 1 byte of storage, LSB significant)
+  88:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			BYTE = 0x02,	// 1-byte
+  89:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			WORD = 0x03,	// 2-bytes
+  90:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			DOUBLE = 0x04,	// 4-bytes
+  91:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			QUAD = 0x05		// 8-bytes
+  92:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		} size;
+  93:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  94:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		U1 groupID;
+  95:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		U2 itemID;
+  96:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+  97:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		X4 toKey() const;
+  98:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		
+  99:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		KeyID() = default;
+ 100:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 101:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		constexpr KeyID(Size size, U1 groupID, U2 itemID) : 
+ 102:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			size(size), groupID(groupID), itemID(itemID) {}
+ 103:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		constexpr KeyID(U4 && key) : 
+ 104:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			size(static_cast<Size>( (key & (0b111u << 28)) >> 28 )),
+ 105:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			groupID((key & (0xFFu << 16)) >> 16),
+ 106:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			itemID((key & 0xFFFu)) {}
+ 107:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	};
+ 108:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 109:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	struct KeyValuePair{
+ 110:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		KeyID keyId;
+ 111:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 112:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		enum{
+ 113:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			L, U1, I1, E1, X1,	// 1-Byte Sized
+ 114:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			U2, I2, E2, X2,		// 2-Byte Sized
+ 115:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			U4, I4, E4, X4, R4	// 4-Byte Sized
+ 116:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		} tag;
+ 117:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 118:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		union{
+ 119:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::L l;
+ 120:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::U1 u1;
+ 121:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::I1 i1;
+ 122:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::E1 e1;
+ 123:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::X1 x1;
+ 124:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::U2 u2;
+ 125:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::I2 i2;
+ 126:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::E2 e2;
+ 127:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::X2 x2;
+ 128:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::U4 u4;
+ 129:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::I4 i4;
+ 130:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::E4 e4;
+ 131:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::X4 x4;
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 10
+
+
+ 132:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 			UBX::R4 r4;
+ 133:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		};
+ 134:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 135:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		uint8_t size() const;
+ 136:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		inline uint32_t key() const { return keyId.toKey(); }
+ 137:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		std::pair<std::array<uint8_t, 12>, uint8_t> value() const;	// {array, size occupied}
+ 138:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 139:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 140:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		KeyValuePair() = default;
+ 141:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 142:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		template<typename T>
+ 143:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		KeyValuePair(KeyID key, T val);
+ 144:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 145:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	};
+ 146:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 147:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	enum class CFG_PM_OPERATEMODE : UBX::E1{
+ 148:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		FULL  = 0u,
+ 149:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		PSMOO = 1u,
+ 150:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 		PSMCT = 2u
+ 151:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	};
+ 152:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 153:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** private:
+ 154:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 	VAL() = delete;
+ 155:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** };
+ 156:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 157:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::L val)  : keyId(key), tag(KeyV
+ 163              		.loc 2 157 12 is_stmt 1 view -0
+ 164              		.cfi_startproc
+ 165              		@ args = 0, pretend = 0, frame = 8
+ 166              		@ frame_needed = 0, uses_anonymous_args = 0
+ 167              		@ link register save eliminated.
+ 168              		.loc 2 157 12 is_stmt 0 view .LVU28
+ 169 0000 82B0     		sub	sp, sp, #8
+ 170              		.cfi_def_cfa_offset 8
+ 171 0002 0191     		str	r1, [sp, #4]
+ 172              	.LBB7:
+ 173              		.loc 2 157 119 view .LVU29
+ 174 0004 0160     		str	r1, [r0]
+ 175 0006 0021     		movs	r1, #0
+ 176 0008 0171     		strb	r1, [r0, #4]
+ 177 000a 0272     		strb	r2, [r0, #8]
+ 178              	.LBE7:
+ 179              		.loc 2 157 121 view .LVU30
+ 180 000c 02B0     		add	sp, sp, #8
+ 181              		.cfi_def_cfa_offset 0
+ 182              		@ sp needed
+ 183 000e 7047     		bx	lr
+ 184              		.cfi_endproc
+ 185              	.LFE1232:
+ 186              		.cantunwind
+ 187              		.fnend
+ 189              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IbEENS1_5KeyIDET_
+ 190              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IbEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1
+ 191              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_
+ 194              		.syntax unified
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 11
+
+
+ 195              		.thumb
+ 196              		.thumb_func
+ 198              	_ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_:
+ 199              		.fnstart
+ 200              	.LVL5:
+ 201              	.LFB1235:
+ 158:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U1 val) : keyId(key), tag(KeyV
+ 202              		.loc 2 158 12 is_stmt 1 view -0
+ 203              		.cfi_startproc
+ 204              		@ args = 0, pretend = 0, frame = 8
+ 205              		@ frame_needed = 0, uses_anonymous_args = 0
+ 206              		@ link register save eliminated.
+ 207              		.loc 2 158 12 is_stmt 0 view .LVU32
+ 208 0000 82B0     		sub	sp, sp, #8
+ 209              		.cfi_def_cfa_offset 8
+ 210 0002 0191     		str	r1, [sp, #4]
+ 211              	.LBB8:
+ 212              		.loc 2 158 121 view .LVU33
+ 213 0004 0160     		str	r1, [r0]
+ 214 0006 0121     		movs	r1, #1
+ 215 0008 0171     		strb	r1, [r0, #4]
+ 216 000a 0272     		strb	r2, [r0, #8]
+ 217              	.LBE8:
+ 218              		.loc 2 158 123 view .LVU34
+ 219 000c 02B0     		add	sp, sp, #8
+ 220              		.cfi_def_cfa_offset 0
+ 221              		@ sp needed
+ 222 000e 7047     		bx	lr
+ 223              		.cfi_endproc
+ 224              	.LFE1235:
+ 225              		.cantunwind
+ 226              		.fnend
+ 228              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IhEENS1_5KeyIDET_
+ 229              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IhEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1
+ 230              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_,"ax",%progbits
+ 231              		.align	1
+ 232              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_
+ 233              		.syntax unified
+ 234              		.thumb
+ 235              		.thumb_func
+ 237              	_ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_:
+ 238              		.fnstart
+ 239              	.LVL6:
+ 240              	.LFB1238:
+ 159:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I1 val) : keyId(key), tag(KeyV
+ 241              		.loc 2 159 12 is_stmt 1 view -0
+ 242              		.cfi_startproc
+ 243              		@ args = 0, pretend = 0, frame = 8
+ 244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 245              		@ link register save eliminated.
+ 246              		.loc 2 159 12 is_stmt 0 view .LVU36
+ 247 0000 82B0     		sub	sp, sp, #8
+ 248              		.cfi_def_cfa_offset 8
+ 249 0002 0191     		str	r1, [sp, #4]
+ 250              	.LBB9:
+ 251              		.loc 2 159 121 view .LVU37
+ 252 0004 0160     		str	r1, [r0]
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 12
+
+
+ 253 0006 0221     		movs	r1, #2
+ 254 0008 0171     		strb	r1, [r0, #4]
+ 255 000a 0272     		strb	r2, [r0, #8]
+ 256              	.LBE9:
+ 257              		.loc 2 159 123 view .LVU38
+ 258 000c 02B0     		add	sp, sp, #8
+ 259              		.cfi_def_cfa_offset 0
+ 260              		@ sp needed
+ 261 000e 7047     		bx	lr
+ 262              		.cfi_endproc
+ 263              	.LFE1238:
+ 264              		.cantunwind
+ 265              		.fnend
+ 267              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IaEENS1_5KeyIDET_
+ 268              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IaEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1
+ 269              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_,"ax",%progbits
+ 270              		.align	1
+ 271              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_
+ 272              		.syntax unified
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	_ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_:
+ 277              		.fnstart
+ 278              	.LVL7:
+ 279              	.LFB1241:
+ 160:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E1 val) : keyId(key), tag(K
+ 161:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X1 val) : keyId(key), tag(K
+ 162:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U2 val) : keyId(key), tag(KeyV
+ 280              		.loc 2 162 12 is_stmt 1 view -0
+ 281              		.cfi_startproc
+ 282              		@ args = 0, pretend = 0, frame = 8
+ 283              		@ frame_needed = 0, uses_anonymous_args = 0
+ 284              		@ link register save eliminated.
+ 285              		.loc 2 162 12 is_stmt 0 view .LVU40
+ 286 0000 82B0     		sub	sp, sp, #8
+ 287              		.cfi_def_cfa_offset 8
+ 288 0002 0191     		str	r1, [sp, #4]
+ 289              	.LBB10:
+ 290              		.loc 2 162 121 view .LVU41
+ 291 0004 0160     		str	r1, [r0]
+ 292 0006 0521     		movs	r1, #5
+ 293 0008 0171     		strb	r1, [r0, #4]
+ 294 000a 0281     		strh	r2, [r0, #8]	@ movhi
+ 295              	.LBE10:
+ 296              		.loc 2 162 123 view .LVU42
+ 297 000c 02B0     		add	sp, sp, #8
+ 298              		.cfi_def_cfa_offset 0
+ 299              		@ sp needed
+ 300 000e 7047     		bx	lr
+ 301              		.cfi_endproc
+ 302              	.LFE1241:
+ 303              		.cantunwind
+ 304              		.fnend
+ 306              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1ItEENS1_5KeyIDET_
+ 307              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1ItEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1
+ 308              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_,"ax",%progbits
+ 309              		.align	1
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 13
+
+
+ 310              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_
+ 311              		.syntax unified
+ 312              		.thumb
+ 313              		.thumb_func
+ 315              	_ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_:
+ 316              		.fnstart
+ 317              	.LVL8:
+ 318              	.LFB1244:
+ 163:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I2 val) : keyId(key), tag(KeyV
+ 319              		.loc 2 163 12 is_stmt 1 view -0
+ 320              		.cfi_startproc
+ 321              		@ args = 0, pretend = 0, frame = 8
+ 322              		@ frame_needed = 0, uses_anonymous_args = 0
+ 323              		@ link register save eliminated.
+ 324              		.loc 2 163 12 is_stmt 0 view .LVU44
+ 325 0000 82B0     		sub	sp, sp, #8
+ 326              		.cfi_def_cfa_offset 8
+ 327 0002 0191     		str	r1, [sp, #4]
+ 328              	.LBB11:
+ 329              		.loc 2 163 121 view .LVU45
+ 330 0004 0160     		str	r1, [r0]
+ 331 0006 0621     		movs	r1, #6
+ 332 0008 0171     		strb	r1, [r0, #4]
+ 333 000a 0281     		strh	r2, [r0, #8]	@ movhi
+ 334              	.LBE11:
+ 335              		.loc 2 163 123 view .LVU46
+ 336 000c 02B0     		add	sp, sp, #8
+ 337              		.cfi_def_cfa_offset 0
+ 338              		@ sp needed
+ 339 000e 7047     		bx	lr
+ 340              		.cfi_endproc
+ 341              	.LFE1244:
+ 342              		.cantunwind
+ 343              		.fnend
+ 345              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IsEENS1_5KeyIDET_
+ 346              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IsEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1
+ 347              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_,"ax",%progbits
+ 348              		.align	1
+ 349              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_
+ 350              		.syntax unified
+ 351              		.thumb
+ 352              		.thumb_func
+ 354              	_ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_:
+ 355              		.fnstart
+ 356              	.LVL9:
+ 357              	.LFB1247:
+ 164:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E2 val) : keyId(key), tag(K
+ 165:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X2 val) : keyId(key), tag(K
+ 166:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::U4 val) : keyId(key), tag(KeyV
+ 358              		.loc 2 166 12 is_stmt 1 view -0
+ 359              		.cfi_startproc
+ 360              		@ args = 0, pretend = 0, frame = 8
+ 361              		@ frame_needed = 0, uses_anonymous_args = 0
+ 362              		@ link register save eliminated.
+ 363              		.loc 2 166 12 is_stmt 0 view .LVU48
+ 364 0000 82B0     		sub	sp, sp, #8
+ 365              		.cfi_def_cfa_offset 8
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 14
+
+
+ 366 0002 0191     		str	r1, [sp, #4]
+ 367              	.LBB12:
+ 368              		.loc 2 166 121 view .LVU49
+ 369 0004 0160     		str	r1, [r0]
+ 370 0006 0921     		movs	r1, #9
+ 371 0008 0171     		strb	r1, [r0, #4]
+ 372 000a 8260     		str	r2, [r0, #8]
+ 373              	.LBE12:
+ 374              		.loc 2 166 123 view .LVU50
+ 375 000c 02B0     		add	sp, sp, #8
+ 376              		.cfi_def_cfa_offset 0
+ 377              		@ sp needed
+ 378 000e 7047     		bx	lr
+ 379              		.cfi_endproc
+ 380              	.LFE1247:
+ 381              		.cantunwind
+ 382              		.fnend
+ 384              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1ImEENS1_5KeyIDET_
+ 385              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1ImEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1
+ 386              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_,"ax",%progbits
+ 387              		.align	1
+ 388              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_
+ 389              		.syntax unified
+ 390              		.thumb
+ 391              		.thumb_func
+ 393              	_ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_:
+ 394              		.fnstart
+ 395              	.LVL10:
+ 396              	.LFB1250:
+ 167:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::I4 val) : keyId(key), tag(KeyV
+ 397              		.loc 2 167 12 is_stmt 1 view -0
+ 398              		.cfi_startproc
+ 399              		@ args = 0, pretend = 0, frame = 8
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+ 401              		@ link register save eliminated.
+ 402              		.loc 2 167 12 is_stmt 0 view .LVU52
+ 403 0000 82B0     		sub	sp, sp, #8
+ 404              		.cfi_def_cfa_offset 8
+ 405 0002 0191     		str	r1, [sp, #4]
+ 406              	.LBB13:
+ 407              		.loc 2 167 121 view .LVU53
+ 408 0004 0160     		str	r1, [r0]
+ 409 0006 0A21     		movs	r1, #10
+ 410 0008 0171     		strb	r1, [r0, #4]
+ 411 000a 8260     		str	r2, [r0, #8]
+ 412              	.LBE13:
+ 413              		.loc 2 167 123 view .LVU54
+ 414 000c 02B0     		add	sp, sp, #8
+ 415              		.cfi_def_cfa_offset 0
+ 416              		@ sp needed
+ 417 000e 7047     		bx	lr
+ 418              		.cfi_endproc
+ 419              	.LFE1250:
+ 420              		.cantunwind
+ 421              		.fnend
+ 423              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IlEENS1_5KeyIDET_
+ 424              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IlEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 15
+
+
+ 425              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_,"ax",%progbits
+ 426              		.align	1
+ 427              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_
+ 428              		.syntax unified
+ 429              		.thumb
+ 430              		.thumb_func
+ 432              	_ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_:
+ 433              		.fnstart
+ 434              	.LVL11:
+ 435              	.LFB1253:
+ 168:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::E4 val) : keyId(key), tag(K
+ 169:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** // template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::X4 val) : keyId(key), tag(K
+ 170:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, UBX::R4 val) : keyId(key), tag(KeyV
+ 436              		.loc 2 170 12 is_stmt 1 view -0
+ 437              		.cfi_startproc
+ 438              		@ args = 0, pretend = 0, frame = 8
+ 439              		@ frame_needed = 0, uses_anonymous_args = 0
+ 440              		@ link register save eliminated.
+ 441              		.loc 2 170 12 is_stmt 0 view .LVU56
+ 442 0000 82B0     		sub	sp, sp, #8
+ 443              		.cfi_def_cfa_offset 8
+ 444 0002 0191     		str	r1, [sp, #4]
+ 445              	.LBB14:
+ 446              		.loc 2 170 121 view .LVU57
+ 447 0004 0160     		str	r1, [r0]
+ 448 0006 0D22     		movs	r2, #13
+ 449 0008 0271     		strb	r2, [r0, #4]
+ 450 000a 80ED020A 		vstr.32	s0, [r0, #8]
+ 451              	.LBE14:
+ 452              		.loc 2 170 123 view .LVU58
+ 453 000e 02B0     		add	sp, sp, #8
+ 454              		.cfi_def_cfa_offset 0
+ 455              		@ sp needed
+ 456 0010 7047     		bx	lr
+ 457              		.cfi_endproc
+ 458              	.LFE1253:
+ 459              		.cantunwind
+ 460              		.fnend
+ 462              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1IfEENS1_5KeyIDET_
+ 463              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1IfEENS1_5KeyIDET_,_ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1
+ 464              		.section	.text._ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_,"ax",%prog
+ 465              		.align	1
+ 466              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_
+ 467              		.syntax unified
+ 468              		.thumb
+ 469              		.thumb_func
+ 471              	_ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_:
+ 472              		.fnstart
+ 473              	.LVL12:
+ 474              	.LFB1256:
+ 171:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** 
+ 172:/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmware/SHARC_Buoy_V3_Peripheral_GPS_Integration/Drivers/GPS_API/UBX_CFG.hpp **** template<> UBX::CFG::VAL::KeyValuePair::KeyValuePair(KeyID key, CFG_PM_OPERATEMODE val) : KeyValueP
+ 475              		.loc 2 172 12 is_stmt 1 view -0
+ 476              		.cfi_startproc
+ 477              		@ args = 0, pretend = 0, frame = 8
+ 478              		@ frame_needed = 0, uses_anonymous_args = 0
+ 479              		.loc 2 172 12 is_stmt 0 view .LVU60
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 16
+
+
+ 480 0000 10B5     		push	{r4, lr}
+ 481              		.cfi_def_cfa_offset 8
+ 482              		.cfi_offset 4, -8
+ 483              		.cfi_offset 14, -4
+ 484 0002 82B0     		sub	sp, sp, #8
+ 485              		.cfi_def_cfa_offset 16
+ 486 0004 0446     		mov	r4, r0
+ 487 0006 0191     		str	r1, [sp, #4]
+ 488              	.LBB15:
+ 489              		.loc 2 172 173 view .LVU61
+ 490 0008 FFF7FEFF 		bl	_ZN3UBX3CFG3VAL12KeyValuePairC1IhEENS1_5KeyIDET_
+ 491              	.LVL13:
+ 492              		.loc 2 172 173 view .LVU62
+ 493              	.LBE15:
+ 494              		.loc 2 172 175 view .LVU63
+ 495 000c 2046     		mov	r0, r4
+ 496 000e 02B0     		add	sp, sp, #8
+ 497              		.cfi_def_cfa_offset 8
+ 498              		@ sp needed
+ 499 0010 10BD     		pop	{r4, pc}
+ 500              		.loc 2 172 175 view .LVU64
+ 501              		.cfi_endproc
+ 502              	.LFE1256:
+ 503              		.cantunwind
+ 504              		.fnend
+ 506              		.global	_ZN3UBX3CFG3VAL12KeyValuePairC1INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_
+ 507              		.thumb_set _ZN3UBX3CFG3VAL12KeyValuePairC1INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_,_ZN3UBX3CFG3VA
+ 508              		.section	.text.Error_Handler,"ax",%progbits
+ 509              		.align	1
+ 510              		.global	Error_Handler
+ 511              		.syntax unified
+ 512              		.thumb
+ 513              		.thumb_func
+ 515              	Error_Handler:
+ 516              		.fnstart
+ 517              	.LFB2269:
+ 206:Core/Src/main.cpp **** 
+ 207:Core/Src/main.cpp **** /* USER CODE BEGIN 4 */
+ 208:Core/Src/main.cpp **** 
+ 209:Core/Src/main.cpp **** /* USER CODE END 4 */
+ 210:Core/Src/main.cpp **** 
+ 211:Core/Src/main.cpp **** /**
+ 212:Core/Src/main.cpp ****   * @brief  This function is executed in case of error occurrence.
+ 213:Core/Src/main.cpp ****   * @retval None
+ 214:Core/Src/main.cpp ****   */
+ 215:Core/Src/main.cpp **** void Error_Handler(void)
+ 216:Core/Src/main.cpp **** {
+ 518              		.loc 1 216 1 is_stmt 1 view -0
+ 519              		.cfi_startproc
+ 520              		@ Volatile: function does not return.
+ 521              		@ args = 0, pretend = 0, frame = 0
+ 522              		@ frame_needed = 0, uses_anonymous_args = 0
+ 523              		@ link register save eliminated.
+ 217:Core/Src/main.cpp ****   /* USER CODE BEGIN Error_Handler_Debug */
+ 218:Core/Src/main.cpp ****   /* User can add his own implementation to report the HAL error return state */
+ 219:Core/Src/main.cpp ****   __disable_irq();
+ 524              		.loc 1 219 3 view .LVU66
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 17
+
+
+ 525              	.LBB16:
+ 526              	.LBI16:
+ 527              		.file 3 "Drivers/CMSIS/Include/cmsis_gcc.h"
+   1:Drivers/CMSIS/Include/cmsis_gcc.h **** /**************************************************************************//**
+   2:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @file     cmsis_gcc.h
+   3:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @brief    CMSIS compiler GCC header file
+   4:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @version  V5.2.0
+   5:Drivers/CMSIS/Include/cmsis_gcc.h ****  * @date     08. May 2019
+   6:Drivers/CMSIS/Include/cmsis_gcc.h ****  ******************************************************************************/
+   7:Drivers/CMSIS/Include/cmsis_gcc.h **** /*
+   8:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
+   9:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  10:Drivers/CMSIS/Include/cmsis_gcc.h ****  * SPDX-License-Identifier: Apache-2.0
+  11:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  12:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Licensed under the Apache License, Version 2.0 (the License); you may
+  13:Drivers/CMSIS/Include/cmsis_gcc.h ****  * not use this file except in compliance with the License.
+  14:Drivers/CMSIS/Include/cmsis_gcc.h ****  * You may obtain a copy of the License at
+  15:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  16:Drivers/CMSIS/Include/cmsis_gcc.h ****  * www.apache.org/licenses/LICENSE-2.0
+  17:Drivers/CMSIS/Include/cmsis_gcc.h ****  *
+  18:Drivers/CMSIS/Include/cmsis_gcc.h ****  * Unless required by applicable law or agreed to in writing, software
+  19:Drivers/CMSIS/Include/cmsis_gcc.h ****  * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+  20:Drivers/CMSIS/Include/cmsis_gcc.h ****  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:Drivers/CMSIS/Include/cmsis_gcc.h ****  * See the License for the specific language governing permissions and
+  22:Drivers/CMSIS/Include/cmsis_gcc.h ****  * limitations under the License.
+  23:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+  24:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  25:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __CMSIS_GCC_H
+  26:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __CMSIS_GCC_H
+  27:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  28:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ignore some GCC warnings */
+  29:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic push
+  30:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wsign-conversion"
+  31:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wconversion"
+  32:Drivers/CMSIS/Include/cmsis_gcc.h **** #pragma GCC diagnostic ignored "-Wunused-parameter"
+  33:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  34:Drivers/CMSIS/Include/cmsis_gcc.h **** /* Fallback for __has_builtin */
+  35:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __has_builtin
+  36:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __has_builtin(x) (0)
+  37:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  38:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+  39:Drivers/CMSIS/Include/cmsis_gcc.h **** /* CMSIS compiler specific defines */
+  40:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ASM
+  41:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ASM                                  __asm
+  42:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  43:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __INLINE
+  44:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __INLINE                               inline
+  45:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  46:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_INLINE
+  47:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_INLINE                        static inline
+  48:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  49:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __STATIC_FORCEINLINE                 
+  50:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __STATIC_FORCEINLINE                   __attribute__((always_inline)) static inline
+  51:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif                                           
+  52:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __NO_RETURN
+  53:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __NO_RETURN                            __attribute__((__noreturn__))
+  54:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 18
+
+
+  55:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __USED
+  56:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __USED                                 __attribute__((used))
+  57:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  58:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __WEAK
+  59:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __WEAK                                 __attribute__((weak))
+  60:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  61:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED
+  62:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED                               __attribute__((packed, aligned(1)))
+  63:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  64:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_STRUCT
+  65:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_STRUCT                        struct __attribute__((packed, aligned(1)))
+  66:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  67:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __PACKED_UNION
+  68:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __PACKED_UNION                         union __attribute__((packed, aligned(1)))
+  69:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  70:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32        /* deprecated */
+  71:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  72:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  73:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  74:Drivers/CMSIS/Include/cmsis_gcc.h ****   struct __attribute__((packed)) T_UINT32 { uint32_t v; };
+  75:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  76:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
+  77:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  78:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_WRITE
+  79:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  80:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  81:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  82:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_WRITE { uint16_t v; };
+  83:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  84:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_WRITE(addr, val)    (void)((((struct T_UINT16_WRITE *)(void *)(addr))-
+  85:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  86:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT16_READ
+  87:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  88:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  89:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  90:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT16_READ { uint16_t v; };
+  91:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+  92:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT16_READ(addr)          (((const struct T_UINT16_READ *)(const void *)(add
+  93:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+  94:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_WRITE
+  95:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+  96:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+  97:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+  98:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_WRITE { uint32_t v; };
+  99:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 100:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_WRITE(addr, val)    (void)((((struct T_UINT32_WRITE *)(void *)(addr))-
+ 101:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 102:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __UNALIGNED_UINT32_READ
+ 103:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic push
+ 104:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wpacked"
+ 105:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic ignored "-Wattributes"
+ 106:Drivers/CMSIS/Include/cmsis_gcc.h ****   __PACKED_STRUCT T_UINT32_READ { uint32_t v; };
+ 107:Drivers/CMSIS/Include/cmsis_gcc.h ****   #pragma GCC diagnostic pop
+ 108:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __UNALIGNED_UINT32_READ(addr)          (((const struct T_UINT32_READ *)(const void *)(add
+ 109:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 110:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __ALIGNED
+ 111:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __ALIGNED(x)                           __attribute__((aligned(x)))
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 19
+
+
+ 112:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 113:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __RESTRICT
+ 114:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __RESTRICT                             __restrict
+ 115:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 116:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef   __COMPILER_BARRIER
+ 117:Drivers/CMSIS/Include/cmsis_gcc.h ****   #define __COMPILER_BARRIER()                   __ASM volatile("":::"memory")
+ 118:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 119:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 120:Drivers/CMSIS/Include/cmsis_gcc.h **** /* #########################  Startup and Lowlevel Init  ######################## */
+ 121:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 122:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __PROGRAM_START
+ 123:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 124:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 125:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Initializes data and bss sections
+ 126:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details This default implementations initialized all data and additional bss
+ 127:Drivers/CMSIS/Include/cmsis_gcc.h ****            sections relying on .copy.table and .zero.table specified properly
+ 128:Drivers/CMSIS/Include/cmsis_gcc.h ****            in the used linker script.
+ 129:Drivers/CMSIS/Include/cmsis_gcc.h ****   
+ 130:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 131:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE __NO_RETURN void __cmsis_start(void)
+ 132:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 133:Drivers/CMSIS/Include/cmsis_gcc.h ****   extern void _start(void) __NO_RETURN;
+ 134:Drivers/CMSIS/Include/cmsis_gcc.h ****   
+ 135:Drivers/CMSIS/Include/cmsis_gcc.h ****   typedef struct {
+ 136:Drivers/CMSIS/Include/cmsis_gcc.h ****     uint32_t const* src;
+ 137:Drivers/CMSIS/Include/cmsis_gcc.h ****     uint32_t* dest;
+ 138:Drivers/CMSIS/Include/cmsis_gcc.h ****     uint32_t  wlen;
+ 139:Drivers/CMSIS/Include/cmsis_gcc.h ****   } __copy_table_t;
+ 140:Drivers/CMSIS/Include/cmsis_gcc.h ****   
+ 141:Drivers/CMSIS/Include/cmsis_gcc.h ****   typedef struct {
+ 142:Drivers/CMSIS/Include/cmsis_gcc.h ****     uint32_t* dest;
+ 143:Drivers/CMSIS/Include/cmsis_gcc.h ****     uint32_t  wlen;
+ 144:Drivers/CMSIS/Include/cmsis_gcc.h ****   } __zero_table_t;
+ 145:Drivers/CMSIS/Include/cmsis_gcc.h ****   
+ 146:Drivers/CMSIS/Include/cmsis_gcc.h ****   extern const __copy_table_t __copy_table_start__;
+ 147:Drivers/CMSIS/Include/cmsis_gcc.h ****   extern const __copy_table_t __copy_table_end__;
+ 148:Drivers/CMSIS/Include/cmsis_gcc.h ****   extern const __zero_table_t __zero_table_start__;
+ 149:Drivers/CMSIS/Include/cmsis_gcc.h ****   extern const __zero_table_t __zero_table_end__;
+ 150:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 151:Drivers/CMSIS/Include/cmsis_gcc.h ****   for (__copy_table_t const* pTable = &__copy_table_start__; pTable < &__copy_table_end__; ++pTable
+ 152:Drivers/CMSIS/Include/cmsis_gcc.h ****     for(uint32_t i=0u; i<pTable->wlen; ++i) {
+ 153:Drivers/CMSIS/Include/cmsis_gcc.h ****       pTable->dest[i] = pTable->src[i];
+ 154:Drivers/CMSIS/Include/cmsis_gcc.h ****     }
+ 155:Drivers/CMSIS/Include/cmsis_gcc.h ****   }
+ 156:Drivers/CMSIS/Include/cmsis_gcc.h ****  
+ 157:Drivers/CMSIS/Include/cmsis_gcc.h ****   for (__zero_table_t const* pTable = &__zero_table_start__; pTable < &__zero_table_end__; ++pTable
+ 158:Drivers/CMSIS/Include/cmsis_gcc.h ****     for(uint32_t i=0u; i<pTable->wlen; ++i) {
+ 159:Drivers/CMSIS/Include/cmsis_gcc.h ****       pTable->dest[i] = 0u;
+ 160:Drivers/CMSIS/Include/cmsis_gcc.h ****     }
+ 161:Drivers/CMSIS/Include/cmsis_gcc.h ****   }
+ 162:Drivers/CMSIS/Include/cmsis_gcc.h ****  
+ 163:Drivers/CMSIS/Include/cmsis_gcc.h ****   _start();
+ 164:Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 165:Drivers/CMSIS/Include/cmsis_gcc.h ****   
+ 166:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __PROGRAM_START           __cmsis_start
+ 167:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 168:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 20
+
+
+ 169:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __INITIAL_SP
+ 170:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __INITIAL_SP              __StackTop
+ 171:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 172:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 173:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __STACK_LIMIT
+ 174:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __STACK_LIMIT             __StackLimit
+ 175:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 176:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 177:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __VECTOR_TABLE
+ 178:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __VECTOR_TABLE            __Vectors
+ 179:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 180:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 181:Drivers/CMSIS/Include/cmsis_gcc.h **** #ifndef __VECTOR_TABLE_ATTRIBUTE
+ 182:Drivers/CMSIS/Include/cmsis_gcc.h **** #define __VECTOR_TABLE_ATTRIBUTE  __attribute((used, section(".vectors")))
+ 183:Drivers/CMSIS/Include/cmsis_gcc.h **** #endif
+ 184:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 185:Drivers/CMSIS/Include/cmsis_gcc.h **** /* ###########################  Core Function Access  ########################### */
+ 186:Drivers/CMSIS/Include/cmsis_gcc.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 187:Drivers/CMSIS/Include/cmsis_gcc.h ****     \defgroup CMSIS_Core_RegAccFunctions CMSIS Core Register Access Functions
+ 188:Drivers/CMSIS/Include/cmsis_gcc.h ****   @{
+ 189:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 190:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 191:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 192:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Enable IRQ Interrupts
+ 193:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Enables IRQ interrupts by clearing the I-bit in the CPSR.
+ 194:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 195:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 196:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __enable_irq(void)
+ 197:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 198:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsie i" : : : "memory");
+ 199:Drivers/CMSIS/Include/cmsis_gcc.h **** }
+ 200:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 201:Drivers/CMSIS/Include/cmsis_gcc.h **** 
+ 202:Drivers/CMSIS/Include/cmsis_gcc.h **** /**
+ 203:Drivers/CMSIS/Include/cmsis_gcc.h ****   \brief   Disable IRQ Interrupts
+ 204:Drivers/CMSIS/Include/cmsis_gcc.h ****   \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+ 205:Drivers/CMSIS/Include/cmsis_gcc.h ****            Can only be executed in Privileged modes.
+ 206:Drivers/CMSIS/Include/cmsis_gcc.h ****  */
+ 207:Drivers/CMSIS/Include/cmsis_gcc.h **** __STATIC_FORCEINLINE void __disable_irq(void)
+ 528              		.loc 3 207 27 view .LVU67
+ 529              	.LBB17:
+ 208:Drivers/CMSIS/Include/cmsis_gcc.h **** {
+ 209:Drivers/CMSIS/Include/cmsis_gcc.h ****   __ASM volatile ("cpsid i" : : : "memory");
+ 530              		.loc 3 209 3 view .LVU68
+ 531              		.syntax unified
+ 532              	@ 209 "Drivers/CMSIS/Include/cmsis_gcc.h" 1
+ 533 0000 72B6     		cpsid i
+ 534              	@ 0 "" 2
+ 535              		.thumb
+ 536              		.syntax unified
+ 537              	.L28:
+ 538              	.LBE17:
+ 539              	.LBE16:
+ 220:Core/Src/main.cpp ****   while (1)
+ 540              		.loc 1 220 3 discriminator 1 view .LVU69
+ 541              		.loc 1 220 3 discriminator 1 view .LVU70
+ 542 0002 FEE7     		b	.L28
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 21
+
+
+ 543              		.cfi_endproc
+ 544              	.LFE2269:
+ 545              		.cantunwind
+ 546              		.fnend
+ 548              		.section	.text._ZL13MX_UART4_Initv,"ax",%progbits
+ 549              		.align	1
+ 550              		.syntax unified
+ 551              		.thumb
+ 552              		.thumb_func
+ 554              	_ZL13MX_UART4_Initv:
+ 555              		.fnstart
+ 556              	.LFB2266:
+ 132:Core/Src/main.cpp **** 
+ 557              		.loc 1 132 1 view -0
+ 558              		.cfi_startproc
+ 559              		@ args = 0, pretend = 0, frame = 0
+ 560              		@ frame_needed = 0, uses_anonymous_args = 0
+ 561 0000 08B5     		push	{r3, lr}
+ 562              		.save {r3, lr}
+ 563              		.cfi_def_cfa_offset 8
+ 564              		.cfi_offset 3, -8
+ 565              		.cfi_offset 14, -4
+ 141:Core/Src/main.cpp ****   huart4.Init.BaudRate = 38400;
+ 566              		.loc 1 141 3 view .LVU72
+ 141:Core/Src/main.cpp ****   huart4.Init.BaudRate = 38400;
+ 567              		.loc 1 141 19 is_stmt 0 view .LVU73
+ 568 0002 1548     		ldr	r0, .L39
+ 569 0004 154B     		ldr	r3, .L39+4
+ 570 0006 0360     		str	r3, [r0]
+ 142:Core/Src/main.cpp ****   huart4.Init.WordLength = UART_WORDLENGTH_8B;
+ 571              		.loc 1 142 3 is_stmt 1 view .LVU74
+ 142:Core/Src/main.cpp ****   huart4.Init.WordLength = UART_WORDLENGTH_8B;
+ 572              		.loc 1 142 24 is_stmt 0 view .LVU75
+ 573 0008 4FF41643 		mov	r3, #38400
+ 574 000c 4360     		str	r3, [r0, #4]
+ 143:Core/Src/main.cpp ****   huart4.Init.StopBits = UART_STOPBITS_1;
+ 575              		.loc 1 143 3 is_stmt 1 view .LVU76
+ 143:Core/Src/main.cpp ****   huart4.Init.StopBits = UART_STOPBITS_1;
+ 576              		.loc 1 143 26 is_stmt 0 view .LVU77
+ 577 000e 0023     		movs	r3, #0
+ 578 0010 8360     		str	r3, [r0, #8]
+ 144:Core/Src/main.cpp ****   huart4.Init.Parity = UART_PARITY_NONE;
+ 579              		.loc 1 144 3 is_stmt 1 view .LVU78
+ 144:Core/Src/main.cpp ****   huart4.Init.Parity = UART_PARITY_NONE;
+ 580              		.loc 1 144 24 is_stmt 0 view .LVU79
+ 581 0012 C360     		str	r3, [r0, #12]
+ 145:Core/Src/main.cpp ****   huart4.Init.Mode = UART_MODE_TX_RX;
+ 582              		.loc 1 145 3 is_stmt 1 view .LVU80
+ 145:Core/Src/main.cpp ****   huart4.Init.Mode = UART_MODE_TX_RX;
+ 583              		.loc 1 145 22 is_stmt 0 view .LVU81
+ 584 0014 0361     		str	r3, [r0, #16]
+ 146:Core/Src/main.cpp ****   huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 585              		.loc 1 146 3 is_stmt 1 view .LVU82
+ 146:Core/Src/main.cpp ****   huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 586              		.loc 1 146 20 is_stmt 0 view .LVU83
+ 587 0016 0C22     		movs	r2, #12
+ 588 0018 4261     		str	r2, [r0, #20]
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 22
+
+
+ 147:Core/Src/main.cpp ****   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+ 589              		.loc 1 147 3 is_stmt 1 view .LVU84
+ 147:Core/Src/main.cpp ****   huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+ 590              		.loc 1 147 25 is_stmt 0 view .LVU85
+ 591 001a 8361     		str	r3, [r0, #24]
+ 148:Core/Src/main.cpp ****   huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+ 592              		.loc 1 148 3 is_stmt 1 view .LVU86
+ 148:Core/Src/main.cpp ****   huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+ 593              		.loc 1 148 28 is_stmt 0 view .LVU87
+ 594 001c C361     		str	r3, [r0, #28]
+ 149:Core/Src/main.cpp ****   huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+ 595              		.loc 1 149 3 is_stmt 1 view .LVU88
+ 149:Core/Src/main.cpp ****   huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+ 596              		.loc 1 149 30 is_stmt 0 view .LVU89
+ 597 001e 0362     		str	r3, [r0, #32]
+ 150:Core/Src/main.cpp ****   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 598              		.loc 1 150 3 is_stmt 1 view .LVU90
+ 150:Core/Src/main.cpp ****   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+ 599              		.loc 1 150 30 is_stmt 0 view .LVU91
+ 600 0020 4362     		str	r3, [r0, #36]
+ 151:Core/Src/main.cpp ****   if (HAL_UART_Init(&huart4) != HAL_OK)
+ 601              		.loc 1 151 3 is_stmt 1 view .LVU92
+ 151:Core/Src/main.cpp ****   if (HAL_UART_Init(&huart4) != HAL_OK)
+ 602              		.loc 1 151 38 is_stmt 0 view .LVU93
+ 603 0022 8362     		str	r3, [r0, #40]
+ 152:Core/Src/main.cpp ****   {
+ 604              		.loc 1 152 3 is_stmt 1 view .LVU94
+ 152:Core/Src/main.cpp ****   {
+ 605              		.loc 1 152 20 is_stmt 0 view .LVU95
+ 606 0024 FFF7FEFF 		bl	HAL_UART_Init
+ 607              	.LVL14:
+ 152:Core/Src/main.cpp ****   {
+ 608              		.loc 1 152 3 view .LVU96
+ 609 0028 70B9     		cbnz	r0, .L35
+ 156:Core/Src/main.cpp ****   {
+ 610              		.loc 1 156 3 is_stmt 1 view .LVU97
+ 156:Core/Src/main.cpp ****   {
+ 611              		.loc 1 156 36 is_stmt 0 view .LVU98
+ 612 002a 0021     		movs	r1, #0
+ 613 002c 0A48     		ldr	r0, .L39
+ 614 002e FFF7FEFF 		bl	HAL_UARTEx_SetTxFifoThreshold
+ 615              	.LVL15:
+ 156:Core/Src/main.cpp ****   {
+ 616              		.loc 1 156 3 view .LVU99
+ 617 0032 58B9     		cbnz	r0, .L36
+ 160:Core/Src/main.cpp ****   {
+ 618              		.loc 1 160 3 is_stmt 1 view .LVU100
+ 160:Core/Src/main.cpp ****   {
+ 619              		.loc 1 160 36 is_stmt 0 view .LVU101
+ 620 0034 0021     		movs	r1, #0
+ 621 0036 0848     		ldr	r0, .L39
+ 622 0038 FFF7FEFF 		bl	HAL_UARTEx_SetRxFifoThreshold
+ 623              	.LVL16:
+ 160:Core/Src/main.cpp ****   {
+ 624              		.loc 1 160 3 view .LVU102
+ 625 003c 40B9     		cbnz	r0, .L37
+ 164:Core/Src/main.cpp ****   {
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 23
+
+
+ 626              		.loc 1 164 3 is_stmt 1 view .LVU103
+ 164:Core/Src/main.cpp ****   {
+ 627              		.loc 1 164 32 is_stmt 0 view .LVU104
+ 628 003e 0648     		ldr	r0, .L39
+ 629 0040 FFF7FEFF 		bl	HAL_UARTEx_EnableFifoMode
+ 630              	.LVL17:
+ 164:Core/Src/main.cpp ****   {
+ 631              		.loc 1 164 3 view .LVU105
+ 632 0044 30B9     		cbnz	r0, .L38
+ 172:Core/Src/main.cpp **** 
+ 633              		.loc 1 172 1 view .LVU106
+ 634 0046 08BD     		pop	{r3, pc}
+ 635              	.L35:
+ 154:Core/Src/main.cpp ****   }
+ 636              		.loc 1 154 5 is_stmt 1 view .LVU107
+ 154:Core/Src/main.cpp ****   }
+ 637              		.loc 1 154 18 is_stmt 0 view .LVU108
+ 638 0048 FFF7FEFF 		bl	Error_Handler
+ 639              	.LVL18:
+ 640              	.L36:
+ 158:Core/Src/main.cpp ****   }
+ 641              		.loc 1 158 5 is_stmt 1 view .LVU109
+ 158:Core/Src/main.cpp ****   }
+ 642              		.loc 1 158 18 is_stmt 0 view .LVU110
+ 643 004c FFF7FEFF 		bl	Error_Handler
+ 644              	.LVL19:
+ 645              	.L37:
+ 162:Core/Src/main.cpp ****   }
+ 646              		.loc 1 162 5 is_stmt 1 view .LVU111
+ 162:Core/Src/main.cpp ****   }
+ 647              		.loc 1 162 18 is_stmt 0 view .LVU112
+ 648 0050 FFF7FEFF 		bl	Error_Handler
+ 649              	.LVL20:
+ 650              	.L38:
+ 166:Core/Src/main.cpp ****   }
+ 651              		.loc 1 166 5 is_stmt 1 view .LVU113
+ 166:Core/Src/main.cpp ****   }
+ 652              		.loc 1 166 18 is_stmt 0 view .LVU114
+ 653 0054 FFF7FEFF 		bl	Error_Handler
+ 654              	.LVL21:
+ 655              	.L40:
+ 656              		.align	2
+ 657              	.L39:
+ 658 0058 00000000 		.word	.LANCHOR0
+ 659 005c 004C0040 		.word	1073761280
+ 660              		.cfi_endproc
+ 661              	.LFE2266:
+ 662              		.fnend
+ 664              		.section	.text.main,"ax",%progbits
+ 665              		.align	1
+ 666              		.global	main
+ 667              		.syntax unified
+ 668              		.thumb
+ 669              		.thumb_func
+ 671              	main:
+ 672              		.fnstart
+ 673              	.LFB2264:
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 24
+
+
+  62:Core/Src/main.cpp **** 	HAL_Init();
+ 674              		.loc 1 62 11 is_stmt 1 view -0
+ 675              		.cfi_startproc
+ 676              		@ args = 0, pretend = 0, frame = 0
+ 677              		@ frame_needed = 0, uses_anonymous_args = 0
+ 678 0000 08B5     		push	{r3, lr}
+ 679              		.save {r3, lr}
+ 680              		.cfi_def_cfa_offset 8
+ 681              		.cfi_offset 3, -8
+ 682              		.cfi_offset 14, -4
+  63:Core/Src/main.cpp **** 
+ 683              		.loc 1 63 2 view .LVU116
+  63:Core/Src/main.cpp **** 
+ 684              		.loc 1 63 10 is_stmt 0 view .LVU117
+ 685 0002 FFF7FEFF 		bl	HAL_Init
+ 686              	.LVL22:
+  65:Core/Src/main.cpp **** 	MX_DMA_Init();
+ 687              		.loc 1 65 2 is_stmt 1 view .LVU118
+  65:Core/Src/main.cpp **** 	MX_DMA_Init();
+ 688              		.loc 1 65 14 is_stmt 0 view .LVU119
+ 689 0006 FFF7FEFF 		bl	_ZL12MX_GPIO_Initv
+ 690              	.LVL23:
+  66:Core/Src/main.cpp **** 	MX_UART4_Init();
+ 691              		.loc 1 66 2 is_stmt 1 view .LVU120
+  66:Core/Src/main.cpp **** 	MX_UART4_Init();
+ 692              		.loc 1 66 13 is_stmt 0 view .LVU121
+ 693 000a FFF7FEFF 		bl	_ZL11MX_DMA_Initv
+ 694              	.LVL24:
+  67:Core/Src/main.cpp **** 
+ 695              		.loc 1 67 2 is_stmt 1 view .LVU122
+  67:Core/Src/main.cpp **** 
+ 696              		.loc 1 67 15 is_stmt 0 view .LVU123
+ 697 000e FFF7FEFF 		bl	_ZL13MX_UART4_Initv
+ 698              	.LVL25:
+  69:Core/Src/main.cpp **** 
+ 699              		.loc 1 69 2 is_stmt 1 view .LVU124
+  69:Core/Src/main.cpp **** 
+ 700              		.loc 1 69 10 is_stmt 0 view .LVU125
+ 701 0012 FFF7FEFF 		bl	_Z8GPS_Initv
+ 702              	.LVL26:
+ 703              	.L42:
+  71:Core/Src/main.cpp **** 
+ 704              		.loc 1 71 2 is_stmt 1 discriminator 1 view .LVU126
+  71:Core/Src/main.cpp **** 
+ 705              		.loc 1 71 2 discriminator 1 view .LVU127
+ 706 0016 FEE7     		b	.L42
+ 707              		.cfi_endproc
+ 708              	.LFE2264:
+ 709              		.fnend
+ 711              		.section	.text._Z18SystemClock_Configv,"ax",%progbits
+ 712              		.align	1
+ 713              		.global	_Z18SystemClock_Configv
+ 714              		.syntax unified
+ 715              		.thumb
+ 716              		.thumb_func
+ 718              	_Z18SystemClock_Configv:
+ 719              		.fnstart
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 25
+
+
+ 720              	.LFB2265:
+  87:Core/Src/main.cpp ****   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 721              		.loc 1 87 1 view -0
+ 722              		.cfi_startproc
+ 723              		@ args = 0, pretend = 0, frame = 88
+ 724              		@ frame_needed = 0, uses_anonymous_args = 0
+ 725 0000 00B5     		push	{lr}
+ 726              		.save {lr}
+ 727              		.cfi_def_cfa_offset 4
+ 728              		.cfi_offset 14, -4
+ 729              		.pad #92
+ 730 0002 97B0     		sub	sp, sp, #92
+ 731              		.cfi_def_cfa_offset 96
+  88:Core/Src/main.cpp ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 732              		.loc 1 88 3 view .LVU129
+  88:Core/Src/main.cpp ****   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 733              		.loc 1 88 22 is_stmt 0 view .LVU130
+ 734 0004 4422     		movs	r2, #68
+ 735 0006 0021     		movs	r1, #0
+ 736 0008 05A8     		add	r0, sp, #20
+ 737 000a FFF7FEFF 		bl	memset
+ 738              	.LVL27:
+  89:Core/Src/main.cpp **** 
+ 739              		.loc 1 89 3 is_stmt 1 view .LVU131
+  89:Core/Src/main.cpp **** 
+ 740              		.loc 1 89 22 is_stmt 0 view .LVU132
+ 741 000e 0023     		movs	r3, #0
+ 742 0010 0093     		str	r3, [sp]
+ 743 0012 0193     		str	r3, [sp, #4]
+ 744 0014 0293     		str	r3, [sp, #8]
+ 745 0016 0393     		str	r3, [sp, #12]
+ 746 0018 0493     		str	r3, [sp, #16]
+  93:Core/Src/main.cpp ****   {
+ 747              		.loc 1 93 3 is_stmt 1 view .LVU133
+  93:Core/Src/main.cpp ****   {
+ 748              		.loc 1 93 38 is_stmt 0 view .LVU134
+ 749 001a 4FF40070 		mov	r0, #512
+ 750 001e FFF7FEFF 		bl	HAL_PWREx_ControlVoltageScaling
+ 751              	.LVL28:
+  93:Core/Src/main.cpp ****   {
+ 752              		.loc 1 93 3 view .LVU135
+ 753 0022 D8B9     		cbnz	r0, .L49
+ 101:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+ 754              		.loc 1 101 3 is_stmt 1 view .LVU136
+ 101:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
+ 755              		.loc 1 101 36 is_stmt 0 view .LVU137
+ 756 0024 1023     		movs	r3, #16
+ 757 0026 0593     		str	r3, [sp, #20]
+ 102:Core/Src/main.cpp ****   RCC_OscInitStruct.MSICalibrationValue = 0;
+ 758              		.loc 1 102 3 is_stmt 1 view .LVU138
+ 102:Core/Src/main.cpp ****   RCC_OscInitStruct.MSICalibrationValue = 0;
+ 759              		.loc 1 102 30 is_stmt 0 view .LVU139
+ 760 0028 0123     		movs	r3, #1
+ 761 002a 0B93     		str	r3, [sp, #44]
+ 103:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_10;
+ 762              		.loc 1 103 3 is_stmt 1 view .LVU140
+ 103:Core/Src/main.cpp ****   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_10;
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 26
+
+
+ 763              		.loc 1 103 41 is_stmt 0 view .LVU141
+ 764 002c 0023     		movs	r3, #0
+ 765 002e 0C93     		str	r3, [sp, #48]
+ 104:Core/Src/main.cpp ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 766              		.loc 1 104 3 is_stmt 1 view .LVU142
+ 104:Core/Src/main.cpp ****   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+ 767              		.loc 1 104 35 is_stmt 0 view .LVU143
+ 768 0030 A022     		movs	r2, #160
+ 769 0032 0D92     		str	r2, [sp, #52]
+ 105:Core/Src/main.cpp ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 770              		.loc 1 105 3 is_stmt 1 view .LVU144
+ 105:Core/Src/main.cpp ****   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 771              		.loc 1 105 34 is_stmt 0 view .LVU145
+ 772 0034 0F93     		str	r3, [sp, #60]
+ 106:Core/Src/main.cpp ****   {
+ 773              		.loc 1 106 3 is_stmt 1 view .LVU146
+ 106:Core/Src/main.cpp ****   {
+ 774              		.loc 1 106 24 is_stmt 0 view .LVU147
+ 775 0036 05A8     		add	r0, sp, #20
+ 776 0038 FFF7FEFF 		bl	HAL_RCC_OscConfig
+ 777              	.LVL29:
+ 106:Core/Src/main.cpp ****   {
+ 778              		.loc 1 106 3 view .LVU148
+ 779 003c 80B9     		cbnz	r0, .L50
+ 113:Core/Src/main.cpp ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 780              		.loc 1 113 3 is_stmt 1 view .LVU149
+ 113:Core/Src/main.cpp ****                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+ 781              		.loc 1 113 31 is_stmt 0 view .LVU150
+ 782 003e 0F23     		movs	r3, #15
+ 783 0040 0093     		str	r3, [sp]
+ 115:Core/Src/main.cpp ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 784              		.loc 1 115 3 is_stmt 1 view .LVU151
+ 115:Core/Src/main.cpp ****   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 785              		.loc 1 115 34 is_stmt 0 view .LVU152
+ 786 0042 0023     		movs	r3, #0
+ 787 0044 0193     		str	r3, [sp, #4]
+ 116:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 788              		.loc 1 116 3 is_stmt 1 view .LVU153
+ 116:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+ 789              		.loc 1 116 35 is_stmt 0 view .LVU154
+ 790 0046 0293     		str	r3, [sp, #8]
+ 117:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 791              		.loc 1 117 3 is_stmt 1 view .LVU155
+ 117:Core/Src/main.cpp ****   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 792              		.loc 1 117 36 is_stmt 0 view .LVU156
+ 793 0048 0393     		str	r3, [sp, #12]
+ 118:Core/Src/main.cpp **** 
+ 794              		.loc 1 118 3 is_stmt 1 view .LVU157
+ 118:Core/Src/main.cpp **** 
+ 795              		.loc 1 118 36 is_stmt 0 view .LVU158
+ 796 004a 0493     		str	r3, [sp, #16]
+ 120:Core/Src/main.cpp ****   {
+ 797              		.loc 1 120 3 is_stmt 1 view .LVU159
+ 120:Core/Src/main.cpp ****   {
+ 798              		.loc 1 120 26 is_stmt 0 view .LVU160
+ 799 004c 0121     		movs	r1, #1
+ 800 004e 6846     		mov	r0, sp
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 27
+
+
+ 801 0050 FFF7FEFF 		bl	HAL_RCC_ClockConfig
+ 802              	.LVL30:
+ 120:Core/Src/main.cpp ****   {
+ 803              		.loc 1 120 3 view .LVU161
+ 804 0054 30B9     		cbnz	r0, .L51
+ 124:Core/Src/main.cpp **** 
+ 805              		.loc 1 124 1 view .LVU162
+ 806 0056 17B0     		add	sp, sp, #92
+ 807              		.cfi_remember_state
+ 808              		.cfi_def_cfa_offset 4
+ 809              		@ sp needed
+ 810 0058 5DF804FB 		ldr	pc, [sp], #4
+ 811              	.L49:
+ 812              		.cfi_restore_state
+  95:Core/Src/main.cpp ****   }
+ 813              		.loc 1 95 5 is_stmt 1 view .LVU163
+  95:Core/Src/main.cpp ****   }
+ 814              		.loc 1 95 18 is_stmt 0 view .LVU164
+ 815 005c FFF7FEFF 		bl	Error_Handler
+ 816              	.LVL31:
+ 817              	.L50:
+ 108:Core/Src/main.cpp ****   }
+ 818              		.loc 1 108 5 is_stmt 1 view .LVU165
+ 108:Core/Src/main.cpp ****   }
+ 819              		.loc 1 108 18 is_stmt 0 view .LVU166
+ 820 0060 FFF7FEFF 		bl	Error_Handler
+ 821              	.LVL32:
+ 822              	.L51:
+ 122:Core/Src/main.cpp ****   }
+ 823              		.loc 1 122 5 is_stmt 1 view .LVU167
+ 122:Core/Src/main.cpp ****   }
+ 824              		.loc 1 122 18 is_stmt 0 view .LVU168
+ 825 0064 FFF7FEFF 		bl	Error_Handler
+ 826              	.LVL33:
+ 827              		.cfi_endproc
+ 828              	.LFE2265:
+ 829              		.fnend
+ 831              		.global	gpsDataLive
+ 832              		.global	hdma_uart4_tx
+ 833              		.global	hdma_uart4_rx
+ 834              		.global	huart4
+ 835              		.section	.bss.gpsDataLive,"aw",%nobits
+ 836              		.align	2
+ 839              	gpsDataLive:
+ 840 0000 00000000 		.space	76
+ 840      00000000 
+ 840      00000000 
+ 840      00000000 
+ 840      00000000 
+ 841              		.section	.bss.hdma_uart4_rx,"aw",%nobits
+ 842              		.align	2
+ 845              	hdma_uart4_rx:
+ 846 0000 00000000 		.space	96
+ 846      00000000 
+ 846      00000000 
+ 846      00000000 
+ 846      00000000 
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 28
+
+
+ 847              		.section	.bss.hdma_uart4_tx,"aw",%nobits
+ 848              		.align	2
+ 851              	hdma_uart4_tx:
+ 852 0000 00000000 		.space	96
+ 852      00000000 
+ 852      00000000 
+ 852      00000000 
+ 852      00000000 
+ 853              		.section	.bss.huart4,"aw",%nobits
+ 854              		.align	2
+ 855              		.set	.LANCHOR0,. + 0
+ 858              	huart4:
+ 859 0000 00000000 		.space	144
+ 859      00000000 
+ 859      00000000 
+ 859      00000000 
+ 859      00000000 
+ 860              		.text
+ 861              	.Letext0:
+ 862              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+ 863              		.file 5 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-
+ 864              		.file 6 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-
+ 865              		.file 7 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-
+ 866              		.file 8 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-
+ 867              		.file 9 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+ 868              		.file 10 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h"
+ 869              		.file 11 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+ 870              		.file 12 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h"
+ 871              		.file 13 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 872              		.file 14 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 873              		.file 15 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 874              		.file 16 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 875              		.file 17 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 876              		.file 18 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 877              		.file 19 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 878              		.file 20 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 879              		.file 21 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 880              		.file 22 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 881              		.file 23 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 882              		.file 24 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 883              		.file 25 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 884              		.file 26 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 885              		.file 27 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 886              		.file 28 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 887              		.file 29 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 888              		.file 30 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 889              		.file 31 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 890              		.file 32 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 891              		.file 33 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 892              		.file 34 "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for
+ 893              		.file 35 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 894              		.file 36 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 895              		.file 37 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 896              		.file 38 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 897              		.file 39 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 898              		.file 40 "/Users/lawrencestanton/GitHub/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Test Firmw
+ 899              		.file 41 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_cortex.h"
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 29
+
+
+ 900              		.file 42 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h"
+ 901              		.file 43 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h"
+ 902              		.file 44 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h"
+ 903              		.file 45 "<built-in>"
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 30
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.cpp
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:20     .text._ZL12MX_GPIO_Initv:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:25     .text._ZL12MX_GPIO_Initv:0000000000000000 _ZL12MX_GPIO_Initv
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:59     .text._ZL12MX_GPIO_Initv:000000000000001c $d
+.ARM.exidx.text._ZL12MX_GPIO_Initv:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:66     .text._ZL11MX_DMA_Initv:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:71     .text._ZL11MX_DMA_Initv:0000000000000000 _ZL11MX_DMA_Initv
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:146    .text._ZL11MX_DMA_Initv:0000000000000050 $d
+.ARM.exidx.text._ZL11MX_DMA_Initv:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:152    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:158    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:158    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IbEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IbEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:192    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:198    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:198    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IhEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IhEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:231    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:237    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:237    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IaEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IaEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:270    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:276    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:276    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ItEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1ItEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:309    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:315    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:315    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IsEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IsEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:348    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:354    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:354    .text._ZN3UBX3CFG3VAL12KeyValuePairC2ImEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1ImEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:387    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:393    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:393    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IlEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IlEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:426    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:432    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:432    .text._ZN3UBX3CFG3VAL12KeyValuePairC2IfEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1IfEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:465    .text._ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:471    .text._ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_
+.ARM.exidx.text._ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:471    .text._ZN3UBX3CFG3VAL12KeyValuePairC2INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_:0000000000000000 _ZN3UBX3CFG3VAL12KeyValuePairC1INS1_18CFG_PM_OPERATEMODEEEENS1_5KeyIDET_
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:509    .text.Error_Handler:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:515    .text.Error_Handler:0000000000000000 Error_Handler
+    .ARM.exidx.text.Error_Handler:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:549    .text._ZL13MX_UART4_Initv:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:554    .text._ZL13MX_UART4_Initv:0000000000000000 _ZL13MX_UART4_Initv
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:658    .text._ZL13MX_UART4_Initv:0000000000000058 $d
+.ARM.extab.text._ZL13MX_UART4_Initv:0000000000000000 $d
+.ARM.exidx.text._ZL13MX_UART4_Initv:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:665    .text.main:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:671    .text.main:0000000000000000 main
+             .ARM.extab.text.main:0000000000000000 $d
+ARM GAS  /var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s 			page 31
+
+
+             .ARM.exidx.text.main:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:712    .text._Z18SystemClock_Configv:0000000000000000 $t
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:718    .text._Z18SystemClock_Configv:0000000000000000 _Z18SystemClock_Configv
+.ARM.exidx.text._Z18SystemClock_Configv:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:839    .bss.gpsDataLive:0000000000000000 gpsDataLive
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:851    .bss.hdma_uart4_tx:0000000000000000 hdma_uart4_tx
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:845    .bss.hdma_uart4_rx:0000000000000000 hdma_uart4_rx
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:858    .bss.huart4:0000000000000000 huart4
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:836    .bss.gpsDataLive:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:842    .bss.hdma_uart4_rx:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:848    .bss.hdma_uart4_tx:0000000000000000 $d
+/var/folders/bb/dhrb69655gd8t4nf464nxc_00000gn/T//ccbXlqqb.s:854    .bss.huart4:0000000000000000 $d
+
+UNDEFINED SYMBOLS
+HAL_NVIC_SetPriority
+HAL_NVIC_EnableIRQ
+__aeabi_unwind_cpp_pr0
+HAL_UART_Init
+HAL_UARTEx_SetTxFifoThreshold
+HAL_UARTEx_SetRxFifoThreshold
+HAL_UARTEx_EnableFifoMode
+__aeabi_unwind_cpp_pr1
+HAL_Init
+_Z8GPS_Initv
+memset
+HAL_PWREx_ControlVoltageScaling
+HAL_RCC_OscConfig
+HAL_RCC_ClockConfig
