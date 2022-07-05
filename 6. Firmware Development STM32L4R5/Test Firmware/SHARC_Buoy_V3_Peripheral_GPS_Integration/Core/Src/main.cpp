@@ -443,23 +443,20 @@ static void Routine_STATE_SAMPLE(void)
 		  IMU_On = 1;
 	  }
 
-	  //initialise gps peripherals and begin comms on sensor instance
-	  GPS_InterruptsOn();
-
-	  if(GPS_Init() == GPS_Init_OK)
-	  {
-		 printmsg("GPS Online! Acquiring Signal...\r\n");
-		 GPS_On = 1;
-	  }
+	  //initialise gps peripherals and begin comms on sensor instanc
 
 
 		  // Sample Routine
 
 		  if(GPS_On)
 		  {
-			  	  GPS_Update();
 
 			  	  GPS_InterruptsOn();
+
+			  	  HAL_Delay(5000);
+
+
+			  	  GPS_Update();
 
 				  printmsg("Logging Data...\r\n");
 //				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
@@ -477,6 +474,8 @@ static void Routine_STATE_SAMPLE(void)
 				  SD_File_Write(&File, tempGPSBuf);
 				  SD_File_Close(&File);
 				  SD_Unmount(SDFatFs);
+
+				  GPS_InterruptsOff();
 
 		  }
 		else
@@ -924,6 +923,17 @@ static void Routine_Init_STATE(void)
 	 {
 		 printmsg("Current Monitor Offline!\r\n");
 	 }
+
+	 /* Test INA 219 Sensor */
+ if(GPS_Init() == GPS_Init_OK)
+ {
+	 printmsg("GPS Online!");
+	 GPS_InterruptsOff();
+	 GPS_On = 1;
+ } else
+ {
+	 printmsg("GPS offline!\r\n");
+ }
 
 	 /* Test SD Cards */
 	 if(SD_Init() == SD_OK)
