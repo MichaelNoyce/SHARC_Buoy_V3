@@ -40,8 +40,8 @@ ENTRY(Reset_Handler)
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 
-_Min_Heap_Size = 0x9F0; /* required amount of heap */
-_Min_Stack_Size = 0x1600; /* required amount of stack */
+_Min_Heap_Size = 0x8000; /* required amount of heap */
+_Min_Stack_Size = 0x10000; /* required amount of stack */
 
 /* Memories definition */
 MEMORY
@@ -175,7 +175,7 @@ SECTIONS
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
-  } >RAM
+  } >RAM3
 
   /* Remove information from the compiler libraries */
   /DISCARD/ :

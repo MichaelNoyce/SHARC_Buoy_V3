@@ -138,6 +138,7 @@ int main(void)
 {
 //======================== 1. SYSTEM INIT & CLOCK CONFIG ========================//
 
+
 	HAL_Init();				//Init Flash prefetch, systick timer, NVIC and LL functions
 	SystemClock_Config();	//configure clock
 	//GPIO_Set_Pin_LP();		//Configure all unused GPIO pins to low Power mode
@@ -192,7 +193,7 @@ int main(void)
 			  	  	 case STATE_SAMPLE:
 			  	  	 //check how many samples have been recorded by the Buoy
 			  	  	 sample_count = __GET_SAMPLE_COUNT();
-			  	  	 if(sample_count > 2)
+			  	  	 if(sample_count >= 2)
 			  	  	 {
 			  	  		 //set next Buoy State to Transmit
 			  	  		 Current_State = STATE_TRANSMIT;
@@ -397,6 +398,13 @@ static void Routine_STATE_SAMPLE(void)
 	  __HAL_RCC_PWR_CLK_DISABLE();
 
 
+	  //Revert all logs to zero - except wave logs
+	  waveLogNo = 1;
+	  gpsLogNo = 1;
+	  envLogNo = 1;
+	  pwrLogNo = 1;
+
+
 
 	//SD Init Routine
 	if(SD_Init()==SD_OK)
@@ -420,106 +428,71 @@ static void Routine_STATE_SAMPLE(void)
 		  IMU_On = 1;
 	  }
 
-	  /* Attempt to initialize sensor within a number of retries */
-		/*  uint8_t retries = 0;
-		  do
+  	  //Filler data
+
+		Gdata.coordinates.lat  = 68.44;
+		Gdata.coordinates.longi  = 160.23;
+		Gdata.Etime = 1656615600;
+		Gdata.diag.HDOP.digit = 5;
+		Gdata.diag.HDOP.precision = 5;
+		Gdata.diag.PDOP.digit = 4;
+		Gdata.diag.PDOP.precision = 4;
+		Gdata.diag.VDOP.digit = 3;
+		Gdata.diag.VDOP.precision = 3;
+		Gdata.diag.num_sats = 1;
+		Gdata.diag.fix_type = 1;
+
+		// Record all GPS data onto SD cards
+		uint8_t tempGPSBuf[500];
+		SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
+		HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+		sprintf(tempGPSBuf, "%d:%d:%d, %f, %f, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.Etime, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats, Gdata.diag.fix_type);
+		SD_File_Write(&File, tempGPSBuf);
+		SD_File_Close(&File);
+		SD_Unmount(SDFatFs);
+
+		gpsDirNo++;
+		gpsLogNo++;
+
+		  // Environmental Sensor Init Routine
+		  BMP_Init_Typedef BMP_InitStruct = {0};
+		  //configure device for environmental sensing
+		  BMP_InitStruct.BMP_Pressure_OverSample = BMP280_CTRLMEAS_OSRSP_OS_1;
+		  BMP_InitStruct.BMP_Temperature_OverSample = BMP280_CTRLMEAS_OSRST_OS_1;
+		  BMP_InitStruct.BMP_IIR_FILTER_COEFFICIENTS = BMP280_CONFIG_FILTER_COEFF_OFF;
+		  BMP_InitStruct.BMP_Power_Mode = BMP280_CTRLMEAS_MODE_FORCED;
+		  if(BMP280_Init(&BMP_InitStruct) == BMP_OK)
 		  {
-			  //initialise gps peripherals and begin comms on sensor instance
-			  if(init_GPS(&hgps)== GPS_Init_OK)
+			  printmsg("Environmental Sensor Online!\r\n");
+			  //create variables
+			  uint32_t temp,press;
+			  int32_t t_fine;
+			  for (int i = 0; i < 10; ++i) //60 second compensation period for averaging
 			  {
-				 printmsg("GPS Online! Acquiring Signal...\r\n");
-				 GPS_On = 1;
-				 break;
+				BMP280_Force_Measure(&temp,&press);		//trigger conversion
+				Gdata.env_Temp = BMP280_Compensate_Temp(temp,&t_fine,bmp.Factory_Trim);			//compensate temperature
+				Gdata.atm_Press = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;	//compensate pressure
+				HAL_Delay(1000);
+
 			  }
-			deinit_GPS(&hgps);
-			retries++;
-		  }
-		  while (retries < GPS_INIT_RETRIES);
+			  printmsg("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
 
-		  // Sample Routine
-
-		  if(GPS_On)
-		  {
-			  	  int x = HAL_GetTick();
-				  while(packet_full != 7)
-				  {
-					  GPS_Log_Begin();
-					  int y = HAL_GetTick()- x;
-					  if(y >  30000) //30s to acquire signal
-					  {
-						  printmsg("Failed to Acquire Signal\r\n");
-						  break;
-					  }
-
-				  }
-				  GPS_Log_Stop();
-				  printmsg("Logging Data...\r\n");
-				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-				  Gdata.coordinates = GPS_coord;
-				  Gdata.Etime = eTime;
-				  Gdata.diag = diag;
-				  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.Etime, Gdata.coordinates.lat, Gdata.coordinates.longi);
-				  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
-				  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
-
-				  // Record all GPS data onto SD cards
-				  uint8_t tempGPSBuf[500];
-				  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
-				  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-				  sprintf(tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.Etime, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
-				  SD_File_Write(&File, tempGPSBuf);
-				  SD_File_Close(&File);
-				  SD_Unmount(SDFatFs);
-
-			  deinit_GPS(&hgps);
-		  }else
-		  {
-			  printmsg("Error GPS Not Found!\r\n");
-		  }
-
-
- 	 */
-
-
-	  // Environmental Sensor Init Routine
-	  BMP_Init_Typedef BMP_InitStruct = {0};
-	  //configure device for environmental sensing
-	  BMP_InitStruct.BMP_Pressure_OverSample = BMP280_CTRLMEAS_OSRSP_OS_1;
-	  BMP_InitStruct.BMP_Temperature_OverSample = BMP280_CTRLMEAS_OSRST_OS_1;
-	  BMP_InitStruct.BMP_IIR_FILTER_COEFFICIENTS = BMP280_CONFIG_FILTER_COEFF_OFF;
-	  BMP_InitStruct.BMP_Power_Mode = BMP280_CTRLMEAS_MODE_FORCED;
-	  if(BMP280_Init(&BMP_InitStruct) == BMP_OK)
-	  {
-		  printmsg("Environmental Sensor Online!\r\n");
-		  //create variables
-		  uint32_t temp,press;
-		  int32_t t_fine;
-		  for (int i = 0; i < 10; ++i) //60 second compensation period for averaging
-		  {
-			BMP280_Force_Measure(&temp,&press);		//trigger conversion
-			Gdata.env_Temp = BMP280_Compensate_Temp(temp,&t_fine,bmp.Factory_Trim);			//compensate temperature
-			Gdata.atm_Press = BMP280_Compensate_Pressure(press,t_fine,bmp.Factory_Trim)/256;	//compensate pressure
-			HAL_Delay(1000);
+			  //Store environmental samples
+			  uint8_t tempENVBuf[200];
+			  SD_ENV_Open(&File, &Dir, &fno,envDirNo, envLogNo);
+			  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+			  sprintf(tempENVBuf, "%d:%d:%d, %ld, %lu \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.env_Temp, Gdata.atm_Press);
+			  SD_File_Write(&File, tempENVBuf);
+			  SD_File_Close(&File);
+			  SD_Unmount(SDFatFs);
+			  envDirNo++;
+			  envLogNo++;
 
 		  }
-		  printmsg("Temp = %ld�C \t Pressure = %lu Pa \r\n",Gdata.env_Temp,Gdata.atm_Press);
-
-		  //Store environmental samples
-		  uint8_t tempENVBuf[200];
-		  SD_ENV_Open(&File, &Dir, &fno,envDirNo, envLogNo);
-		  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-		  sprintf(tempENVBuf, "%d:%d:%d, %ld, %lu \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds, Gdata.env_Temp, Gdata.atm_Press);
-		  SD_File_Write(&File, tempENVBuf);
-		  SD_File_Close(&File);
-		  SD_Unmount(SDFatFs);
-		  envDirNo++;
-		  envLogNo++;
-
-	  }
-
-
-
-
+		  else
+		  {
+			  printmsg( "BMP280 offline! \r\n");
+		  }
 
 	  //INA219 Sample Routine
 	  if(INA219_Init_Sensor() == INA_OK)
@@ -556,6 +529,8 @@ static void Routine_STATE_SAMPLE(void)
 	  uint8_t tempFIFOBuf[500];
 	  uint8_t imu[12] = {0};
 	  uint8_t data_status;
+
+	  IMU_On = 1;
 
 	  SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
 
@@ -621,6 +596,10 @@ static void Routine_STATE_SAMPLE(void)
 		  ICM20649_Deinit_IMU();
 		  SD_Unmount(SDFatFs);
 
+		  IMU_On = 0;
+
+
+
 	//Store updated directory and log numbers
 	  __HAL_RCC_PWR_CLK_ENABLE();
 	  WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF00)|(waveLogNo));
@@ -656,6 +635,12 @@ static void Routine_STATE_TRANSMIT(void)
 	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
 	  __HAL_RCC_PWR_CLK_DISABLE();
 
+	  //Initial log in each directory
+	  waveLogNo = 1;
+	  gpsLogNo = 1;
+	  envLogNo = 1;
+	  pwrLogNo = 1;
+
 	  //Transfer Buffer
 	  uint8_t GPS_trans_Buffer[340];
 	  uint8_t WAVE_trans_Buffer[340];
@@ -667,7 +652,7 @@ static void Routine_STATE_TRANSMIT(void)
 	  SD_Init();
 
 	  //Create Temporary Arrays
-	  float32_t gpsData[9] = {0};
+	  float32_t gpsData[10] = {0};
 	  float32_t envData[3] = {0};
 	  float32_t pwrData[5] = {0};
 
@@ -678,6 +663,52 @@ static void Routine_STATE_TRANSMIT(void)
 	  /* First GPS Buffer */
 
 	  //Get GPS data from SD card
+	  fpointer = 0;
+	  SD_GPS_Read(&File, gpsData, gpsDirNo-2, gpsLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //Note: gpsData[0] is a timestamp
+	  GdataT.coordinates.lat =  gpsData[1];
+	  GdataT.coordinates.longi = gpsData[2];
+	  GdataT.diag.HDOP.digit = (uint8_t)gpsData[3];
+	  GdataT.diag.HDOP.precision = (uint8_t)gpsData[4];
+	  GdataT.diag.VDOP.digit = (uint8_t)gpsData[5];
+	  GdataT.diag.VDOP.precision = (uint8_t)gpsData[6];
+	  GdataT.diag.PDOP.digit = (uint8_t)gpsData[7];
+	  GdataT.diag.PDOP.precision = (uint8_t)gpsData[8];
+
+	  //Get Environmental data from SD card
+	  fpointer = 0;
+	  SD_ENV_Read(&File, envData, envDirNo-2, envLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //ENV Data
+	  //Note: envData[0] is a timestamp
+	  GdataT.env_Temp = (uint32_t)envData[1];
+	  GdataT.atm_Press = (uint32_t)envData[2];
+
+	  //Get power data from SD Card
+	  fpointer = 0;
+	  SD_PWR_Read(&File, pwrData, pwrDirNo-2, pwrLogNo, &fpointer);
+	  SD_File_Close(&File);
+
+	  //PWR Data
+	  //Note: pwrData[0] is a timestamp
+	  GdataT.shunt_v = pwrData[1];
+	  GdataT.bus_v = pwrData[2];
+	  GdataT.current = pwrData[3];
+	  GdataT.power = pwrData[4];
+
+
+	  //Convert GData Buffer to binary
+	  uint8_t* buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT()-1);
+
+	  //Populate first packet of GPS data into array
+	  memcpy(&GPS_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
+
+	  /* Second GPS Buffer */
+
+  	  //Get GPS data from SD card
 	  fpointer = 0;
 	  SD_GPS_Read(&File, gpsData, gpsDirNo-1, gpsLogNo, &fpointer);
 	  SD_File_Close(&File);
@@ -714,52 +745,6 @@ static void Routine_STATE_TRANSMIT(void)
 	  GdataT.current = pwrData[3];
 	  GdataT.power = pwrData[4];
 
-
-	  //Convert GData Buffer to binary
-	  uint8_t* buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT()-1);
-
-	  //Populate first packet of GPS data into array
-	  memcpy(&GPS_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
-
-	  /* Second GPS Buffer */
-
-  	  //Get GPS data from SD card
-	  fpointer = 0;
-	  SD_GPS_Read(&File, gpsData, gpsDirNo, gpsLogNo, &fpointer);
-	  SD_File_Close(&File);
-
-	  //Note: gpsData[0] is a timestamp
-	  GdataT.coordinates.lat =  gpsData[1];
-	  GdataT.coordinates.longi = gpsData[2];
-	  GdataT.diag.HDOP.digit = (uint8_t)gpsData[3];
-	  GdataT.diag.HDOP.precision = (uint8_t)gpsData[4];
-	  GdataT.diag.VDOP.digit = (uint8_t)gpsData[5];
-	  GdataT.diag.VDOP.precision = (uint8_t)gpsData[6];
-	  GdataT.diag.PDOP.digit = (uint8_t)gpsData[7];
-	  GdataT.diag.PDOP.precision = (uint8_t)gpsData[8];
-
-	  //Get Environmental data from SD card
-	  fpointer = 0;
-	  SD_ENV_Read(&File, envData, envDirNo-1, envLogNo, &fpointer);
-	  SD_File_Close(&File);
-
-	  //ENV Data
-	  //Note: envData[0] is a timestamp
-	  GdataT.env_Temp = (uint32_t)envData[1];
-	  GdataT.atm_Press = (uint32_t)envData[2];
-
-	  //Get power data from SD Card
-	  fpointer = 0;
-	  SD_PWR_Read(&File, pwrData, pwrDirNo, pwrLogNo, &fpointer);
-	  SD_File_Close(&File);
-
-	  //PWR Data
-	  //Note: pwrData[0] is a timestamp
-	  GdataT.shunt_v = pwrData[1];
-	  GdataT.bus_v = pwrData[2];
-	  GdataT.current = pwrData[3];
-	  GdataT.power = pwrData[4];
-
 	  //Convert GData Buffer to binary
 	  buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT());
 
@@ -768,8 +753,9 @@ static void Routine_STATE_TRANSMIT(void)
 
 	  //Wave Buffer
 	  //Calculate wave parameter extraction for previous two logs
-	  Wave_Data_t waveData1;
+	  /*Wave_Data_t waveData1;
 	  fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
+
 	  Wave_Data_t waveData2;
 	  fullPipeline(waveData2, waveDirNo); //get wave data from previous record
 
@@ -780,7 +766,7 @@ static void Routine_STATE_TRANSMIT(void)
 	  buffer = to_binary_format_Wave(waveData2, __GET_SAMPLE_COUNT());
 
 	  memcpy(&WAVE_trans_Buffer[WAVEBUFFER_SIZE], buffer, WAVEBUFFER_SIZE);
-
+      */
 	  //Dismount SD cards! DO NOT WANT MOUNTED SD CARDS DURING IRIDIUM TRANSMISSION
 	  SD_Unmount(SDFatFs);
 
@@ -804,11 +790,11 @@ static void Routine_STATE_TRANSMIT(void)
 		  //getlength of data
 
 
-		  /* 3. Upload Drift Data */
+
 		  IR_Status_t flag;
 		 for (int i = 0; i < 2; ++i)
 		 {
-			 flag = (i<1)? IR_send_Bin_String(GPS_trans_Buffer,sizeof(GPS_trans_Buffer)):IR_send_Bin_String(WAVE_trans_Buffer,sizeof(WAVE_trans_Buffer));
+			 flag = IR_send_Bin_String(GPS_trans_Buffer,sizeof(GPS_trans_Buffer));//:IR_send_Bin_String(WAVE_trans_Buffer,sizeof(WAVE_trans_Buffer));
 
 	  	  if(flag == IR_MSG_UPLOAD_OK)
 	  	  {
@@ -875,8 +861,10 @@ static void Routine_Init_STATE(void)
 	 WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF)|((pwrDirNo)<<8));
 	 __HAL_RCC_PWR_CLK_DISABLE();
 
+
+
 	 /* Test Iridium Modem */
-	 /*uint8_t retries = 0;
+	 uint8_t retries = 0;
 	 while(retries++ < 20)
 	 {
 		 if(IR_Init_Module() == IR_OK)
@@ -893,7 +881,7 @@ static void Routine_Init_STATE(void)
 	 {
 		 printmsg("Error Connecting To Modem\r\n");
 	 }
-	 IR_DeInit_Module(); */
+	 IR_DeInit_Module();
 
 	 /* Test BMP280 Sensor*/
 	 BMP_Init_Typedef BMP_InitStruct = {0};
@@ -919,6 +907,7 @@ static void Routine_Init_STATE(void)
 	 if(SD_Init() == SD_OK)
 	 {
 		 printmsg(" SD Cards Online! \r\n");
+
 	 }
 	 else
 	 {

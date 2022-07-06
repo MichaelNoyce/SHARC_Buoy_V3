@@ -100,7 +100,7 @@ HAL_StatusTypeDef Init_Debug(void)
 
 //Debug Print
 void printmsg(char *format,...) {
-    char str[80];
+    char str[100];
 
     /*Extract the the argument list using VA apis */
     va_list args;
