@@ -23,8 +23,6 @@
 
 #include "stm32l4xx_hal.h"
 
-#include <string>
-
 using string = StaticString;
 
 void receiveGLL(const NMEA_Standard::GLL & gll);

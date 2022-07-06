@@ -925,15 +925,16 @@ static void Routine_Init_STATE(void)
 	 }
 
 	 /* Test INA 219 Sensor */
- if(GPS_Init() == GPS_Init_OK)
- {
-	 printmsg("GPS Online!");
-	 GPS_InterruptsOff();
-	 GPS_On = 1;
- } else
- {
-	 printmsg("GPS offline!\r\n");
- }
+	if(GPS_Init() == GPS_Init_OK)
+	{
+		printmsg("GPS Online!");
+		HAL_Delay(2000);	// ! TEMPORARY
+		GPS_InterruptsOff();
+		GPS_On = 1;
+	} else
+	{
+		printmsg("GPS offline!\r\n");
+	}
 
 	 /* Test SD Cards */
 	 if(SD_Init() == SD_OK)
