@@ -160,7 +160,7 @@ M9N_Base::NMEA_PUBX::Rate::Rate(
 }
 
 string M9N_Base::NMEA_PUBX::Rate::toString(char buff[40]){
-	std::snprintf(buff, 40, "$PUBX,40,%3s,%3u,%3u,%3u,%3u,%3u,0*%02X\r\n",
+	std::snprintf(buff, 40, "$PUBX,40,%3s,%u,%u,%u,%u,%u,0*%02X\r\n",
 					NMEA_PUBX::toString(ID).c_str(),	
 					rddc, rus1, rus2, rusb, rspi, cs.cs );
 	

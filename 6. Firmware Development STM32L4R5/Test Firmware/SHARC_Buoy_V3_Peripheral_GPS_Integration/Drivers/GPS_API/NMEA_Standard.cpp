@@ -116,7 +116,8 @@ uint8_t NMEA_Standard::Checksum::checksum(const string & nmea){
 }
 
 void NMEA_Standard::setChecksum(){
-	cs.cs = Checksum::checksum(this->toString(nullptr));
+	char buff[40];
+	cs.cs = Checksum::checksum(this->toString(buff));
 }
 
 const string NMEA_Standard::toString(const Message msg){
@@ -222,16 +223,14 @@ time_t NMEA_Standard::UTC_Time::daytime() const{
 
 /*  NMEA Coordinate Methods */
 
-NMEA_Standard::Coordinate::Coordinate(const string & s, char nsew) : nsew(nsew){
-	auto const decI = s.find('.');
-	if(
-		(decI != string::npos) &&
-		(s.length() >= 6) &&
-		(decI > 3)
-	){
-		char fmt[8];
-		std::snprintf(fmt, 8, "%%%1dhd%%8f", decI-2);
-		std::sscanf(s.c_str(), fmt, &deg, &min);
+NMEA_Standard::Coordinate::Coordinate(const string & s, char nsew) : deg(0), min(0), nsew(nsew){
+	if(s.length() >= 6){
+		auto const decI = s.find('.');
+		if(	(decI != string::npos) && (decI > 3) ){
+			char fmt[8];
+			std::snprintf(fmt, 8, "%%%1dhd%%8f", decI-2);
+			std::sscanf(s.c_str(), fmt, &deg, &min);
+		}
 	}
 }
 
@@ -247,7 +246,7 @@ string NMEA_Standard::Coordinate::toString(char cStr[12]){
  * @return float The Coordinate in fractional degrees.
  */
 NMEA_Standard::Coordinate::operator float() const{
-	return (static_cast<float>(deg)*60 + min) * (( nsew == 'S') || (nsew == 'W') ? -1.0 : 1.0);
+	return (static_cast<float>(deg) + static_cast<float>(min)/60) * (( nsew == 'S') || (nsew == 'W') ? -1.0 : 1.0);
 }
 
 /* NMEA GNS Message */

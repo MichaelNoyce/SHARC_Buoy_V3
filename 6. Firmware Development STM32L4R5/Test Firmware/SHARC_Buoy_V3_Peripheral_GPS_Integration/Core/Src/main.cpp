@@ -444,44 +444,41 @@ static void Routine_STATE_SAMPLE(void)
 	  }
 
 	  //initialise gps peripherals and begin comms on sensor instanc
+	  if(GPS_Init() == GPS_Init_OK)
+	  {
 
 
 		  // Sample Routine
+	  GPS_InterruptsOn();
 
-		  if(GPS_On)
-		  {
+	  HAL_Delay(5000);
 
-			  	  GPS_InterruptsOn();
+	  gpsDataLive = {0};
+	  GPS_Update();
 
-			  	  HAL_Delay(5000);
-
-
-			  	  GPS_Update();
-
-				  printmsg("Logging Data...\r\n");
+	  printmsg("Logging Data...\r\n");
 //				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
-				  Gdata.coordinates = gpsDataLive.coordinates;
-				  Gdata.diag = gpsDataLive.diag;
-				  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.coordinates.time, Gdata.coordinates.lat, Gdata.coordinates.longi);
-				  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
-				  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
+	  Gdata.coordinates = gpsDataLive.coordinates;
+	  Gdata.diag = gpsDataLive.diag;
+	  gpsDataLive = {0};
+	  printmsg("local time: %lu, position: %f Lat, %f long\r\n", Gdata.coordinates.time, Gdata.coordinates.lat, Gdata.coordinates.longi);
+	  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
+	  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
 
-				  // Record all GPS data onto SD cards
-				  uint8_t tempGPSBuf[500];
-				  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
-				  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
-				  sprintf((char *)tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.coordinates.time, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
-				  SD_File_Write(&File, tempGPSBuf);
-				  SD_File_Close(&File);
-				  SD_Unmount(SDFatFs);
+	  GPS_InterruptsOff();
 
-				  GPS_InterruptsOff();
+	  // Record all GPS data onto SD cards
+	  uint8_t tempGPSBuf[500];
+	  SD_GPS_Open(&File, &Dir, &fno, gpsDirNo, gpsLogNo);
+	  HAL_RTC_GetTime(&hrtc, &gTime, RTC_FORMAT_BIN);
+	  sprintf((char *)tempGPSBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %d.%d, %d.%d, %d.%d, %d, %d \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  Gdata.coordinates.lat,  Gdata.coordinates.longi, Gdata.coordinates.time, Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision, Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.fix_type);
+	  SD_File_Write(&File, tempGPSBuf);
+	  SD_File_Close(&File);
+	  SD_Unmount(SDFatFs);
 
-		  }
-		else
-		  {
-			  printmsg("Error GPS Not Found!\r\n");
-		  }
+
+	  }
+
 
 
 
@@ -928,7 +925,6 @@ static void Routine_Init_STATE(void)
 	if(GPS_Init() == GPS_Init_OK)
 	{
 		printmsg("GPS Online!");
-		HAL_Delay(2000);	// ! TEMPORARY
 		GPS_InterruptsOff();
 		GPS_On = 1;
 	} else

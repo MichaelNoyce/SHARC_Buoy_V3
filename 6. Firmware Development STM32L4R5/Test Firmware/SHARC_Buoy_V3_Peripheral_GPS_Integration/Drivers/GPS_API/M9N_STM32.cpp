@@ -20,8 +20,6 @@
 #include "M9N_STM32.hpp"
 #include <array>
 #include <algorithm>
-#include <string>
-#include <vector>
 
 #include "M9N_C_API.h"
 
@@ -29,15 +27,19 @@ M9N::M9N(UART_HandleTypeDef * h, IRQn_Type uartIrq, IRQn_Type dmaTxIrq, IRQn_Typ
 	uart(h, uartIrq, dmaTxIrq, dmaRxIrq) {}
 
 void M9N::init(){
-	const std::array<NMEA_PUBX::Message, 4u> msgs = {
-		NMEA_PUBX::Message::GSV, 
-		NMEA_PUBX::Message::RMC, 
+	const std::array<NMEA_PUBX::Message, 5u> msgs = {
+		NMEA_PUBX::Message::GSV,
+		NMEA_PUBX::Message::RMC,
 		NMEA_PUBX::Message::VTG,
-		NMEA_PUBX::Message::TXT 
+		NMEA_PUBX::Message::GGA,
+		NMEA_PUBX::Message::TXT
 		};
 
 	for(auto m : msgs)
 		setRate(NMEA_PUBX::Rate(m));
+
+	setRate({NMEA_PUBX::Message::ZDA, 1});
+
 		
 	uart.rx.beginReceive();
 }
@@ -76,67 +78,74 @@ void M9N::setBaudrate(Baud baud, PortID portId){
 }
 
 void M9N::scanMessages(){
-	std::pair<uint8_t *, uint16_t> s;	// {array, size}
-	s.second =  uart.rx.offloadBuff.tail;
-	if(s.second == 0) return;	// Nothing to do
-	uint8_t buffCopy[s.second];
-	s.first = buffCopy;
+	std::array<uint8_t, UART::Rx::buffSize> s;	// {array, size}
+	auto tail = uart.rx.dmaBuff.tail;
+	if(tail == 0) return;	// Nothing to do
 
 	// The later processing will take a while. Pay copy expense in return for flushing the buffer ASAP.
 	uart.interruptsOff();
-	std::copy(uart.rx.offloadBuff.buff, uart.rx.offloadBuff.buff + s.second, s.first);
-	uart.rx.offloadBuff.tail = 0;
+	if(uart.rx.dmaBuff.overflow){
+		std::copy(uart.rx.dmaBuff.buff + tail, uart.rx.dmaBuff.buff + uart.rx.dmaBuff.size, s.begin());
+		std::copy(uart.rx.dmaBuff.buff, uart.rx.dmaBuff.buff + tail, s.begin() + (uart.rx.dmaBuff.size - tail));
+		tail = uart.rx.dmaBuff.size;	// From this point consider the buffer as full since it overflowed.
+		uart.rx.dmaBuff.overflow = false;
+	}
+	else{
+		std::copy(uart.rx.dmaBuff.buff, uart.rx.dmaBuff.buff + tail, s.begin());
+	}
+	uart.rx.dmaBuff.tail = 0;
 	uart.interruptsOn();
 
-	uint16_t lenD = std::count_if(s.first, s.first + s.second, [](uint8_t c) -> bool{ return c == '$'; });
-	uint16_t lenL = std::count_if(s.first, s.first + s.second, [](uint8_t c) -> bool{ return c == '\r'; });
-	uint16_t lenU = std::count_if(s.first, s.first + s.second, [](uint8_t c) -> bool{ return c == 0xB5; });
+	uint16_t lenD = std::count_if(s.begin(), s.begin() + tail, [](uint8_t c) -> bool{ return c == '$'; });
+	uint16_t lenL = std::count_if(s.begin(), s.begin() + tail, [](uint8_t c) -> bool{ return c == '\r'; });
+	// uint16_t lenU = std::count_if(s.begin(), s.begin() + tail, [](uint8_t c) -> bool{ return c == 0xB5; });
 	uint16_t dollars[(lenD > 0) ? lenD : 1u];	// Will crash if zero-sized.
 	uint16_t lfcrs	[(lenL > 0) ? lenL : 1u];	// Will crash if zero-sized.
-	uint16_t mus	[(lenU > 0) ? lenU : 1u];	// Will crash if zero-sized.
+	// uint16_t mus	[(lenU > 0) ? lenU : 1u];	// Will crash if zero-sized.
 	std::pair<uint16_t*, uint16_t> d = {dollars	, 0u};	// {array, working index}
 	std::pair<uint16_t*, uint16_t> l = {lfcrs	, 0u};	// {array, working index}
-	std::pair<uint16_t*, uint16_t> u = {mus		, 0u};	// {array, working index}
+	// std::pair<uint16_t*, uint16_t> u = {mus		, 0u};	// {array, working index}
 
-	for(uint16_t i = 0; i < s.second - 1; i++){
-		switch(s.first[i]){
+	for(uint16_t i = 0; i < tail - 1; i++){
+		switch(s[i]){
 			case '$': {
 				d.first[d.second++] = i;
 				break;
 			}
 			case '\r':{
-				if(s.first[i+1] == '\n'){
+				if(s[i+1] == '\n'){
 					l.first[l.second++] = i;
 				}
 				break;
 			} 
-			case 0xB5: {
-				if(s.first[i+1] == 0x62){
-					u.first[u.second++] = i;
-				}
-				break;
-			}
+			// case 0xB5: {
+			// 	if(s[i+1] == 0x62){
+			// 		u.first[u.second++] = i;
+			// 	}
+			// 	break;
+			// }
 			default: continue;
 		}
 	}
 
+	// ! UBX Identification Currently Disabled
 	/* UBX Frame Identification */
 	// Drop any "μb" indicies which are too close to the end of v such that the length specifier is not received.
-	for(auto i = u.second - 1; (u.second > 1u) && (i >= 0); i-- ){
-		if(u.first[i] > (s.second - 5)) lenU--;
-		else break;
-	}
+	// for(auto i = u.second - 1; (u.second > 1u) && (i >= 0); i-- ){
+	// 	if(u.first[i] > (tail - 5)) lenU--;
+	// 	else break;
+	// }
 
-	// Construct pairs of UBX indicies and the length of that frame.
-	std::pair<uint16_t, uint16_t> ubxRanges[lenU];	// {Start, Length}
+	// // Construct pairs of UBX indicies and the length of that frame.
+	// std::pair<uint16_t, uint16_t> ubxRanges[lenU];	// {Start, Length}
 
-	for(uint16_t i = 0u; i < lenU; i++){
-		// ubxRanges[i] = { u.first[i], UBX::getPayloadLen(std::vector<uint8_t>(s.first + u.first[i], s.first + u.first[i] + 6)) + 8 };	// +6 safe because of prior filter.
-	}
+	// for(uint16_t i = 0u; i < lenU; i++){
+	// 	// ubxRanges[i] = { u.first[i], UBX::getPayloadLen(std::vector<uint8_t>(s.first + u.first[i], s.first + u.first[i] + 6)) + 8 };	// +6 safe because of prior filter.
+	// }
 
 	// Filter pairs for which the entire frame is not within v.
 	// This will also happen to erase pairs with a corrupted and had a large length specifier.
-	for(size_t i = 0; (lenU > 0) && (i < lenU); i++) if(ubxRanges[i].first + ubxRanges[i].second > s.second) lenU--;
+	// for(size_t i = 0; (lenU > 0) && (i < lenU); i++) if(ubxRanges[i].first + ubxRanges[i].second > tail) lenU--;
 
 
 	// TODO: Scan UBX Frames
@@ -167,33 +176,32 @@ void M9N::scanMessages(){
 
 	/* Scan NMEA Frames */
 	for(uint16_t i = 0; i < k; i++){
-		interpretNmea(StaticString(s.first + nmeaRanges[i].first, s.first + nmeaRanges[i].second));
-		// __NOP();
+		interpretNmea(StaticString(s.begin() + nmeaRanges[i].first, s.begin() + nmeaRanges[i].second));
 	}
 
 	/* Push remainder characters back to Rx */
-	auto lastUBX  = (lenU > 0) ? ubxRanges[lenU].first + ubxRanges[lenU].second : 0;
+	// auto lastUBX  = (lenU > 0) ? ubxRanges[lenU].first + ubxRanges[lenU].second : 0;
 	auto lastNmea = (k > 0) ? nmeaRanges[k-1].second + 2 : 0;
-	auto lastC = (lastUBX > lastNmea) ? lastUBX : lastNmea;
+	// auto lastC = (lastUBX > lastNmea) ? lastUBX : lastNmea;
+	auto lastC = lastNmea;
 
 	// If nothing was processed, or if all was processed, do nothing.
-	if( (lastC == 0) || (lastC = s.second) ) return;
+	if( (lastC == 0) || (lastC = tail) ) return;
 	// Add any characters that may have been received during the above processing.
-	else if(uart.rx.offloadBuff.tail > 0){	// More characters have been added during this function's call.
-		if(s.second + uart.rx.offloadBuff.tail > uart.rx.offloadBuff.size ) return;	// Buffer will overflow. Flush these remaining characters
+	else if(uart.rx.dmaBuff.tail > 0){	// More characters have been added during this function's call.
+		if(tail + uart.rx.dmaBuff.tail > uart.rx.dmaBuff.size ) return;	// Buffer will overflow. Flush these remaining characters
 		else{
 			uart.interruptsOff();
-			std::copy(uart.rx.offloadBuff.buff, uart.rx.offloadBuff.buff + uart.rx.offloadBuff.tail, s.first + lastC);
-			s.second += uart.rx.offloadBuff.tail;
-			std::copy(s.first + lastC, s.first + s.second, uart.rx.offloadBuff.buff);
-			uart.rx.offloadBuff.tail = lastC;
+			std::move(uart.rx.dmaBuff.buff, uart.rx.dmaBuff.buff + uart.rx.dmaBuff.tail, uart.rx.dmaBuff.buff + lastC);
+			std::move(s.begin() + lastC, s.begin() + tail, uart.rx.dmaBuff.buff);
+			uart.rx.dmaBuff.tail += (lastC - tail);
 			uart.interruptsOn();
 		}
 	}
 	else{	// No characters were added. Copy directly into the buffer
 		uart.interruptsOff();
-		std::copy(s.first + lastC, s.first + s.second, uart.rx.offloadBuff.buff);
-		uart.rx.offloadBuff.tail = s.second;
+		std::copy(s.begin() + lastC, s.begin() + tail, uart.rx.dmaBuff.buff);
+		uart.rx.dmaBuff.tail = tail;
 		uart.interruptsOn();
 	}
 }
@@ -209,7 +217,7 @@ inline void M9N::interpretNmea(const StaticString & s){
 		}
 		case M9N_Base::NMEA_PUBX::Message::GSA :{
 			NMEA_Standard::GSA gsa{s};
-			receiveGSA(gsa);	// C API Call
+			if(gsa.systemId == 1) receiveGSA(gsa);	// C API Call
 			return;
 		}
 		case M9N_Base::NMEA_PUBX::Message::ZDA :{

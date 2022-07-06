@@ -123,8 +123,8 @@ bool UART::Tx::txScheduled() const{
 
 bool UART::Rx::dataReady(){
 	static uint16_t lastTail = 0;
-	bool retval = ((offloadBuff.tail > 0) && (lastTail != offloadBuff.tail)) ? true : false;
-	lastTail = offloadBuff.tail;
+	bool retval = ((dmaBuff.tail > 0) && (lastTail != dmaBuff.tail)) ? true : false;
+	lastTail = dmaBuff.tail;
 	return retval;
 }
 
@@ -165,32 +165,9 @@ void UART::Tx::txCmpltCallback(){
 	// interruptsOn();
 }
 
-
-/**
- * @brief 
- * 
- * @param size The new head position reported from the UART peripheral.
- */
 void UART::Rx::rxEventCallback(uint16_t size){
-	if(size == dmaBuff.tail) return;	// Do nothing. Unknown event of zero size.
-
-	if(offloadBuff.tail == offloadBuff.size) offloadBuff.tail = 0;	// Flush if buffer completely full.
-	
-	// Offload buffer overflow. Reduce size to fill only available capacity. All further characters will be discarded.
-	uint16_t head = (offloadBuff.tail + (size - dmaBuff.tail) > offloadBuff.size) ?  // Will the offload buffer overflow if [size] characters are added.
-		(offloadBuff.size - offloadBuff.tail) + dmaBuff.tail : 	// Only move head to as many characters forward as will fit in offload buffer.
-		size; 	// Move head to new head
-	
-	/**
-	 * If an interrupt is missed, or suspended during debug, a condition may arise where the tail was not reset and is now greater than the head.
-	 * If so, the tail must be reset. The data at the end of the buffer should not be retrieved as this may create a race condition with the DMA controller.
-	 */
-	if( (dmaBuff.tail > size) || (dmaBuff.tail > head) ) dmaBuff.tail = 0;
-	
-	std::memcpy(offloadBuff.buff + offloadBuff.tail, dmaBuff.buff + dmaBuff.tail, head - dmaBuff.tail);
-	offloadBuff.tail += (head - dmaBuff.tail);
-	
-	dmaBuff.tail = (head == dmaBuff.size) ? 0 : head;	// Loop if at end else move tail to head.
+	if(size == dmaBuff.size || dmaBuff.tail > size) dmaBuff.overflow = true;	// Check for overflow
+	dmaBuff.tail = (size == dmaBuff.size) ? 0 : size;	// Loop if at end else move tail to size.
 }
 
 void UART::errorCallback(UART_HandleTypeDef * huart){

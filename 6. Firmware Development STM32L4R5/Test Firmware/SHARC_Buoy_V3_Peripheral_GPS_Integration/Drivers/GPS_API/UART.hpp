@@ -89,15 +89,15 @@ public:
 			const tS size{S};		// Size of buffer.
 			tB buff[S];				// Static Storage
 			volatile tS tail{0};	// Data Written to Buffer. Will be advanced in an ISR.
+			volatile bool overflow = false;
 
 			// Buffer() = default;
 			static_assert(S > 0, "Buffer size must be non-zero.");
 			static_assert(sizeof(tB) == 1, "Only byte-sized types allowed for buffer elements (STM32 Configuration Constraint).");
 		};
 
-		static const size_t buffSize = 2048u;
+		static const size_t buffSize = 4096u;
 		Buffer<buffSize> dmaBuff{};			// Main Circular Buffer given to HAL DMA Process
-		Buffer<1*buffSize> offloadBuff{};	// Large static offloading buffer. Rx Event Callbacks will move data from rxBuff to here.
 		bool receiving = false;	// Notes if currently in receiving mode. Will be used to re-enable if there is and error requiring peripheral reset.
 
 		friend class M9N;	// Temporary for testing

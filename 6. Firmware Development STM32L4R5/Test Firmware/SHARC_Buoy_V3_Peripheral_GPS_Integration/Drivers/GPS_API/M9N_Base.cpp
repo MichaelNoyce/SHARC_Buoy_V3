@@ -20,7 +20,7 @@
 #include "M9N_Base.hpp"
 
 void M9N_Base::setRate(NMEA_PUBX::Rate rate){
-	char buff[30];
+	char buff[40];
 	transmit(rate.toString(buff));
 }
 
@@ -33,13 +33,13 @@ void M9N_Base::setConfig(NMEA_PUBX::Config cfg){
 
 void M9N_Base::silenceDefaultRates(){
 	const std::array<NMEA_PUBX::Message, 7u> msgs = {
+		NMEA_PUBX::Message::TXT,
 		NMEA_PUBX::Message::GGA, 
 		NMEA_PUBX::Message::GLL, 
 		NMEA_PUBX::Message::GSA, 
 		NMEA_PUBX::Message::GSV, 
 		NMEA_PUBX::Message::RMC, 
-		NMEA_PUBX::Message::VTG,
-		NMEA_PUBX::Message::TXT 
+		NMEA_PUBX::Message::VTG
 		};
 
 	for(auto m : msgs)
