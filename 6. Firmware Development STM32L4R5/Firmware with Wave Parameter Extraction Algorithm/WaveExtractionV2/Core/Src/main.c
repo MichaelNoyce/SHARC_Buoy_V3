@@ -117,14 +117,14 @@ int main(void)
 
   uint32_t fpointer = 0;
 
-  SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+ // SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
 
 
-    for(int i=0; i<1024; i++)
-    {
-    	 printmsg("%.8f \r\n", rawData[i]);
-    }
+    //for(int i=0; i<1024; i++)
+    //{
+    	 //printmsg("%.8f \r\n", rawData[i]);
+    //}
 
   //WelchMethod(PSD, waveDirNo);
 

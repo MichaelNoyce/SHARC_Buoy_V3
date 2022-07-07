@@ -128,7 +128,7 @@ int main(void)
 	  {
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,SET);
 	  }
-  uint8_t msg[40] = "This is A Test in Binary in an enclosure";
+  uint8_t msg[40] = "This is A Test in Binary from the roof!";
   if(IR_send_Bin_String(msg,40) == IR_MSG_UPLOAD_OK)
   {
 
@@ -161,7 +161,7 @@ int main(void)
   uint8_t strength;
   if(IR_get_Signal_Strength(&strength) == IR_OK)
   {
-	  printmsg("Iridium strength okay! \r\n");
+	  printmsg("Iridium strength okay!, Strength: %d \r\n", strength);
 	  __NOP();
   }
   else

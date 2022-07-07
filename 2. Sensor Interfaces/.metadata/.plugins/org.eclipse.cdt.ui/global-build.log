@@ -1,51 +1,63 @@
-19:06:04 **** Build of configuration Debug for project SDMMC_Interface ****
+17:56:32 **** Incremental Build of configuration Debug for project Iridium_Interface ****
 make -j4 all 
-arm-none-eabi-size   SDMMC_Interface.elf 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -Og -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "Iridium_Interface.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\2. Sensor Interfaces\STM32L4R5ZIT6P Interfaces\5. Iridium Interface\Iridium_Interface\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="Iridium_Interface.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Iridium_Interface.elf
+ 
+arm-none-eabi-size   Iridium_Interface.elf 
+arm-none-eabi-objdump -h -S  Iridium_Interface.elf  > "Iridium_Interface.list"
    text	   data	    bss	    dec	    hex	filename
-  71864	    488	   5888	  78240	  131a0	SDMMC_Interface.elf
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
 Finished building: default.size.stdout
  
-19:06:23 **** Incremental Build of configuration Debug for project WaveExtractionV2 ****
-make -j4 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DARM_MATH_CM4 -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../FATFS/App -I../FATFS/Target -I../Middlewares/Third_Party/FatFs/src -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Firmware with Wave Parameter Extraction Algorithm/WaveExtractionV2/FATFS" -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Firmware with Wave Parameter Extraction Algorithm/WaveExtractionV2/Middlewares" -I"C:/Users/mpnoy/OneDrive/Documents/Masters 2021/SHARC_Buoy_V3/6. Firmware Development STM32L4R5/Firmware with Wave Parameter Extraction Algorithm/WaveExtractionV2/Drivers/CMSIS/Lib" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-In file included from ../Core/Src/main.c:29:0:
-../Core/Inc/waveFunctions.h:40:1: warning: "/*" within comment [-Wcomment]
- /*
-  
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:118:12: warning: unused variable 'fpointer' [-Wunused-variable]
-   uint32_t fpointer = 0;
-            ^~~~~~~~
-../Core/Src/main.c:116:12: warning: unused variable 'waveDirNo' [-Wunused-variable]
-   uint32_t waveDirNo  = 1;
-            ^~~~~~~~~
-../Core/Src/main.c:115:15: warning: unused variable 'waveData' [-Wunused-variable]
-   Wave_Data_t waveData;
-               ^~~~~~~~
-../Core/Src/main.c:113:11: warning: unused variable 'rawData' [-Wunused-variable]
-   int32_t rawData[FFT_LENGTH];
-           ^~~~~~~
-../Core/Src/main.c:112:13: warning: unused variable 'PSD' [-Wunused-variable]
-   float32_t PSD[FFT_LENGTH/2];
-             ^~~
-../Core/Src/main.c:110:12: warning: unused variable 'i' [-Wunused-variable]
-   uint32_t i = 0;
-            ^
-arm-none-eabi-gcc -o "WaveExtractionV2.elf" @"objects.list"  -larm_cortexM4lf_math -mcpu=cortex-m4 -T"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with Wave Parameter Extraction Algorithm\WaveExtractionV2\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="WaveExtractionV2.map" -Wl,--gc-sections -static -L"C:\Users\mpnoy\OneDrive\Documents\Masters 2021\SHARC_Buoy_V3\6. Firmware Development STM32L4R5\Firmware with Wave Parameter Extraction Algorithm\WaveExtractionV2\Drivers\CMSIS\DSP\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: WaveExtractionV2.elf
+Finished building: Iridium_Interface.list
  
-arm-none-eabi-size   WaveExtractionV2.elf 
-arm-none-eabi-objdump -h -S  WaveExtractionV2.elf  > "WaveExtractionV2.list"
+17:56:44 **** Incremental Build of configuration Debug for project Iridium_Interface ****
+make -j4 all 
+arm-none-eabi-size   Iridium_Interface.elf 
    text	   data	    bss	    dec	    hex	filename
-  49676	    484	 117404	 167564	  28e8c	WaveExtractionV2.elf
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
 Finished building: default.size.stdout
  
-Finished building: WaveExtractionV2.list
- 
-19:07:18 **** Incremental Build of configuration Debug for project SDMMC_Interface ****
+17:58:09 **** Incremental Build of configuration Debug for project Iridium_Interface ****
 make -j4 all 
-arm-none-eabi-size   SDMMC_Interface.elf 
+arm-none-eabi-size   Iridium_Interface.elf 
    text	   data	    bss	    dec	    hex	filename
-  71864	    488	   5888	  78240	  131a0	SDMMC_Interface.elf
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
+Finished building: default.size.stdout
+ 
+11:09:36 **** Incremental Build of configuration Debug for project Iridium_Interface ****
+make -j4 all 
+arm-none-eabi-size   Iridium_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
+Finished building: default.size.stdout
+ 
+11:10:56 **** Build of configuration Debug for project Basic Interface ****
+make -j4 all 
+arm-none-eabi-size   Basic\ Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  14200	     20	   1716	  15936	   3e40	Basic Interface.elf
+Finished building: default.size.stdout
+ 
+11:18:55 **** Incremental Build of configuration Debug for project Iridium_Interface ****
+make -j4 all 
+arm-none-eabi-size   Iridium_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
+Finished building: default.size.stdout
+ 
+11:30:12 **** Incremental Build of configuration Debug for project Iridium_Interface ****
+make -j4 all 
+arm-none-eabi-size   Iridium_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
+Finished building: default.size.stdout
+ 
+12:20:55 **** Incremental Build of configuration Debug for project Iridium_Interface ****
+make -j4 all 
+arm-none-eabi-size   Iridium_Interface.elf 
+   text	   data	    bss	    dec	    hex	filename
+  45088	    488	   6768	  52344	   cc78	Iridium_Interface.elf
 Finished building: default.size.stdout
  
