@@ -402,13 +402,13 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 		Sum = Sum + (freq[i])*PSD[i];
 	}
 
-	printmsg("f^2 sum %.8f", Sum);
+	//printmsg("f^2 sum %.8f", Sum);
 
 	m1 = 10000*0.5*subInt_length*(freq[1]*PSD[1]+2*Sum+(freq[subInt_no+1]*PSD[subInt_no+1]));
 
 	*M1 = m1/10000;
 
-	printmsg("M1 calculated!: m1 %.8f", m1);
+	//printmsg("M1 calculated!: m1 %.8f", m1);
 
 	Sum = 0;
 
@@ -421,7 +421,7 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 
 	 *M2 = m2/10000;
 
-	printmsg("M2 calculated!");
+	//printmsg("M2 calculated!");
 
 	//add M2, T0, Hrms and H0 calculations
 

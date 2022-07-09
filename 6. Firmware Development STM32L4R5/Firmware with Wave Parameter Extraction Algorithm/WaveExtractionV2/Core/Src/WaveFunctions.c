@@ -46,6 +46,318 @@ void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 	//waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 	waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
 
+
+	//Make PSD Spectra
+	/*float32_t sumTotal;
+	uint32_t i;
+
+	//0 - 0.122 Hz
+	for (i = 0; i < 10; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[1] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 10; i < 20; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[2] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 10; i < 20; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[3] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 20; i < 30; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[4] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 30; i < 40; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[5] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 40; i < 50; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[6] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 50; i < 60; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[7] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 60; i < 70; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[8] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 70; i < 80; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[1] = sumTotal/10;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 80; i < 90; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[9] = sumTotal/10;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 90; i < 100; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[1] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 100; i < 110; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[10] = sumTotal/10;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 110; i < 120; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[11] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 120; i < 130; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[12] = sumTotal/10;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 130; i < 140; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[14] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 140; i < 150; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[15] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 1500; i < 160; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[16] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 160; i < 170; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[17] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 170; i < 180; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[18] = sumTotal/10;
+
+	//0 - 0.122 Hz
+	for (i = 180; i < 190; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[19] = sumTotal/10;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 190; i < 200; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[20] = sumTotal/10;
+
+
+	//0 - 0.122 Hz
+	for (i = 200; i < 230; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[21] = sumTotal/30;
+
+	//0 - 0.122 Hz
+	for (i = 230; i < 260; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+	waveData.PSD[22] = sumTotal/30;
+
+
+	//0 - 0.122 Hz
+	for (i = 260; i < 290; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[23] = sumTotal/30;
+
+
+
+	//0 - 0.122 Hz
+	for (i = 290; i < 320; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[24] = sumTotal/30;
+
+	//0 - 0.122 Hz
+	for (i = 320; i < 350; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[25] = sumTotal/30;
+
+
+	//0 - 0.122 Hz
+	for (i = 350; i < 380; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[26] = sumTotal/30;
+
+
+	//0 - 0.122 Hz
+	for (i = 0; i < 10; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[27] = sumTotal/30;
+
+	//0 - 0.122 Hz
+	for (i = 380; i < 410; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[28] = sumTotal/30;
+
+
+	//0 - 0.122 Hz
+	for (i = 410; i < 440; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+		waveData.PSD[29] = sumTotal/30;
+
+		//0 - 0.122 Hz
+	for (i = 440; i < 512; i++)
+	{
+		sumTotal = sumTotal + PSD[i];
+	}
+
+
+	waveData.PSD[30] = sumTotal/30;
+
+	*/
+
+
+
 	printmsg("Hm0 %.8f \r\n", waveData.Hm0);
 	printmsg("Hrms %.8f \r\n", waveData.Hrms);
 	printmsg("M0 %.8f \r\n", waveData.M0);
@@ -116,11 +428,10 @@ void singleSegmentPipeline(float32_t* singleSegment, uint32_t waveDirNo, uint32_
     //Output Inverse - Wave Amplitude series
     embeddedFFT(tempBuf4, tempBuf5, FFT_LENGTH, IFFT);
 
-
     //Apply Hanning Window to reduce spectral leakage
    float32_t tempWindow;
 
-    for(i = 0; i<FFT_LENGTH; i++)
+    for(i = 0; i<FFT_LENGTH/2; i++)
     {
     	tempWindow = 0.5 * (1 - cos(2*PI*i/FFT_LENGTH));
     	singleSegment[i] = tempBuf5[i]*tempWindow;
@@ -140,7 +451,7 @@ void calibrate(int32_t* rawData, float32_t* calOutput)
 
 	for (i = 0; i < FFT_LENGTH ; i++)
 	{
-		calOutput[i] = ((float32_t)rawData[i] - 92.22)/1686.50 -9.81; //remove bias offset, scale and subtract g
+		calOutput[i] = (((float32_t)rawData[i])/(8192))*9.81 -9.81 - 0.06; //remove bias offset, scale and subtract g
 	}
 
 }

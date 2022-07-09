@@ -505,7 +505,8 @@ sd_status_t SD_Wave_Read(FIL *myFile, int32_t *IMUArray,  uint32_t WaveDirNo, ui
 
 					  IMUArray[i] = atoi(p);
 
-					  //printmsg("%s\r\n", p);
+					  //printmsg("%d\r\n", IMUArray[i]);
+
 
 				  }
 

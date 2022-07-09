@@ -46,6 +46,13 @@ void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 	//waveParamExtract(PSD, &Hm0, &Hrms, &T0, &Tp, &M0, &M1, &M2);
 	waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
 
+
+	/*for(int i = 0; i<(FFT_LENGTH/2); i++)
+	{
+		if(i<(FFT_LENGTH/2)
+
+	} */
+
 	printmsg("Hm0 %.8f \r\n", waveData.Hm0);
 	printmsg("Hrms %.8f \r\n", waveData.Hrms);
 	printmsg("M0 %.8f \r\n", waveData.M0);
@@ -54,6 +61,8 @@ void fullPipeline(Wave_Data_t waveData, uint32_t WaveDirNo)
 	printmsg("Tm01 %.8f \r\n", waveData.TM01);
 	printmsg("T0 %.8f \r\n", waveData.T0);
 	printmsg("Tp %.8f \r\n", waveData.Tp);
+
+
 }
 
 /**

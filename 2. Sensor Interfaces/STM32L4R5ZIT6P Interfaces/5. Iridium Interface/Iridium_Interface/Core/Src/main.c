@@ -128,8 +128,8 @@ int main(void)
 	  {
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,SET);
 	  }
-  uint8_t msg[40] = "This is A Test in Binary from the roof!";
-  if(IR_send_Bin_String(msg,40) == IR_MSG_UPLOAD_OK)
+  uint8_t msg[62] = "This is A Test in Binary from the roof with handle enclosure!";
+  if(IR_send_Bin_String(msg,61) == IR_MSG_UPLOAD_OK)
   {
 
 	  printmsg("IR Message Upload okay \r\n");

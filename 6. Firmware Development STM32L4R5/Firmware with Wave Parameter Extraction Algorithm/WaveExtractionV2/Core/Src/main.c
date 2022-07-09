@@ -111,33 +111,35 @@ int main(void)
 
   float32_t PSD[FFT_LENGTH/2];
   int32_t rawData[FFT_LENGTH];
+  int32_t timeSeries[FFT_LENGTH];
 
   Wave_Data_t waveData;
   uint32_t waveDirNo  = 1;
+  uint32_t waveLogNo = 1;
 
   uint32_t fpointer = 0;
 
- // SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+  //SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
 
 
 
-    //for(int i=0; i<1024; i++)
-    //{
-    	 //printmsg("%.8f \r\n", rawData[i]);
-    //}
+   /* for(int i=0; i<1024; i++)
+    {
+    	 printmsg("%d \r\n", rawData[i]);
+    } */
 
   //WelchMethod(PSD, waveDirNo);
 
-  //singleSegmentPipeline(PSD, 1, 1);
+  ///singleSegmentPipeline(timeSeries, 1, 3);
 
  //waveParamExtract(PSD, &waveData.Hm0, &waveData.TM01, &waveData.Hrms, &waveData.T0, &waveData.Tp, &waveData.M0, &waveData.M1, &waveData.M2);
 
-  //fullPipeline(waveData, waveDirNo);
+  fullPipeline(waveData, waveDirNo);
 
- /*for(int i=0; i<512; i++)
+ for(int i=0; i<30; i++)
  {
-	 printmsg("%.8f \r\n", PSD[i]);
- }*/
+	 printmsg("%f \r\n", waveData.PSD[i]);
+ }
 
 
     printmsg("DSP Pipeline Finished!\r\n");

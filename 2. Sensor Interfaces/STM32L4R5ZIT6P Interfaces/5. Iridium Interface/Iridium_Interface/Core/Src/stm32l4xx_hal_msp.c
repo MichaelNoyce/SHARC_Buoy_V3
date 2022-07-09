@@ -21,7 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
-#include "HAl_Iridium.h"
+#include "HAL_Iridium.h"
 /* USER CODE END Includes */
 extern DMA_HandleTypeDef hdma_usart3_rx;
 

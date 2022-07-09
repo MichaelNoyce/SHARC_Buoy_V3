@@ -82,10 +82,10 @@ int main(void)
 
 	  //Wave Buffer
 	  //Calculate wave parameter extraction for previous two logs
-	  Wave_Data_t waveData1;
-	  fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
-	  Wave_Data_t waveData2;
-	  fullPipeline(waveData2, waveDirNo); //get wave data from previous record
+	  //Wave_Data_t waveData1;
+	  //fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
+	  //Wave_Data_t waveData2;
+	  //fullPipeline(waveData2, waveDirNo); //get wave data from previous record
 
 
 }

@@ -431,6 +431,8 @@ static void Routine_STATE_SAMPLE(void)
 		printmsg("SD Card offline \r\n");
 	}
 
+	SD_Unmount(SDFatFs);
+
 	  //GPS  Init Routine
 	  GPS_Data_t Gdata;
 	  sample_count = __GET_SAMPLE_COUNT();
