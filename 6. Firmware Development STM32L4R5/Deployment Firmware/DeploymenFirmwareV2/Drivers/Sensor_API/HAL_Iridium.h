@@ -182,9 +182,9 @@ typedef struct
 #define IR_TIM_PORT TIM3						//IRIDIUM TIMER PERIPHERAL
 
 //Constant Definitions
-#define TX_BUFFER_SIZE 2046						//SIZE OF USART TX BUFFER
-#define RX_BUFFER_SIZE 2046						//SIZE OF USART RX BUFFER
-#define RM_BUFFER_SIZE 500						//SIZE OF MESSAGE RECIEVE BUFFER
+#define TX_BUFFER_SIZE 350						//SIZE OF USART TX BUFFER
+#define RX_BUFFER_SIZE 30						//SIZE OF USART RX BUFFER
+#define RM_BUFFER_SIZE 100						//SIZE OF MESSAGE RECIEVE BUFFER
 #define ASCII_MSG_BYTE_LEN 9					//Number of Bytes in  the string "AT+SBDWT="
 
 //========================== 4. Global Variables ==========================================

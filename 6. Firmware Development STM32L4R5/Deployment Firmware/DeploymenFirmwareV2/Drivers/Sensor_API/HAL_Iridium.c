@@ -87,6 +87,7 @@ static HAL_StatusTypeDef MX_TIM3_Init(void);
 //======================= 3. Static Function Definition ==================================
 
 /**
+/**
   * @brief USART3 Initialization Function
   * @param None
   * @retval None
@@ -129,56 +130,12 @@ static HAL_StatusTypeDef MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
+  return HAL_OK;
 
   /* USER CODE END USART3_Init 2 */
 
 }
 
-/**
-  * Enable DMA controller clock
-  * Configure DMA for memory to memory transfers
-  *   hdma_memtomem_dma1_channel2
-  */
-static HAL_StatusTypeDef MX_DMA_Init(void)
-{
-
-	 if(DMA2_Channel2->CCR != 0)
-	  {
-	   //clear channel to reset state
-	   hdma_usart3_rx.Instance = DMA2_Channel2;
-	   hdma_usart3_rx.DmaBaseAddress->ISR = DMA2->ISR;
-	   hdma_usart3_rx.ChannelIndex = 2;
-	   HAL_DMA_DeInit(&hdma_usart3_rx);
-	  }
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMAMUX1_CLK_ENABLE();
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* Configure DMA request hdma_memtomem_dma1_channel2 on DMA1_Channel2 */
-  hdma_memtomem_dma1_channel2.Instance = DMA1_Channel2;
-  hdma_memtomem_dma1_channel2.Init.Request = DMA_REQUEST_MEM2MEM;
-  hdma_memtomem_dma1_channel2.Init.Direction = DMA_MEMORY_TO_MEMORY;
-  hdma_memtomem_dma1_channel2.Init.PeriphInc = DMA_PINC_ENABLE;
-  hdma_memtomem_dma1_channel2.Init.MemInc = DMA_MINC_ENABLE;
-  hdma_memtomem_dma1_channel2.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-  hdma_memtomem_dma1_channel2.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-  hdma_memtomem_dma1_channel2.Init.Mode = DMA_NORMAL;
-  hdma_memtomem_dma1_channel2.Init.Priority = DMA_PRIORITY_LOW;
-  if (HAL_DMA_Init(&hdma_memtomem_dma1_channel2) != HAL_OK)
-  {
-    Error_Handler( );
-  }
-
-  /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-  /* DMA1_Channel2_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
-
-}
 
 
 /**
@@ -223,68 +180,6 @@ static HAL_StatusTypeDef MX_GPIO_Init(void)
 
   return HAL_OK;
 
-}
-
-/**
-  * @brief TIM3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static HAL_StatusTypeDef MX_TIM3_Init(void)
-{
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-  TIM_OC_InitTypeDef sConfigOC = {0};
-
-  htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 0;
-  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 65535;
-  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  if (HAL_TIM_OC_Init(&htim3) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_RESET;
-  sSlaveConfig.InputTrigger = TIM_TS_ETRF;
-  sSlaveConfig.TriggerPolarity = TIM_TRIGGERPOLARITY_NONINVERTED;
-  sSlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1;
-  sSlaveConfig.TriggerFilter = 0;
-  if (HAL_TIM_SlaveConfigSynchro(&htim3, &sSlaveConfig) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  if (HAL_TIMEx_RemapConfig(&htim3, TIM_TIM3_ETR_COMP1) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  sConfigOC.OCMode = TIM_OCMODE_TIMING;
-  sConfigOC.Pulse = 11520;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
-  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-  if (HAL_TIM_OC_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-  {
-    return HAL_ERROR;
-  }
-  return HAL_OK;
 }
 
 //======================= 4. MSP Function Definition ==================================
@@ -345,31 +240,36 @@ IR_Status_t IR_Init_Module(void)
 {
 	 if(MX_GPIO_Init() != HAL_OK){return IR_Pin_CFG_Error;}
 	 HAL_GPIO_WritePin(IR_OnOff_GPIO_Port,IR_OnOff_Pin,SET);
-	 if(MX_DMA_Init()  != HAL_OK){return IR_Pin_CFG_Error;}
+	 //if(MX_DMA_Init()  != HAL_OK){return IR_Pin_CFG_Error;}
 	 if(MX_USART3_UART_Init()!= HAL_OK){return IR_Pin_CFG_Error;}
-	 if(MX_TIM3_Init()!= HAL_OK){return IR_Pin_CFG_Error;}
+	 //if(MX_TIM3_Init()!= HAL_OK){return IR_Pin_CFG_Error;}
 
 
 	 printmsg("Peripheral initialisation complete \r\n");
 
 	  //send acknowledgement
 	 char* msg;
+	 int ch = 'O';
 	 if(IR_send_AT_CMD("AT\r")== IR_OK)
 	 {
 		printmsg("AT command sent \r\n");
-	 	msg = strtok((char*)(&RM_Buffer[2]),"\r");
+	 	/*msg = str((char*)(&RM_Buffer[2]),"\r");
 	 	if(strcmp(msg,(char*)"OK") != 0)
 	 	{
 	 	  printmsg("IR_Ack_Error");
 	 	  return IR_Ack_Error;
-	 	}
-	 }else
-	 {
-		 printmsg("IR_Ack_Error");
-	 	  return IR_Ack_Error;
+	 	}*/
+
+		if((strchr(IR_RX_Buffer, ch) == NULL))
+		{
+			printmsg("IR_Ack_Error");
+		 	return IR_Ack_Error;
+		}
+
 	 }
-	 	  //analyse message
-	 	  IR_Clear_Buffer(RM_Buffer,RM_BUFFER_SIZE);
+
+	 	 //analyse message
+	 	  IR_Clear_Buffer(IR_RX_Buffer,RX_BUFFER_SIZE);
 	 	  return IR_OK;
 }
 
@@ -383,16 +283,7 @@ IR_Status_t IR_Init_Module(void)
  */
 IR_Status_t IR_DeInit_Module(void)
 {
-	/* Deinitialize TIMx Peripheral*/
-	if(htim3.Instance != IR_TIM_PORT)
-	{
-		htim3.Instance = IR_TIM_PORT;
-	}
-	HAL_TIM_Base_Stop_IT(&htim3);
-	if(HAL_TIM_Base_DeInit(&htim3) != HAL_OK)
-	{
-		return IR_CFG_Error;
-	}
+
 	/* Deinitialize UARTx Peripheral*/
 	if(huart3.Instance != UART5)
 	{
@@ -403,15 +294,6 @@ IR_Status_t IR_DeInit_Module(void)
 		return IR_CFG_Error;
 	}
 
-	/* Deinitialize DMA MEM Channel*/
-	if(hdma_memtomem_dma1_channel2.Instance != DMA1_Channel2)
-	{
-		hdma_memtomem_dma1_channel2.Instance = DMA1_Channel2;
-	}
-	if(HAL_DMA_DeInit(&hdma_memtomem_dma1_channel2) != HAL_OK)
-	{
-		return IR_CFG_Error;
-	}
 	//set On/Off Pin to low and enable pull down resistor
 	HAL_GPIO_WritePin(IR_OnOff_GPIO_Port,IR_OnOff_Pin,RESET);
 	HAL_PWREx_EnableGPIOPullDown(IR_OnOff_PWR_GPIO_Port,IR_OnOff_Pin);
@@ -474,45 +356,26 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 	//printmsg("IR_send_AT_CMD entered \r\n");
 
 	int size = strlen(cmd);
-	memcpy(IR_TX_Buffer,cmd,size);
+	uint8_t someBuffer[10] = {0};
+	//memcpy(IR_TX_Buffer,cmd,size);
 
 	//printmsg("memcpy success \r\n");
 
-	if(HAL_UART_Transmit(&huart3,IR_TX_Buffer,size,100) != HAL_OK)
+	if(HAL_UART_Transmit(&huart3, cmd, size,100) != HAL_OK)
 	{
 		printmsg("IR_Tx_Error \r\n");
 		return IR_Tx_Error;
 	}
-	else
-	{
-	//printmsg("UART Transmit OK \r\n");
-	}
 
-	__HAL_DMA_ENABLE_IT(&hdma_usart3_rx,DMA_IT_TC);
-	if(__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE))
-	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart3);
-	}
-	__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);
-	HAL_UART_Receive_DMA(&huart3,IR_RX_Buffer,RX_BUFFER_SIZE);
-	__HAL_TIM_ENABLE_IT(&htim3,TIM_IT_CC1);
-	HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1);
-	HAL_TIM_Base_Start_IT(&htim3);
-	//printmsg("While loop starting");
-	while(IR_RX_Flag == RESET);
-	//printmsg("While loop ended");
-	if(IR_RX_Flag == -2)
-	{
-		printmsg("IR_Rx_Timeout \r\n");
-		return IR_Rx_Timeout;
-	}if(IR_RX_Flag == -1)
+	if(HAL_UART_Receive(&huart3,IR_RX_Buffer,size,10000) != HAL_OK)
 	{
 		printmsg("IR_Rx_Error \r\n");
 		return IR_Rx_Error;
 	}
-	IR_RX_Flag = 0;
-	printmsg("END of IR_send_AT_CMD \r\n ");
+
+
 	return IR_OK;
+
 }
 
 //======================= 7. Transmit/Recieve Function Definition ==================================
@@ -529,28 +392,7 @@ IR_Status_t IR_start_SBD_Session(SBDX_Status_t* sbd)
 		{
 			return IR_Tx_Error;
 		}
-		__HAL_DMA_ENABLE_IT(&hdma_usart3_rx,DMA_IT_TC);
-		if(__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE))
-		{
-			__HAL_UART_CLEAR_IDLEFLAG(&huart3);
-		}
-		__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);
-		HAL_UART_Receive_DMA(&huart3,IR_RX_Buffer,RX_BUFFER_SIZE);
-		__HAL_TIM_DISABLE_IT(&htim3,TIM_IT_CC1);
-		__HAL_TIM_ENABLE_IT(&htim3,TIM_IT_UPDATE);
-		HAL_NVIC_ClearPendingIRQ(TIM3_IRQn);
-		__HAL_TIM_ENABLE(&htim3);
-		while(IR_RX_Flag == RESET);
-		if(IR_RX_Flag == -2)
-		{
-			IR_Clear_Buffer(RM_Buffer,RM_BUFFER_SIZE);
-			return IR_Rx_Timeout;
-		}if(IR_RX_Flag == -1)
-		{
-			IR_Clear_Buffer(RM_Buffer,RM_BUFFER_SIZE);
-			return IR_Rx_Error;
-		}
-		IR_RX_Flag = RESET;
+
 		//decode SBD Message
 		char* status = strtok((char*)&RM_Buffer[2],"\r\n");
 		char* msg = strtok(NULL,"\r\n");
@@ -573,9 +415,7 @@ IR_Status_t IR_start_SBD_Session(SBDX_Status_t* sbd)
 		sbd->MT_MSN = temp_sbd[3];
 		sbd->MT_length = temp_sbd[4];
 		sbd->MT_Queued = temp_sbd[5];
-		//reset prescaler
-		htim3.Instance->PSC = 0;
-		IR_Clear_Buffer(RM_Buffer,RM_BUFFER_SIZE);
+
 		return IR_OK;
 
 }
@@ -632,7 +472,7 @@ IR_Status_t IR_send_Bin_String(uint8_t* bin_string,uint32_t len)
 	  IR_send_AT_CMD((char*)IR_TX_Buffer);
 	  Session_Flag = NONE;
 	  msg = strtok((char*)(&RM_Buffer[2]),"\r\n");
-	  int8_t ret_val = *(msg) -48;
+	  int8_t ret_val = *(msg) - 48;
 	  msg = strtok(NULL,"\r\n");
 	  if(ret_val < 0 || ret_val > 9)
 	  {
@@ -650,11 +490,13 @@ IR_Status_t IR_send_Bin_String(uint8_t* bin_string,uint32_t len)
 	  		  	  return IR_SBDWB_CHECKSUM_ERROR;
 	  	  	  case 3:
 	  		  	  return IR_SBDWB_MSGOVERRUN_ERROR;
+	  	  	  default:
+	  	  		  break;
 	  	  }
 	 	 }
 	  //decode return pack
 	  //return status
-	  printmsg("Message upload error \r\n");
+	  printmsg("Message upload error %d \r\n", ret_val);
 	  return IR_MSG_UPLOAD_ERROR;
 }
 
@@ -861,7 +703,7 @@ void USART_RTO_IRQHandler(TIM_HandleTypeDef *htim)
 void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 {
 
-	printmsg("USART_Iridium_IRQHandler entered \r\n");
+	//printmsg("USART_Iridium_IRQHandler entered \r\n");
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_IDLE))
 	{
 		uint32_t temp = huart->Instance->ISR;
@@ -922,7 +764,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 			{
 				//reciever timeout
 				IR_RX_Flag = -2;
-				printmsg('Receiver timeout \r\n');
+				//printmsg('Receiver timeout \r\n');
 			}
 			IR_TIM_IDLE_Timeout = 0;
 			__HAL_UART_CLEAR_IDLEFLAG(huart);
@@ -933,7 +775,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_ERR))
 	{
 
-		printmsg("UART error flags cleared \r\n");
+		//printmsg("UART error flags cleared \r\n");
 		//clear framing error
 		if(__HAL_UART_GET_FLAG(huart,UART_FLAG_FE) == SET)
 		{

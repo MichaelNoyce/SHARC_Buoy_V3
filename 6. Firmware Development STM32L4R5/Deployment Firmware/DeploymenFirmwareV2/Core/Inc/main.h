@@ -41,7 +41,10 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+#define IRID_RXD_Pin GPIO_PIN_4
+#define IRID_RXD_GPIO_Port GPIOC
+#define IRID_TXD_Pin GPIO_PIN_5
+#define IRID_TXD_GPIO_Port GPIOC
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

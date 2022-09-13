@@ -142,14 +142,14 @@ static HAL_StatusTypeDef MX_USART3_UART_Init(void)
 static HAL_StatusTypeDef MX_DMA_Init(void)
 {
 
-	 if(DMA2_Channel2->CCR != 0)
+	/* if(DMA2_Channel2->CCR != 0)
 	  {
 	   //clear channel to reset state
 	   hdma_usart3_rx.Instance = DMA2_Channel2;
 	   hdma_usart3_rx.DmaBaseAddress->ISR = DMA2->ISR;
 	   hdma_usart3_rx.ChannelIndex = 2;
 	   HAL_DMA_DeInit(&hdma_usart3_rx);
-	  }
+	  } */
 
   /* DMA controller clock enable */
   __HAL_RCC_DMAMUX1_CLK_ENABLE();
@@ -511,7 +511,7 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 		return IR_Rx_Error;
 	}
 	IR_RX_Flag = 0;
-	printmsg("END of IR_send_AT_CMD \r\n ");
+	//printmsg("END of IR_send_AT_CMD \r\n ");
 	return IR_OK;
 }
 
@@ -861,7 +861,7 @@ void USART_RTO_IRQHandler(TIM_HandleTypeDef *htim)
 void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 {
 
-	printmsg("USART_Iridium_IRQHandler entered \r\n");
+	//printmsg("USART_Iridium_IRQHandler entered \r\n");
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_IDLE))
 	{
 		uint32_t temp = huart->Instance->ISR;
@@ -922,7 +922,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 			{
 				//reciever timeout
 				IR_RX_Flag = -2;
-				printmsg('Receiver timeout \r\n');
+				//printmsg('Receiver timeout \r\n');
 			}
 			IR_TIM_IDLE_Timeout = 0;
 			__HAL_UART_CLEAR_IDLEFLAG(huart);
@@ -933,7 +933,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_ERR))
 	{
 
-		printmsg("UART error flags cleared \r\n");
+		//printmsg("UART error flags cleared \r\n");
 		//clear framing error
 		if(__HAL_UART_GET_FLAG(huart,UART_FLAG_FE) == SET)
 		{

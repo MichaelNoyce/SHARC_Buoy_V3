@@ -356,17 +356,13 @@ IR_Status_t IR_Init_Module(void)
 	 char* msg;
 	 if(IR_send_AT_CMD("AT\r")== IR_OK)
 	 {
-		printmsg("AT command sent \r\n");
+		//printmsg("AT command sent \r\n");
 	 	msg = strtok((char*)(&RM_Buffer[2]),"\r");
 	 	if(strcmp(msg,(char*)"OK") != 0)
 	 	{
 	 	  printmsg("IR_Ack_Error");
 	 	  return IR_Ack_Error;
 	 	}
-	 }else
-	 {
-		 printmsg("IR_Ack_Error");
-	 	  return IR_Ack_Error;
 	 }
 	 	  //analyse message
 	 	  IR_Clear_Buffer(RM_Buffer,RM_BUFFER_SIZE);
@@ -488,28 +484,30 @@ IR_Status_t IR_send_AT_CMD(char* cmd)
 	//printmsg("UART Transmit OK \r\n");
 	}
 
-	__HAL_DMA_ENABLE_IT(&hdma_usart3_rx,DMA_IT_TC);
-	if(__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE))
-	{
-		__HAL_UART_CLEAR_IDLEFLAG(&huart3);
-	}
-	__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);
-	HAL_UART_Receive_DMA(&huart3,IR_RX_Buffer,RX_BUFFER_SIZE);
-	__HAL_TIM_ENABLE_IT(&htim3,TIM_IT_CC1);
-	HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1);
-	HAL_TIM_Base_Start_IT(&htim3);
+//	__HAL_DMA_ENABLE_IT(&hdma_usart3_rx,DMA_IT_TC);
+//	if(__HAL_UART_GET_FLAG(&huart3,UART_FLAG_IDLE))
+//	{
+//		__HAL_UART_CLEAR_IDLEFLAG(&huart3);
+//	}
+//	__HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);
+//	HAL_UART_Receive_DMA(&huart3,IR_RX_Buffer,RX_BUFFER_SIZE);
+//	__HAL_TIM_ENABLE_IT(&htim3,TIM_IT_CC1);
+//	HAL_TIM_OC_Start_IT(&htim3, TIM_CHANNEL_1);
+//	HAL_TIM_Base_Start_IT(&htim3);
+	char ok[3];
+	HAL_UART_Receive(&huart3, (uint8_t *)ok, 3, 1000);
 	//printmsg("While loop starting");
-	while(IR_RX_Flag == RESET);
+//	while(IR_RX_Flag == RESET);
 	//printmsg("While loop ended");
-	if(IR_RX_Flag == -2)
-	{
-		printmsg("IR_Rx_Timeout \r\n");
-		return IR_Rx_Timeout;
-	}if(IR_RX_Flag == -1)
-	{
-		printmsg("IR_Rx_Error \r\n");
-		return IR_Rx_Error;
-	}
+//	if(IR_RX_Flag == -2)
+//	{
+//		printmsg("IR_Rx_Timeout \r\n");
+//		return IR_Rx_Timeout;
+//	}if(IR_RX_Flag == -1)
+//	{
+//		printmsg("IR_Rx_Error \r\n");
+//		return IR_Rx_Error;
+//	}
 	IR_RX_Flag = 0;
 	printmsg("END of IR_send_AT_CMD \r\n ");
 	return IR_OK;
@@ -861,7 +859,7 @@ void USART_RTO_IRQHandler(TIM_HandleTypeDef *htim)
 void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 {
 
-	printmsg("USART_Iridium_IRQHandler entered \r\n");
+	//printmsg("USART_Iridium_IRQHandler entered \r\n");
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_IDLE))
 	{
 		uint32_t temp = huart->Instance->ISR;
@@ -922,7 +920,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 			{
 				//reciever timeout
 				IR_RX_Flag = -2;
-				printmsg('Receiver timeout \r\n');
+				//printmsg('Receiver timeout \r\n');
 			}
 			IR_TIM_IDLE_Timeout = 0;
 			__HAL_UART_CLEAR_IDLEFLAG(huart);
@@ -933,7 +931,7 @@ void USART_Iridium_IRQHandler(UART_HandleTypeDef *huart)
 	if(__HAL_UART_GET_IT_SOURCE(huart,UART_IT_ERR))
 	{
 
-		printmsg("UART error \r\n");
+		//printmsg("UART error \r\n");
 		//clear framing error
 		if(__HAL_UART_GET_FLAG(huart,UART_FLAG_FE) == SET)
 		{

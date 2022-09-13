@@ -107,6 +107,8 @@ int main(void)
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
   printmsg("Iridium test started!");
+
+  //HAL_Delay(60000);
 //==================TEST Initialization ==========================//
 
   	  IR_Status_t status = IR_Init_Module();
@@ -123,13 +125,26 @@ int main(void)
 
 
 	  IR_DeInit_Module();
+
+
+	  status = IR_Init_Module();
+
+	  if(status == IR_OK)
+	  {
+		  Test_On_Off();
+		 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+	  }
+	  else
+	  {
+		  printmsg("Error, the status of the system is: %d", status);
+	  }
 //==================TEST Transmission==========================//
 	  if(IR_Init_Module() == IR_OK)
 	  {
 		  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,SET);
 	  }
-  uint8_t msg[62] = "This is A Test in Binary from the roof with handle enclosure!";
-  if(IR_send_Bin_String(msg,61) == IR_MSG_UPLOAD_OK)
+  uint8_t msg[38] = "This is A Test in Binary from level 7!";
+  if(IR_send_Bin_String(msg,38) == IR_MSG_UPLOAD_OK)
   {
 
 	  printmsg("IR Message Upload okay \r\n");
@@ -147,7 +162,104 @@ int main(void)
 		 		  }
 
 		 }
+		  else
+		  {
+			  printmsg("SBD session not started! \r\n");
+		  }
+
+
+		  printmsg("Binary string not sent \r\n");
   }
+
+	//IR_RX_Flag = -1;
+
+	  	HAL_Delay(10000);
+
+	  	printmsg("Starting buffer reset \r\n");
+
+	  	uint8_t bufmsg[] = "AT+SBDD0\r";
+
+	  	if(HAL_UART_Transmit(&huart3, bufmsg, sizeof(bufmsg),100) != HAL_OK)
+	  		{
+	  			printmsg("SDB reset buffer fail \r\n");
+	  		}
+
+
+
+		  if(status == IR_OK)
+		  {
+			  Test_On_Off();
+			 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+		  }
+		  else
+		  {
+			  printmsg("Error, the status of the system is: %d", status);
+		  }
+
+		  HAL_Delay(30000);
+
+
+		  IR_DeInit_Module();
+
+
+		  status = IR_Init_Module();
+
+		  if(status == IR_OK)
+		  {
+			  Test_On_Off();
+			 HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+		  }
+		  else
+		  {
+			  printmsg("Error, the status of the system is: %d", status);
+		  }
+	//==================TEST Transmission==========================//
+		  if(IR_Init_Module() == IR_OK)
+		  {
+			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_14,SET);
+		  }
+	  uint8_t msg2[38] = "This is A Test in Binary from level 7!";
+	  if(IR_send_Bin_String(msg2,38) == IR_MSG_UPLOAD_OK)
+	  {
+
+		  printmsg("IR Message Upload okay \r\n");
+		  SBDX_Status_t sbd2;
+
+			  if(IR_start_SBD_Session(&sbd2) == IR_OK)
+			 {
+				  printmsg("Started Iridium session \r\n");
+			 		  //check return status
+			 		  if(sbd2.MO_Status == 0)
+			 		  {
+			 			  //message sent
+			 			  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_7,SET);
+			 			  printmsg("Message sent!");
+			 		  }
+
+			 }
+			  else
+			  {
+				  printmsg("SBD session not started! \r\n");
+			  }
+
+
+			  printmsg("Binary string not sent \r\n");
+	  }
+
+		IR_RX_Flag = -1;
+
+		  	HAL_Delay(10000);
+
+		  	printmsg("Starting buffer reset \r\n");
+
+		  	uint8_t bufmsg2[] = "AT+SBDD0\r";
+
+		  	if(HAL_UART_Transmit(&huart3, bufmsg2, sizeof(bufmsg2),100) != HAL_OK)
+		  		{
+		  			printmsg("SDB reset buffer fail \r\n");
+		  		}
+
+
 
 //==================TEST Reception==========================//
 //

@@ -145,7 +145,7 @@ static void Routine_Init_STATE(void);
  **  See also the <system_*.c> file and how the SystemInit() function updates
  **  SCB->VTOR register.
  **  E.g.  SCB->VTOR = 0x20000000;
- **
+ *7*
  **
  **===========================================================================
  **/
@@ -153,6 +153,7 @@ static void Routine_Init_STATE(void);
 int main(void)
 {
 //======================== 1. SYSTEM INIT & CLOCK CONFIG ========================//
+
 
 	HAL_Init();				//Init Flash prefetch, systick timer, NVIC and LL functions
 	SystemClock_Config();	//configure clock
@@ -208,7 +209,7 @@ int main(void)
 			  	  	 case STATE_SAMPLE:
 			  	  	 //check how many samples have been recorded by the Buoy
 			  	  	 sample_count = __GET_SAMPLE_COUNT();
-			  	  	 if(sample_count >= 2)
+			  	  	 if(sample_count >= 1)
 			  	  	 {
 			  	  		 //set next Buoy State to Transmit
 			  	  		 Current_State = STATE_TRANSMIT;
@@ -358,6 +359,24 @@ static void MX_RTC_Init(void)
 
 }
 
+static void IridiumOff(void)
+{
+
+		printmsg("Iridium Off! \r\n");
+		//turn off
+		IR_OnOff_GPIO_Port->ODR &= ~GPIO_ODR_OD1;
+}
+
+static void IridiumOn(void)
+{
+
+		printmsg("Iridium On! \r\n");
+		//turn on
+		//IR_OnOff_GPIO_Port->ODR |= GPIO_ODR_OD1;
+}
+
+
+
 //====================================== 6. END ======================================//
 
 //==================================== 7. Handlers ===================================//
@@ -394,6 +413,8 @@ static void Routine_STATE_SLEEP(void)
 
 static void Routine_STATE_SAMPLE(void)
 {
+	//SystemClock_Config();	//configure clock
+
 	//Initialize RTC struct to get current time
 	RTC_TimeTypeDef gTime;
 	RTC_DateTypeDef gDate;
@@ -402,16 +423,12 @@ static void Routine_STATE_SAMPLE(void)
 	Sample_Time_Start = HAL_GetTick();
 
 	//Get Previous Directory and Log Numbers for SD Cards
-	  __HAL_RCC_PWR_CLK_ENABLE();
-	  waveLogNo = (RTC->BKP0R)&0xFF;
-	  waveDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  gpsLogNo = (RTC->BKP0R)&0xFF;
-	  gpsDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  envLogNo = (RTC->BKP0R)&0xFF;
-	  envDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  pwrLogNo = (RTC->BKP0R)&0xFF;
-	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  __HAL_RCC_PWR_CLK_DISABLE();
+	  HAL_PWR_EnableBkUpAccess();
+	  waveDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2);
+	  gpsDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3);
+	  envDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4);
+	  pwrDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR5);
+	  HAL_PWR_DisableBkUpAccess();
 
 
 	  //Revert all logs to zero - except wave logs
@@ -435,7 +452,7 @@ static void Routine_STATE_SAMPLE(void)
 	  //GPS  Init Routine
 	  GPS_Data_t Gdata;
 	  sample_count = __GET_SAMPLE_COUNT();
-	  if(sample_count <= 2)
+	  if(sample_count == 1)
 	  {
 		  printmsg("Current State: SAMPLE \t Next State: SLEEP\r\n");
 	  } else
@@ -452,10 +469,10 @@ static void Routine_STATE_SAMPLE(void)
 		  // Sample Routine
 	  GPS_InterruptsOn();
 
-	  HAL_Delay(5000);
-
 	  gpsDataLive = {0};
+	  HAL_Delay(5000);
 	  GPS_Update();
+	  GPS_InterruptsOff();
 
 	  printmsg("Logging Data...\r\n");
 //				  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
@@ -466,7 +483,7 @@ static void Routine_STATE_SAMPLE(void)
 	  printmsg("HDOP = %d.%d, \t PDOP = %d.%d, VDOP = %d.%d\r\n",  Gdata.diag.HDOP.digit, Gdata.diag.HDOP.precision,  Gdata.diag.PDOP.digit, Gdata.diag.PDOP.precision,  Gdata.diag.VDOP.digit, Gdata.diag.VDOP.precision, Gdata.diag.num_sats);
 	  printmsg("Number of Satellites %d, Fix Type = %d\r\n", Gdata.diag.num_sats, Gdata.diag.fix_type);
 
-	  GPS_InterruptsOff();
+
 
 	  // Record all GPS data onto SD cards
 	  uint8_t tempGPSBuf[500];
@@ -477,6 +494,7 @@ static void Routine_STATE_SAMPLE(void)
 	  SD_File_Close(&File);
 	  SD_Unmount(SDFatFs);
 
+	  gpsDirNo++;
 
 	  }
 
@@ -631,18 +649,18 @@ static void Routine_STATE_SAMPLE(void)
 		  IMU_On = 0;
 
 	//Store updated directory and log numbers
-	  __HAL_RCC_PWR_CLK_ENABLE();
-	  WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF00)|(waveLogNo));
-	  WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF)|((waveDirNo)<<8));
-	  WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF00)|(gpsLogNo));
-	  WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF)|((gpsDirNo)<<8));
-      WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF00)|(envLogNo));
-	  WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF)|((envDirNo)<<8));
-	  WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF00)|(pwrLogNo));
-	  WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF)|((pwrDirNo)<<8));
-	  __HAL_RCC_PWR_CLK_DISABLE();
+	  HAL_PWR_EnableBkUpAccess();
+	  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR2, waveDirNo);
+	  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR3, gpsDirNo);
+	  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR4, envDirNo);
+	  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR5, pwrDirNo);
+	  HAL_PWR_DisableBkUpAccess();
+
 
 	  Sample_Time = HAL_GetTick() - Sample_Time_Start;
+
+
+
 
 }
 
@@ -654,16 +672,13 @@ static void Routine_STATE_TRANSMIT(void)
 
 
 	  //Get Previous Directory and Log Numbers for SD Cards
-	  __HAL_RCC_PWR_CLK_ENABLE();
-	  waveLogNo = (RTC->BKP0R)&0xFF;
-	  waveDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  gpsLogNo = (RTC->BKP0R)&0xFF;
-	  gpsDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  envLogNo = (RTC->BKP0R)&0xFF;
-	  envDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  pwrLogNo = (RTC->BKP0R)&0xFF;
-	  pwrDirNo = ((RTC->BKP0R)&0xFF00)>>8;
-	  __HAL_RCC_PWR_CLK_DISABLE();
+	  HAL_PWR_EnableBkUpAccess();
+	  	  waveDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR2);
+	  	  gpsDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR3);
+	  	  envDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR4);
+	  	  pwrDirNo = HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR5);
+	  HAL_PWR_DisableBkUpAccess();
+
 
 	  //All logs start at zero
 	  waveLogNo = 0;
@@ -672,8 +687,7 @@ static void Routine_STATE_TRANSMIT(void)
 	  pwrLogNo = 0;
 
 	  //Transfer Buffer
-	  uint8_t GPS_trans_Buffer[340];
-	  uint8_t WAVE_trans_Buffer[340];
+	  uint8_t GPS_Wave_trans_Buffer[116] = {0};
 
 	  //File pointer
 	  uint32_t fpointer = 0;
@@ -737,7 +751,7 @@ static void Routine_STATE_TRANSMIT(void)
 	  uint8_t* buffer = to_binary_format_GPS(GdataT, (__GET_SAMPLE_COUNT()-1) );
 
 	  //Populate first packet of GPS data into array
-	  memcpy(&GPS_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
+	  memcpy(&GPS_Wave_trans_Buffer[0], buffer, DRIFTBUFFER_SIZE);
 
 	  /* Second GPS Buffer */
 
@@ -759,7 +773,6 @@ static void Routine_STATE_TRANSMIT(void)
 	  GdataT.diag.PDOP.precision = (uint8_t)gpsData[9];
 	  GdataT.diag.num_sats = (uint8_t)gpsData[10];
 	  GdataT.diag.fix_type = (uint8_t)gpsData[11];
-
 
 	  //Get Environmental data from SD card
 	  fpointer = 0;
@@ -787,58 +800,71 @@ static void Routine_STATE_TRANSMIT(void)
 	  buffer = to_binary_format_GPS(GdataT, __GET_SAMPLE_COUNT());
 
 	  //Populate Second packet of GPS data into array
-	  memcpy(&GPS_trans_Buffer[DRIFTBUFFER_SIZE+1], buffer, DRIFTBUFFER_SIZE);
-
+	  memcpy(&GPS_Wave_trans_Buffer[DRIFTBUFFER_SIZE+1], buffer, DRIFTBUFFER_SIZE);
+	  HAL_Delay(10);
 	  //Wave Buffer
 	  //Calculate wave parameter extr action for previous two logs
-	  Wave_Data_t waveData1;
-	  fullPipeline(waveData1, waveDirNo - 2); //get wave data from previous record
-	  Wave_Data_t waveData2;
-	  fullPipeline(waveData2, waveDirNo - 1); //get wave data from previous record
+	  //Wave_Data_t waveData1;
+	  //fullPipeline(waveData1, waveDirNo - 2); //get wave data from previous record
+	  //Wave_Data_t waveData2;
+	  //fullPipeline(waveData2, waveDirNo - 1); //get wave data from previous record
 
-	  buffer = to_binary_format_Wave(waveData1, __GET_SAMPLE_COUNT() -1);
+	  //buffer = to_binary_format_Wave(waveData1, __GET_SAMPLE_COUNT() -1);
 
-	  memcpy(&WAVE_trans_Buffer[0], buffer, WAVEBUFFER_SIZE);
+	  //memcpy(&WAVE_trans_Buffer[0], buffer, WAVEBUFFER_SIZE);
 
-	  buffer = to_binary_format_Wave(waveData2, __GET_SAMPLE_COUNT());
+	  //buffer = to_binary_format_Wave(waveData2, __GET_SAMPLE_COUNT());
 
-	  memcpy(&WAVE_trans_Buffer[WAVEBUFFER_SIZE], buffer, WAVEBUFFER_SIZE);
+	  //memcpy(&WAVE_trans_Buffer[WAVEBUFFER_SIZE], buffer, WAVEBUFFER_SIZE);
 
 	  //Dismount SD cards! DO NOT WANT MOUNTED SD CARDS DURING IRIDIUM TRANSMISSION
 	  SD_Unmount(SDFatFs);
 
-	  uint8_t retry = 0;
-	  IR_On = 1;
-	  while (IR_Init_Module() != IR_OK)
-	  {
-		  IR_DeInit_Module();
-		  if(retry == 20)
-		  {
-			  IR_On = 0;
-			  break;
-		  }
-		retry++;
+	  IridiumOn();
 
+ 	  HAL_Delay(30000);
+
+	  /* Test Iridium Modem */
+	 IR_Status_t status = IR_Init_Module();
+
+	  if(status == IR_OK)
+	  {
+		  printmsg("Iridium Initialized successfully! \r\n");
+		  IR_On = 1;
 	  }
+	  else
+	  {
+		  printmsg("Iridium Error, the status of the system is: %d", status);
+		  IR_On = 0;
+	  }
+
+
 	  if(IR_On)
 	  {
 
-		  printmsg("Preparing To Transmit...");
+		  printmsg("Preparing To Transmit... \r\n");
 		  //getlength of data
 
 
-		  /* 3. Upload Drift Data */
+
 		  IR_Status_t flag;
-		 for (int i = 0; i < 2; ++i)
+		 for (int i = 0; i < 5; ++i)
 		 {
-			 flag = (i<1)? IR_send_Bin_String(GPS_trans_Buffer,sizeof(GPS_trans_Buffer)):IR_send_Bin_String(WAVE_trans_Buffer,sizeof(WAVE_trans_Buffer));
+			 //flag = IR_send_Bin_String(GPS_Wave_trans_Buffer, 116 - 2 );//:IR_send_Bin_String(WAVE_trans_Buffer,sizeof(WAVE_trans_Buffer));
+			 char msg2[42];
+			 snprintf(msg2, 42, "Test message from main code no %d", waveDirNo);
+			 //uint8_t msg = (uint8_t)atoi(msg2);
+
+			 flag = IR_send_Bin_String((uint8_t *)msg2, sizeof(msg2)-2);
+
+			 printmsg("IR_send_Bin_String error: %d", flag);
 
 	  	  if(flag == IR_MSG_UPLOAD_OK)
 	  	  {
-		  	  printmsg("Message Uploaded!\r\nTransmitting...");
+		  	  printmsg("Message Uploaded!\r\n Transmitting... \r\n");
 		  	  //create SBD Session
 		  	  SBDX_Status_t sbd;
-		  	  for (int i = 0; i < 5; ++i)
+		  	  for (int i = 0; i < 2; ++i)
 		  	  {
 		  		  if(IR_start_SBD_Session(&sbd)== IR_OK)
 		  		  {
@@ -852,21 +878,27 @@ static void Routine_STATE_TRANSMIT(void)
 		  		  	  }else
 		  		  	  {
 		  		  		  printmsg("Failed!\r\n");
-
 		  		  	  }
 		 	  	  }
 		  		  HAL_Delay(1000);
 		  	  }
-	  		  IR_send_AT_CMD("AT+SBDD0\r");
+
+
 	  	  }
 
 		 }
 	  }
+
+
 	  IR_DeInit_Module();
-/* Reset Memory pointer*/
+
+  /* Reset Memory pointer*/
   //reset sample count
   __SET_SAMPLE_COUNT(0);
   //erase page and reset counter
+
+
+  IridiumOff();
 
 
 }
@@ -887,31 +919,12 @@ static void Routine_Init_STATE(void)
 	pwrDirNo = 1;
 
 	//Store current SD and log numbers variable in RTC->BCKUP//
-	 __HAL_RCC_PWR_CLK_ENABLE();
-	 WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF00)|(waveLogNo));
-	 WRITE_REG(RTC->BKP1R,(RTC->BKP1R &0xFF)|((waveDirNo)<<8));
-	 WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF00)|(gpsLogNo));
-	 WRITE_REG(RTC->BKP2R,(RTC->BKP2R &0xFF)|((gpsDirNo)<<8));
-     WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF00)|(envLogNo));
-	 WRITE_REG(RTC->BKP3R,(RTC->BKP3R &0xFF)|((envDirNo)<<8));
-     WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF00)|(pwrLogNo));
-	 WRITE_REG(RTC->BKP4R,(RTC->BKP4R &0xFF)|((pwrDirNo)<<8));
-	 __HAL_RCC_PWR_CLK_DISABLE();
-
-	 /* Test Iridium Modem */
-	 IR_Status_t status = IR_Init_Module();
-
-	  if(status == IR_OK)
-	  {
-		  printmsg("Iridium Initialized successfully! \r\n");
-	  }
-	  else
-	  {
-		  printmsg("Iridium Error, the status of the system is: %d", status);
-	  }
-
-
-	  IR_DeInit_Module();
+	HAL_PWR_EnableBkUpAccess();
+		  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR2, waveDirNo);
+		  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR3, gpsDirNo);
+		  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR4, envDirNo);
+		  	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR5, pwrDirNo);
+	HAL_PWR_DisableBkUpAccess();
 
 	 /* Test BMP280 Sensor*/
 	 BMP_Init_Typedef BMP_InitStruct = {0};
@@ -964,6 +977,21 @@ static void Routine_Init_STATE(void)
 		 printmsg("IMU Offline \r\n");
 	 }
 	ICM20649_Deinit_IMU();
+
+	 /* Test Iridium Modem */
+	 IR_Status_t status = IR_Init_Module();
+
+	  if(status == IR_OK)
+	  {
+		  printmsg("Iridium Initialized successfully! \r\n");
+	  }
+	  else
+	  {
+		  printmsg("Iridium Error, the status of the system is: %d", status);
+	  }
+
+
+	 IR_DeInit_Module();
 
 }
 

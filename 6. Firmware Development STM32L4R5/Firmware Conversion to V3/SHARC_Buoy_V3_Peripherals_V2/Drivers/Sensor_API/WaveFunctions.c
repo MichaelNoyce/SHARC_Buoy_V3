@@ -438,7 +438,7 @@ void waveParamExtract(float32_t* PSD, float32_t* Hm0, float32_t* Tm01, float32_t
 	    }
 	  }
 
-	fm = freq[fi];
+//	fm = freq[fi];
 
 	*Tp = 1/fm;
 

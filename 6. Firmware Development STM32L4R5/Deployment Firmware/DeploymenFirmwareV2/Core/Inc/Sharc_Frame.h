@@ -108,7 +108,7 @@ typedef enum
 
 #define __WEEKS_TO_SECS(x) x*__DAYS_TO_SECS(7)  //for Twake > 6 days
 
-#define T_SLEEP 1   //(3600-Sample_Time)	//set the sleep period in seconds
+#define T_SLEEP 60  //(3600-Sample_Time)	//set the sleep period in seconds
 /*
  * @brief: state machine Macros
  */

@@ -108,8 +108,8 @@ void printmsg(char *format,...) {
     /*Extract the the argument list using VA apis */
     va_list args;
     va_start(args, format);
-    vsprintf(str, format,args);
-    HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str),HAL_MAX_DELAY);
+    vsprintf(str, format, args);
+    HAL_UART_Transmit(&hlpuart1,(uint8_t *)str, strlen(str), 100);
     va_end(args);
 }
 
@@ -202,7 +202,7 @@ HAL_StatusTypeDef Go_To_Sleep(PWR_MODE_t mode, uint32_t seconds)
 	 return HAL_OK;
 }
 
-/*HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
+HAL_StatusTypeDef USART_Enter_Standby_for_data(UART_HandleTypeDef *huart)
 {
 	//step 1, wait for ongoing uart transmissions to finish
 	printf("Heading to Sleep\r\n");
@@ -232,7 +232,7 @@ HAL_StatusTypeDef Go_To_Sleep(PWR_MODE_t mode, uint32_t seconds)
 	HAL_UARTEx_EnableStopMode(huart);
 	HAL_PWREx_EnterSTOP1Mode(PWR_STOPENTRY_WFI);
 	return HAL_OK;
-} */
+}
 
 void set_WUP_Pin(uint32_t Pin, PinMode_typedef mode)
 {

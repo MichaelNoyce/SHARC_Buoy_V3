@@ -154,7 +154,7 @@ int main(void)
 			waveLogNo++;
 			imu_sample_count = 0;
 			SD_Wave_Open(&File, &Dir, &fno, waveDirNo, waveLogNo);
-			//printmsg("New log! \r\n");
+			printmsg("New log! \r\n");
 		 }
 
 	  	ICM20649_Is_Data_Ready(&hi2c1, &data_status);
@@ -180,7 +180,6 @@ int main(void)
 
 		   //printmsg("Ax      Ay      Az      Gx      Gy      Gz \r\n");
 		   //printmsg("%d  %d  %d  %d  %d  %d \r\n", accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1],gyroTemp[2]);
-
 			sprintf(tempFIFOBuf, "%d:%d:%d, %ld, %ld, %ld, %ld, %ld, %ld \r\n", gTime.Hours, gTime.Minutes, gTime.Seconds,  accelTemp[0], accelTemp[1], accelTemp[2], gyroTemp[0], gyroTemp[1], gyroTemp[2]);
 		   SD_File_Write(&File, tempFIFOBuf);
 

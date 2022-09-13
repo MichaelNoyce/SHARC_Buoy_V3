@@ -805,7 +805,7 @@ static void Routine_STATE_TRANSMIT(void)
 
 	  //Wave Buffer
 	  //Calculate wave parameter extraction for previous two logs
-	  Wave_Data_t waveData1;
+	  /*Wave_Data_t waveData1;
 	  fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
 	  Wave_Data_t waveData2;
 	  fullPipeline(waveData2, waveDirNo); //get wave data from previous record
@@ -818,6 +818,7 @@ static void Routine_STATE_TRANSMIT(void)
 
 	  memcpy(&WAVE_trans_Buffer[WAVEBUFFER_SIZE], buffer, WAVEBUFFER_SIZE);
 
+	*/
 	  //Dismount SD cards! DO NOT WANT MOUNTED SD CARDS DURING IRIDIUM TRANSMISSION
 	  SD_Unmount(SDFatFs);
 
