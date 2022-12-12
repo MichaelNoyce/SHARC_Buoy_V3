@@ -1,0 +1,9 @@
+The IMU's were not necessariliy deployed with numbering corresponing to the SHARC Buoys:
+
+The following order was given: 
+
+1. IMU SB05 was deployed in SHARC Buoy SB06
+2. IMU SB04 was deployed in SHARC Buoy SB05
+3. IMU SB03 was deployed in SHARC Buoy SB04
+4. IMU SB01 was deployed in SHARC Buoy SB01
+
