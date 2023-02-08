@@ -403,12 +403,12 @@ typedef struct
 #define ACC_CONFIG_AFSSEL_16G	2<<3
 #define ACC_CONFIG_AFSSEL_30G	ACC_CONFIG_AFSSEL_MSK<<3
 
-#define ACCEL_DPLFCFG_1 0<<3
-#define ACCEL_DPLFCFG_2 1<<3
-#define ACCEL_DPLFCFG_3 2<<3
-#define ACCEL_DPLFCFG_4 3<<3
-#define ACCEL_DPLFCFG_5 4<<3
-#define ACCEL_DPLFCFG_6 5<<3
+#define ACCEL_DPLFCFG_0 0<<3
+#define ACCEL_DPLFCFG_1 1<<3
+#define ACCEL_DPLFCFG_2 2<<3
+#define ACCEL_DPLFCFG_3 3<<3
+#define ACCEL_DPLFCFG_4 4<<3
+#define ACCEL_DPLFCFG_5 5<<3
 
 #define ACC_CONFIG_ST_EN_X	0b1<<7
 #define ACC_CONFIG_ST_EN_Y	0b1<<6

@@ -196,8 +196,8 @@ imu_status_t ICM20649_Init_IMU(uint8_t g_fsr, uint8_t a_fsr, uint8_t dlpf_acc_co
 	//Configure sensor settings
 	ICM20649_Set_Acc_FSR(&hi2c1,a_fsr);
 	ICM20649_Set_Gyro_FSR(&hi2c1,g_fsr);
-	ICM20649_Set_Acc_DLPF(&hi2c1,1, ENABLE);
-	ICM20649_Set_Gyro_DLPF(&hi2c1, 1, ENABLE);
+	ICM20649_Set_Acc_DLPF(&hi2c1, ACCEL_DPLFCFG_0, ENABLE);
+	ICM20649_Set_Gyro_DLPF(&hi2c1, GYRO_DPLFCFG_0, ENABLE);
 	//ICM20649_Disable_LPF(&hi2c1, ACC_FCHOICE_DIS, GYRO_FCHOICE_DIS);
 	ICM20649_Set_Sample_Rate(&hi2c1);
 

@@ -80,11 +80,36 @@ int main(void)
 
 //=================================== 1. END ====================================//
 
+	//Test single segment
+	int WaveDirNo = 30;
+	int WaveLogNo = 1;
+
+	uint32_t fpointer = 0;
+	int32_t rawData[FFT_LENGTH];
+	SD_Wave_Read(&File, rawData, waveDirNo, waveLogNo, Z_ACC, &fpointer);
+
+
+    //float32_t singleSegment[FFT_LENGTH];
+	//singleSegmentPipeline(singleSegment, WaveDirNo, WaveLogNo);
+
+
+	int i = 0;
+
+	/*for (i = 0; i< FFT_LENGTH; 3
+	{
+		printmsg("%.3f", singleSegment[i]);
+	}*/
+
+	//Test Welch method
+
+
+
+	//Test wave parameter extraction
+
+
 	  //Wave Buffer
 	  //Calculate wave parameter extraction for previous two logs
 	  //Wave_Data_t waveData1;
-	  //fullPipeline(waveData1, waveDirNo-1); //get wave data from previous record
-	  //Wave_Data_t waveData2;
 	  //fullPipeline(waveData2, waveDirNo); //get wave data from previous record
 
 

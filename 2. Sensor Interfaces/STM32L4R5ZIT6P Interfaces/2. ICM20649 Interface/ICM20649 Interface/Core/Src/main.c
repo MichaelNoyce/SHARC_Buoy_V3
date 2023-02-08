@@ -99,7 +99,7 @@ int main(void)
 
   printmsg("IMU Test started!");
 
-  imu_status_t initStatus = ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_1, GYRO_DPLFCFG_0);
+  imu_status_t initStatus = ICM20649_Init_IMU(GYRO_CONFIG_FSSEL_500DPS, ACC_CONFIG_AFSSEL_4G, ACCEL_DPLFCFG_0, GYRO_DPLFCFG_0);
 
   if(initStatus != IMU_OK)
   {
